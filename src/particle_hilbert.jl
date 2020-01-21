@@ -25,18 +25,6 @@ function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::
   return phs.bitoffsets[isite] + bitoffset(PS, iptl)
 end
 
-function get_bitmask(hs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, QN}
-  return make_bitmask(bitwidth(hs), BR)
-end
-
-function get_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, ::Colon, ::Colon)::BR where {PS, BR, QN}
-  return make_bitmask(bitwidth(hs), BR)
-end
-
-function get_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, ::Colon, isite::Integer)::BR where {PS, BR, QN}
-  return make_bitmask(hs.bitoffsets[isite+1], hs.bitoffsets[isite], BR)
-end
-
 
 function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer)::BR where {PS, BR, QN}
   n_sites = length(phs.sites)
@@ -44,15 +32,42 @@ function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite
   return bm << phs.bitoffsets[isite]
 end
 
+function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN},
+                     iptls::AbstractVector{<:Integer},
+                     isites::AbstractVector{<:Integer})::BR where {PS, BR, QN}
+  #n_sites = length(phs.sites)
+  bm = mapreduce((iptl) -> get_bitmask(PS, iptl, BR), |, zero(BR), iptls)
+  return mapreduce((isite) -> bm << phs.bitoffsets[isite], | zero(BR), isites)
+end
+
 function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, ::Colon)::BR where {PS, BR, QN}
   n_sites = length(phs.sites)
   bm = get_bitmask(PS, iptl, BR)
-  out = zero(BR)
-  for isite in 1:n_sites
-    out |= bm << phs.bitoffsets[isite]
-  end
-  return out
+  return mapreduce( (isite) -> bm << phs.bitoffsets[isite], |, zero(BR), 1:n_sites)
+  # out = zero(BR)
+  # for isite in 1:n_sites
+  #   out |= bm << phs.bitoffsets[isite]
+  # end
+  # return out
 end
+
+function get_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, ::Colon, isite::Integer)::BR where {PS, BR, QN}
+  return make_bitmask(hs.bitoffsets[isite+1], hs.bitoffsets[isite], BR)
+end
+
+
+function get_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, ::Colon, ::Colon)::BR where {PS, BR, QN}
+  return make_bitmask(bitwidth(hs), BR)
+end
+
+
+function get_bitmask(hs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, QN}
+  return make_bitmask(bitwidth(hs), BR)
+end
+
+
+
+
 
 function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isites::AbstractVector{<:Integer})::BR where {PS, BR, QN}
   n_sites = length(phs.sites)

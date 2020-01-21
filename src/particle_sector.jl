@@ -1,15 +1,14 @@
 export ParticleSector, ParticleIndex
-export make_particle_sector
-export bitoffset
 
 import ExactDiagonalization.bitwidth
 import ExactDiagonalization.compress
 import ExactDiagonalization.extract
 import ExactDiagonalization.get_bitmask
 
-export num_particle_species
-export particle_species, particle_species_name
+export num_particle_species, particle_species, particle_species_name
 
+export make_particle_sector
+export bitoffset
 
 struct ParticleSector{P<:Tuple{Vararg{AbstractParticle}}, N}
   function ParticleSector{P, N}() where {P<:Tuple{Vararg{AbstractParticle}}, N}
