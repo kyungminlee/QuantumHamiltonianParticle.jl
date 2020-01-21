@@ -1,75 +1,24 @@
 export normal_order, simplify
+export unify_type
 
+import ExactDiagonalization.simplify
 
-function _normal_order(arg::OperatorProduct{<:Tuple{}})
-  return (OperatorSum(arg), false)
-end
-
-
-function _normal_order(arg::OperatorProduct{<:Tuple{<:LadderOperator}})
-  return (OperatorSum(arg), false)
-end
-
-
-function _normal_order(arg::OperatorProduct{<:Tuple{<:LadderOperator,
-                                                    <:LadderOperator,
-                                                    Vararg{<:LadderOperator}}})
-  factors = arg.factors
-
-  f1, f2 = factors[1], factors[2]
-  if maxoccupancy(f1) == 1
-    isequal(f1, f2) && return (OperatorSum(), true)
-  end
-
-  if isless(f2, f1)
-    (tail_op, dirty) = _normal_order(OperatorProduct(f1, factors[3:end]...))
-    f2s = OperatorSum(f2) * exchangesign(f1, f2)
-    swapped_op = f2s * tail_op
-    if isa(f1, AnnihilationOperator) && isa(f2, CreationOperator) && f1.orbital == f2.orbital
-      (resid_op, _) = _normal_order(OperatorProduct(factors[3:end]...))
-      return (swapped_op + resid_op, true)
-    else
-      return (swapped_op, true)
-    end
-  else
-    (tail_op, dirty) = _normal_order(OperatorProduct(f2, factors[3:end]...))
-    f1s = OperatorSum(f1)
-    return (f1s * tail_op, dirty)
-  end
-end
-
-
-function _normal_order(arg::OperatorSum{<:Tuple{Vararg{<:Tuple{<:OperatorProduct, <:Number}}}}) ::Tuple{OperatorSum, Bool}
-  terms = arg.terms
-  out = OperatorSum()
-  dirty = false
-  for (t, a) in terms
-    (t2, d) = _normal_order(t)
-    dirty = dirty || d
-    out += t2 * a
-  end
-  return (out, dirty)
-end
-
-
-function normal_order(arg::OperatorSum{<:Tuple{Vararg{<:Tuple{<:OperatorProduct, <:Number}}}}) ::OperatorSum
+function normal_order(arg::OperatorSum{P, O, S}) ::OperatorSum{P, O, S} where {P, O, S}
   isempty(arg.terms) && return arg
-  while true
+  dirty = true
+  while dirty
     (arg, dirty) = _normal_order(arg)
-    if !dirty
-      break
-    end
   end
   arg
 end
 
 
-function simplify(arg::OperatorSum{<:Tuple{Vararg{<:Tuple{<:OperatorProduct, <:Number}}}}) ::OperatorSum
+function simplify(arg::OperatorSum{P, O, S}) ::OperatorSum{P, O, S} where {P, O, S}
   isempty(arg.terms) && return arg
   arg = normal_order(arg)
 
-  terms = sort(Tuple{OperatorProduct, Number}[arg.terms...])
-  new_terms = Tuple{OperatorProduct, Number}[]
+  terms = sort(arg.terms)
+  new_terms = Tuple{OperatorProduct{P, O}, S}[]
   t, a = Base.first(terms)
   for i in 2:length(terms)
     t2, a2 = terms[i]
@@ -85,14 +34,49 @@ function simplify(arg::OperatorSum{<:Tuple{Vararg{<:Tuple{<:OperatorProduct, <:N
   if a != 0
     push!(new_terms, (t, a))
   end
-  return OperatorSum(new_terms...)
+  return OperatorSum(new_terms)
 end
 
 
-# TODO: rename function
-function unify_type(arg::OperatorSum{T}) where T<:Tuple{Vararg{<:Tuple{<:OperatorProduct, <:Number}}}
-  isempty(arg.terms) && return arg
-  S = promote_type((t.types[2] for t in T.types)...)
-  terms = Tuple{OperatorProduct, S}[arg.terms...]
-  return OperatorSum(terms...)
+function _normal_order(arg::OperatorProduct{P, O}) where {P, O}
+  if length(arg.factors) <= 1
+    return (OperatorSum([(arg, 1)]), false)
+  end
+
+  factors = arg.factors
+  f1, f2 = factors[1], factors[2]
+  if maxoccupancy(f1) == 1 && isequal(f1, f2)
+    return (zero(OperatorSum{P,O,Int}), true)
+  end
+
+  if isless(f2, f1)
+    (tail_op, dirty) = _normal_order(OperatorProduct(vcat(f1, factors[3:end])))
+    f2s = OperatorSum([(OperatorProduct([f2]), exchangesign(f1, f2))])
+    swapped_op = f2s * tail_op
+    if (f1.particle_index == f2.particle_index) && (f1.orbital == f2.orbital) && (f1.ladder == ANNIHILATION) && (f2.ladder == CREATION)
+      (resid_op, _) = _normal_order(OperatorProduct(factors[3:end]))
+      return (swapped_op + resid_op, true)
+    else
+      return (swapped_op, true)
+    end
+  else
+    (tail_op, dirty) = _normal_order(OperatorProduct(vcat(f2, factors[3:end])))
+    f1s = OperatorSum([(OperatorProduct([f1]), exchangesign(f1, f2))])
+    return (f1s * tail_op, dirty)
+  end
+end
+
+
+function _normal_order(arg::OperatorSum{P, O, S})::Tuple{OperatorSum{P, O, S}, Bool} where {P, O, S}
+  terms = arg.terms
+  out = zero(OperatorSum{P, O, S})
+  dirty = false
+  out_terms = Tuple{OperatorProduct{P, O}, S}[]
+
+  for (t, a) in terms
+    (t2, d) = _normal_order(t)
+    dirty = dirty || d
+    out += t2 * a
+  end
+  return (out, dirty)
 end

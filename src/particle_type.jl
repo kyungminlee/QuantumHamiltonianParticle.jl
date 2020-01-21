@@ -1,21 +1,44 @@
 abstract type AbstractParticle end
 
-struct Fermion{Species} <: AbstractParticle end
-struct HardcoreBoson{Species} <: AbstractParticle end
-struct Boson{Species, Max} <:AbstractParticle end
+export Fermion, HardcoreBoson, Boson
+export particle_species
+export exchangesign
+export isfermion
+export maxoccupancy
 
-function pariclespecies(p::Type{F}) ::String where F<:AbstractParticle
-  return p.parameters[1]
-end
+import ExactDiagonalization.bitwidth
+import ExactDiagonalization.compress
+import ExactDiagonalization.extract
+import ExactDiagonalization.get_bitmask
 
-# Default is 1 for different types
-exchangesign(::Type{T1}, ::Type{T2}) where {T1<:AbstractParticle, T2<:AbstractParticle} = 1
-exchangesign(::Type{T}, ::Type{T}) where {T<:Fermion} = -1
-exchangesign(::T1, ::T2) where {T1<:AbstractParticle, T2<:AbstractParticle} = exchangesign(T1, T2)
+export bitoffset
 
-isfermion(::Type{T}) where {T<:AbstractParticle} = false
-isfermion(::Type{T}) where {T<:Fermion} = true
+struct Fermion{Species}<:AbstractParticle end
+struct HardcoreBoson{Species}<:AbstractParticle end
+struct Boson{Species, Max}<:AbstractParticle end
 
-maxoccupancy(::Type{<:Fermion}) = 1
+particle_species(p::Type{<:AbstractParticle}) = p.parameters[1]
+
+exchangesign(p::Type{<:Boson}) = 1
+exchangesign(p::Type{<:HardcoreBoson}) = 1
+exchangesign(p::Type{<:Fermion}) = -1
+
+isfermion(p::Type{<:AbstractParticle}) = false
+isfermion(p::Type{<:Fermion}) = true
+
+isboson(::Type{<:AbstractParticle}) = false
+isboson(::Type{<:HardcoreBoson}) = true
+isboson(::Type{<:Boson}) = true
+
+maxoccupancy(::Type{<:Boson{S, M}}) where {S, M} = M
 maxoccupancy(::Type{<:HardcoreBoson}) = 1
-maxoccupancy(::Type{<:Boson{Species, Max}}) where {Species, Max} = Max::Int
+maxoccupancy(::Type{<:Fermion}) = 1
+
+# TODO: Edge case: when maxoccupancy is 0.
+bitwidth(::Type{P}) where {P<:AbstractParticle} = Int(ceil(log2(maxoccupancy(P)+1)))
+
+for fname in [:particle_species, :exchangesign, :isfermion, :isboson, :maxoccupancy, :bitwidth]
+  @eval begin
+    ($fname)(::T) where {T<:AbstractParticle} = ($fname)(T)
+  end
+end
