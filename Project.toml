@@ -5,3 +5,4 @@ version = "0.1.0"
 
 [deps]
 ExactDiagonalization = "cf149b0a-e8f7-4f00-9ab4-03e4f5ec5cff"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
