@@ -19,6 +19,11 @@ struct Boson{Species, Max}<:AbstractParticle end
 
 particle_species(p::Type{<:AbstractParticle}) = p.parameters[1]
 
+# in units of 1/q where q is the ``charge'' of the particle
+particleflux(p::Type{<:Boson}) = 0//1
+particleflux(p::Type{<:HardcoreBoson}) = 0//1
+particleflux(p::Type{<:Fermion}) = 1//2 # TODO: is 1 a good number? or should i say 1/2 == pi/(2pi) ?
+
 exchangesign(p::Type{<:Boson}) = 1
 exchangesign(p::Type{<:HardcoreBoson}) = 1
 exchangesign(p::Type{<:Fermion}) = -1
@@ -38,7 +43,7 @@ maxoccupancy(::Type{<:Fermion}) = 1
 bitwidth(::Type{P}) where {P<:AbstractParticle} = Int(ceil(log2(maxoccupancy(P)+1)))
 
 for fname in [:particle_species, :exchangesign, :isfermion, :isboson, :maxoccupancy, :bitwidth]
-  @eval begin
-    ($fname)(::T) where {T<:AbstractParticle} = ($fname)(T)
-  end
+    @eval begin
+        ($fname)(::T) where {T<:AbstractParticle} = ($fname)(T)
+    end
 end
