@@ -1,9 +1,7 @@
-export AbstractParticleOperator
 export LadderUnitOperator
 
 import LinearAlgebra
 
-abstract type AbstractParticleOperator end
 
 export LadderType, CREATION, ANNIHILATION
 @enum LadderType CREATION ANNIHILATION

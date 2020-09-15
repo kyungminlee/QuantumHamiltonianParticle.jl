@@ -1,5 +1,4 @@
 import ExactDiagonalization.apply
-
 import ExactDiagonalization.get_column_iterator
 
 function get_column_iterator(
@@ -34,7 +33,7 @@ function get_column_iterator(
         if occupancy_at_site > 0
             if isfermion(particle)
                 wj_parity = get_fermion_parity(hs, op, bvec)
-                ampl = wj_parity == 0 ? 1.0 : -1.0
+                ampl = wj_parity == 0 ? one(S) : -one(S)
             elseif isboson(particle)
                 ampl = Base.sqrt(S(occupancy_at_site))
             else
@@ -61,7 +60,7 @@ function get_column_iterator(
 
     for f in reverse(op.factors)
         newout = get_column_iterator(hs, f, bvec)
-        if isempty(newout)
+        if isempty(newout) || iszero(ampl)
             bvec = zero(BR)
             ampl = zero(S)
             match = false

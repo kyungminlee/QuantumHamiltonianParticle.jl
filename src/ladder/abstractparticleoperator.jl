@@ -1,0 +1,2 @@
+export AbstractParticleOperator
+abstract type AbstractParticleOperator end

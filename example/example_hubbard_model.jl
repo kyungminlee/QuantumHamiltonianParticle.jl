@@ -1,3 +1,6 @@
+using LatticeTools
+using ExactDiagonalization
+using Particle
 
 fermion = Fermion{:c}()
 particle_sector = make_particle_sector(fermion)
