@@ -2,7 +2,7 @@
 
 # export AbstractParticleOperator
 
-# export ParticleProjectionSumOperator
+# export ParticleProjectorSumOperator
 # import ExactDiagonalization.represent
 
 # import Base.zero, Base.one
@@ -12,86 +12,86 @@
 # import Base.promote_rule
 # import Base.convert
 
-# struct ParticleProjectionSumOperator{BR<:Unsigned, S<:Number}
-#     terms::Vector{Tuple{ParticleProjectionUnitOperator{BR}, S}}
-#     function ParticleProjectionSumOperator(terms::AbstractVector{Tuple{ParticleProjectionUnitOperator{BR}, S}}) where {BR, S}
+# struct ParticleProjectorSumOperator{BR<:Unsigned, S<:Number}
+#     terms::Vector{Tuple{ParticleProjectorUnitOperator{BR}, S}}
+#     function ParticleProjectorSumOperator(terms::AbstractVector{Tuple{ParticleProjectorUnitOperator{BR}, S}}) where {BR, S}
 #         return new{BR, S}(terms)
 #     end
 # end
 
 
 # function Base.promote_rule(
-#     ::Type{ParticleProjectionSumOperator{BL, S}},
-#     ::Type{ParticleProjectionUnitOperator{BR}}
+#     ::Type{ParticleProjectorSumOperator{BL, S}},
+#     ::Type{ParticleProjectorUnitOperator{BR}}
 # ) where {BL, BR, S}
 #     B = promote_type(BL, BR)
-#     return ParticleProjectionSumOperator{B, S}
+#     return ParticleProjectorSumOperator{B, S}
 # end
 
 # function Base.promote_rule(
-#     ::Type{ParticleProjectionUnitOperator{BL}},
-#     ::Type{ParticleProjectionSumOperator{BR, S}},
+#     ::Type{ParticleProjectorUnitOperator{BL}},
+#     ::Type{ParticleProjectorSumOperator{BR, S}},
 # ) where {BL, BR, S}
 #     B = promote_type(BL, BR)
-#     return ParticleProjectionSumOperator{B, S}
+#     return ParticleProjectorSumOperator{B, S}
 # end
 
 # function Base.promote_rule(
-#     ::Type{ParticleProjectionSumOperator{BL, SL}},
-#     ::Type{ParticleProjectionSumOperator{BR, SR}},
+#     ::Type{ParticleProjectorSumOperator{BL, SL}},
+#     ::Type{ParticleProjectorSumOperator{BR, SR}},
 # ) where {BL, BR, SL, SR}
 #     B = promote_type(BL, BR)
 #     S = promote_Type(SL, SR)
-#     return ParticleProjectionSumOperator{B, S}
+#     return ParticleProjectorSumOperator{B, S}
 # end
 
 
-# function Base.convert(::Type{ParticleProjectionSumOperator{B, S}}, arg::ParticleProjectionUnitOperator) where {B, S}
-#     projop = ParticleProjectionUnitOperator(
+# function Base.convert(::Type{ParticleProjectorSumOperator{B, S}}, arg::ParticleProjectorUnitOperator) where {B, S}
+#     projop = ParticleProjectorUnitOperator(
 #         B(arg.bitmask), B(arg.bitrow), B(arg.bitcol),
 #         B(arg.pmask), B(arg.prow), B(arg.pcol), B(arg.pcheck))
-#     return ParticleProjectionSumOperator([(projop, one(S))])
+#     return ParticleProjectorSumOperator([(projop, one(S))])
 # end
 
 
-# function Base.zero(::Type{ParticleProjectionSumOperator{BR, S}}) where {BR, S}
-#     terms = Tuple{ParticleProjectionUnitOperator{BR}, S}[]
-#     return ParticleProjectionSumOperator(terms)
+# function Base.zero(::Type{ParticleProjectorSumOperator{BR, S}}) where {BR, S}
+#     terms = Tuple{ParticleProjectorUnitOperator{BR}, S}[]
+#     return ParticleProjectorSumOperator(terms)
 # end
 
 
-# function Base.one(::Type{ParticleProjectionSumOperator{BR, S}}) where {BR, S}
-#     terms = [(ParticleProjectionUnitOperator{BR}(), one(S))]
-#     return ParticleProjectionSumOperator(terms)
+# function Base.one(::Type{ParticleProjectorSumOperator{BR, S}}) where {BR, S}
+#     terms = [(ParticleProjectorUnitOperator{BR}(), one(S))]
+#     return ParticleProjectorSumOperator(terms)
 # end
 
 
-# Base.:(*)(x::ParticleProjectionSumOperator, y::Number) = ParticleProjectionSumOperator([(t, a*y) for (t,a) in x.terms])
-# Base.:(/)(x::ParticleProjectionSumOperator, y::Number) = ParticleProjectionSumOperator([(t, a/y) for (t,a) in x.terms])
-# Base.:(//)(x::ParticleProjectionSumOperator, y::Number) = ParticleProjectionSumOperator([(t, a//y) for (t,a) in x.terms])
-# Base.:(÷)(x::ParticleProjectionSumOperator, y::Number) = ParticleProjectionSumOperator([(t, a÷y) for (t,a) in x.terms])
-# Base.:(*)(y::Number, x::ParticleProjectionSumOperator) = ParticleProjectionSumOperator([(t, y*a) for (t,a) in x.terms])
-# Base.:(\)(y::Number, x::ParticleProjectionSumOperator) = ParticleProjectionSumOperator([(t, y\a) for (t,a) in x.terms])
+# Base.:(*)(x::ParticleProjectorSumOperator, y::Number) = ParticleProjectorSumOperator([(t, a*y) for (t,a) in x.terms])
+# Base.:(/)(x::ParticleProjectorSumOperator, y::Number) = ParticleProjectorSumOperator([(t, a/y) for (t,a) in x.terms])
+# Base.:(//)(x::ParticleProjectorSumOperator, y::Number) = ParticleProjectorSumOperator([(t, a//y) for (t,a) in x.terms])
+# Base.:(÷)(x::ParticleProjectorSumOperator, y::Number) = ParticleProjectorSumOperator([(t, a÷y) for (t,a) in x.terms])
+# Base.:(*)(y::Number, x::ParticleProjectorSumOperator) = ParticleProjectorSumOperator([(t, y*a) for (t,a) in x.terms])
+# Base.:(\)(y::Number, x::ParticleProjectorSumOperator) = ParticleProjectorSumOperator([(t, y\a) for (t,a) in x.terms])
 
 
-# Base.:(+)(arg::ParticleProjectionSumOperator) = arg
-# Base.:(-)(arg::ParticleProjectionSumOperator) = ParticleProjectionSumOperator([(t, -a) for (t, a) in arg.terms])
+# Base.:(+)(arg::ParticleProjectorSumOperator) = arg
+# Base.:(-)(arg::ParticleProjectorSumOperator) = ParticleProjectorSumOperator([(t, -a) for (t, a) in arg.terms])
 
 
-# Base.:(+)(lhs::ParticleProjectionSumOperator,  rhs::ParticleProjectionSumOperator) = ParticleProjectionSumOperator(vcat(lhs.terms, rhs.terms))
-# Base.:(-)(lhs::ParticleProjectionSumOperator,  rhs::ParticleProjectionSumOperator) = lhs + (-rhs)
+# Base.:(+)(lhs::ParticleProjectorSumOperator,  rhs::ParticleProjectorSumOperator) = ParticleProjectorSumOperator(vcat(lhs.terms, rhs.terms))
+# Base.:(-)(lhs::ParticleProjectorSumOperator,  rhs::ParticleProjectorSumOperator) = lhs + (-rhs)
 
 
-# function Base.:(*)(x::ParticleProjectionSumOperator{BR, S1}, y::ParticleProjectionSumOperator{BR, S2}) where {BR, S1, S2}
+# function Base.:(*)(x::ParticleProjectorSumOperator{BR, S1}, y::ParticleProjectorSumOperator{BR, S2}) where {BR, S1, S2}
 #     S3 = promote_type(S1, S2)
-#     terms = Tuple{ParticleProjectionUnitOperator{BR}, S3}[]
+#     terms = Tuple{ParticleProjectorUnitOperator{BR}, S3}[]
 #     for (t1, a1) in x.terms, (t2, a2) in y.terms
 #         t3, sgn = projection_product(t1, t2)
 #         if !iszero(sgn)
 #         push!(terms, (t3, a1*a2*sgn))
 #         end
 #     end
-#     return ParticleProjectionSumOperator(terms)
+#     return ParticleProjectorSumOperator(terms)
 # end
 
 
@@ -107,7 +107,7 @@
 #     particle = particle_species(PS, iptl)
 #     bitmask = get_bitmask(phs, iptl, isite)
 
-#     terms = Tuple{ParticleProjectionUnitOperator{BR}, Int}[]
+#     terms = Tuple{ParticleProjectorUnitOperator{BR}, Int}[]
 #     for n in 1:maxoccupancy(particle)
 #         lo = BR(n-1) << bitoffset(phs, iptl, isite)
 #         hi = BR(n) << bitoffset(phs, iptl, isite)
@@ -118,9 +118,9 @@
 #             pmask, prow, pcol = bitmask, bitrow, bitcol
 #             pcheck = get_bitmask(phs, iptl, 1:isite-1)
 #         end
-#         push!(terms, (ParticleProjectionUnitOperator(bitmask, bitrow, bitcol, pmask, prow, pcol, pcheck), 1))
+#         push!(terms, (ParticleProjectorUnitOperator(bitmask, bitrow, bitcol, pmask, prow, pcol, pcheck), 1))
 #     end
-#     return ParticleProjectionSumOperator(terms)
+#     return ParticleProjectorSumOperator(terms)
 # end
 
 
