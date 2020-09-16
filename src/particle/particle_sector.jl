@@ -18,8 +18,8 @@ struct ParticleSector{P<:Tuple{Vararg{AbstractParticle}}}
     function ParticleSector(::P) where {P<:Tuple{Vararg{AbstractParticle}}}
         return new{P}()
     end
-    function ParticleSector(::P) where {P<:Vararg{AbstractParticle}}
-        return new{P}()
+    function ParticleSector(p::Vararg{AbstractParticle})
+        return new{typeof(p)}()
     end
 end
 

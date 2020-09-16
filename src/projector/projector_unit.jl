@@ -1,11 +1,11 @@
 export AbstractParticleProjectorOperator
 export ParticleProjectorUnitOperator
 
-abstract type AbstractParticleProjectorOperator <: AbstractParticleOperator end
+abstract type AbstractParticleProjectorOperator{BR<:Unsigned, S<:Number} end
 
 Base.:(-)(lhs::AbstractParticleProjectorOperator, rhs::AbstractParticleProjectorOperator) = lhs + (-rhs)
 
-struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number} <: AbstractParticleProjectorOperator
+struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number} <: AbstractParticleProjectorOperator{BR, S}
     bitmask::BR
     bitrow::BR
     bitcol::BR
