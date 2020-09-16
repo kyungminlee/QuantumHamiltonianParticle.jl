@@ -1,47 +1,66 @@
 export prettyprint
 import ExactDiagonalization.prettyprintln
 
-function prettyprint(arg::LadderUnitOperator)
-    print("ψ")
-    arg.ladder == CREATION && print("†")
-    print("(", particle_species_name(arg.particle_index), ",", arg.orbital, ")")
+#function prettyprint()
+prettyprintln(xs...) = prettyprintln(stdout::IO, xs...)
+prettyprint(xs...) = prettyprint(stdout::IO, xs...)
+
+function prettyprint(io::IO, arg::LadderUnitOperator{PS, PI, OI}) where {PS, PI, OI}
+    print(io, "ψ")
+    arg.ladder == CREATION && print(io, "†")
+    print(io, "(", particle_species_name(PS, arg.particle_index), ",", arg.orbital, ")")
 end
 
-function prettyprint(arg::LadderProductOperator)
+function prettyprint(io::IO, arg::LadderProductOperator)
     first = true
     for f in arg.factors
         if !first
-            print("⋅")
+            print(io, "⋅")
         end
-        prettyprint(f)
+        prettyprint(io, f)
         first = false
     end
 end
 
-function prettyprint(arg::LadderSumOperator)
-    if isempty(arg)
-        print("0")
+function prettyprint(io::IO, arg::LadderSumOperator)
+    if isempty(arg.terms)
+        print(io, "0")
     else
         t, a = arg.terms[1]
         print("(", a, ")")
-        if !isempty(t)
-            print("⋅")
-            prettyprint(t)
+        if !isempty(t.factors)
+            print(io, "⋅")
+            prettyprint(io, t)
         end
         for (t, a) in arg.terms[2:end]
-            print(" + (", a, ")")
-            if !isempty(t)
-                print("⋅")
-                prettyprint(t)
+            print(io, " + (", a, ")")
+            if !isempty(t.factors)
+                print(io, "⋅")
+                prettyprint(io, t)
             end
         end
     end
 end
 
 
-# function prettyprintln(io::IO, arg::ParticleProjectionUnitOperator{BR}, prefix::AbstractString="") where {BR}
+function prettyprintln(io::IO, arg::LadderUnitOperator)
+    prettyprint(io, arg)
+    println(io)
+end
+
+function prettyprintln(io::IO, arg::LadderProductOperator)
+    prettyprint(io, arg)
+    println(io)
+end
+
+function prettyprintln(io::IO, arg::LadderSumOperator)
+    prettyprint(io, arg)
+    println(io)
+end
+
+# function prettyprintln(io::IO, arg::ParticleProjectorUnitOperator{BR}, prefix::AbstractString="") where {BR}
 #     pad = sizeof(BR)*8
-#     println(io, prefix, "ParticleProjectionUnitOperator")
+#     println(io, prefix, "ParticleProjectorUnitOperator")
 #     println(io, prefix, "  - bitmask: ", string(arg.bitmask, base=2, pad=pad))
 #     println(io, prefix, "  - bitrow : ", string(arg.bitrow,  base=2, pad=pad))
 #     println(io, prefix, "  - bitcol : ", string(arg.bitcol,  base=2, pad=pad))
@@ -51,8 +70,8 @@ end
 #     println(io, prefix, "  - pcheck : ", string(arg.pcheck,  base=2, pad=pad))
 # end
 
-# function prettyprintln(io::IO, arg::ParticleProjectionSumOperator{BR, S}, prefix::AbstractString="") where {BR, S}
-#     println(io, prefix, "ParticleProjectionSumOperator")
+# function prettyprintln(io::IO, arg::ParticleProjectorSumOperator{BR, S}, prefix::AbstractString="") where {BR, S}
+#     println(io, prefix, "ParticleProjectorSumOperator")
 #     for (term, ampl) in arg.terms
 #         println(io, prefix, "amplit : ", ampl)
 #         prettyprintln(io, term, prefix*"  ")
@@ -60,9 +79,9 @@ end
 # end
 
 
-function prettyprintln(io::IO, arg::ParticleProjectionUnitOperator{BR}, prefix::AbstractString="") where {BR}
+function prettyprintln(io::IO, arg::ParticleProjectorUnitOperator{BR}, prefix::AbstractString="") where {BR}
     pad = sizeof(BR)*8
-    println(io, prefix, "ParticleProjectionUnitOperator")
+    println(io, prefix, "ParticleProjectorUnitOperator")
     println(io, prefix, "  - bitmask       : ", string(arg.bitmask, base=2, pad=pad))
     println(io, prefix, "  - bitrow        : ", string(arg.bitrow,  base=2, pad=pad))
     println(io, prefix, "  - bitcol        : ", string(arg.bitcol,  base=2, pad=pad))
@@ -70,8 +89,8 @@ function prettyprintln(io::IO, arg::ParticleProjectionUnitOperator{BR}, prefix::
     println(io, prefix, "  - amplitude     : ", arg.amplitude)
 end
 
-function prettyprintln(io::IO, arg::ParticleProjectionSumOperator{BR, S}, prefix::AbstractString="") where {BR, S}
-    println(io, prefix, "ParticleProjectionSumOperator")
+function prettyprintln(io::IO, arg::ParticleProjectorSumOperator{BR, S}, prefix::AbstractString="") where {BR, S}
+    println(io, prefix, "ParticleProjectorSumOperator")
     for term in arg.terms
         prettyprintln(io, term, prefix*"  ")
     end

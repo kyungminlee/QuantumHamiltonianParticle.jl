@@ -24,7 +24,7 @@ hopping = sum(
         for i in 1:nsites
         for sp in 1:2
 )
-hopping2 = make_projection_operator(hs, hopping)
+hopping2 = make_projector_operator(hs, hopping)
 
 interaction = sum(
     c_dag(i, 1) * c(i, 1) * c_dag(i, 2) * c(i, 2)
@@ -34,8 +34,8 @@ interaction = sum(
 t = 1.0
 U = 1.0
 hamiltonian = -t * hopping + U * interaction
-hamiltonian_proj = make_projection_operator(hs, hamiltonian)
-#@show make_projection_operator(hs, c_dag(3,1)  * c_dag(4,2) * c(4,2) * c(3, 1))
+hamiltonian_proj = make_projector_operator(hs, hamiltonian)
+#@show make_projector_operator(hs, c_dag(3,1)  * c_dag(4,2) * c(4,2) * c(3, 1))
 matrix = zeros(Float64, (2^(nsites*2), 2^(nsites*2)))
 for bcol in UInt(0):UInt(1<<(2*nsites)-1)
     iter = get_column_iterator(hamiltonian_proj, bcol)

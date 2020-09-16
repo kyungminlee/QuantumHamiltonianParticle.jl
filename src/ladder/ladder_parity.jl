@@ -10,9 +10,9 @@ end
 
 function get_fermion_parity(
     hs::ParticleHilbertSpace,
-    op::LadderUnitOperator{<:Integer, <:Integer},
+    op::LadderUnitOperator{PS, <:Integer, <:Integer},
     bvec::Unsigned,
-)
+) where {PS}
     bm_mask = get_parity_mask(hs, op.particle_index, op.orbital)
     bm_parity = bm_mask & bvec
     return count_ones(bm_parity) % 2

@@ -4,8 +4,8 @@ using ExactDiagonalization
 
 include("util.jl")
 
-include("basic/particle_type.jl")
-include("basic/particle_sector.jl")
+include("particle/particle_type.jl")
+include("particle/particle_sector.jl")
 
 include("hilbert/particle_site.jl")
 include("hilbert/particle_hilbert.jl")
@@ -18,21 +18,21 @@ include("ladder/ladder_unit.jl")
 include("ladder/ladder_product.jl")
 include("ladder/ladder_sum.jl")
 include("ladder/ladder_parity.jl")
+include("ladder/ladder_iterator.jl")
 include("ladder/ladder_apply.jl")
 
-include("simplify/particle_simplify.jl")
+include("simplify/ladder_simplify.jl")
 
 # Free representation
 #include("projection/particle_projection_unit_operator.jl")
 #include("projection/particle_projection_sum_operator.jl")
 
-include("projection/pure_operator.jl")
-include("projection/sum_operator.jl")
-include("projection/operator_iterator.jl")
-
+include("projector/projector_unit.jl")
+include("projector/projector_sum.jl")
+include("projector/projector_conversion.jl")
+include("projector/projector_iterator.jl")
 
 include("io/prettyprint.jl")
-
 
 include("symmetry/symmetry_apply.jl")
 

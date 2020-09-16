@@ -8,15 +8,20 @@ import ExactDiagonalization.get_bitmask
 export num_particle_species, particle_species, particle_species_name
 
 export make_particle_sector
-export bitoffset
+export bitoffset, bitoffsets
 
 
 struct ParticleSector{P<:Tuple{Vararg{AbstractParticle}}}
-    function ParticleSector{P}() where {P<:Tuple{Vararg{AbstractParticle}}}
+    # function ParticleSector{P}() where {P<:Tuple{Vararg{AbstractParticle}}}
+    #     return new{P}()
+    # end
+    function ParticleSector(::Type{P}) where {P<:Tuple{Vararg{AbstractParticle}}}
         return new{P}()
     end
-
-    function ParticleSector(::Type{P}) where {P<:Tuple{Vararg{AbstractParticle}}}
+    function ParticleSector(::P) where {P<:Tuple{Vararg{AbstractParticle}}}
+        return new{P}()
+    end
+    function ParticleSector(::P) where {P<:Vararg{AbstractParticle}}
         return new{P}()
     end
 end
@@ -31,9 +36,14 @@ end
 num_particle_species(::Type{ParticleSector{P}}) where {P} = tuplelength(P)
 particle_species(::Type{P}) where {P<:ParticleSector} = P.parameters[1].parameters
 
-particle_species(::Type{ParticleSector{P}}, index::Integer) where {P} = P.parameters[index]::DataType
-particle_species_name(::Type{ParticleSector{P}}, index::Integer) where {P} = particle_species(ParticleSpecies{P}, index).parameter[1]::Symbol
+particle_species(::Type{ParticleSector{P}}, index::Integer) where {P} = P.parameters[index]
+particle_species_name(::Type{ParticleSector{P}}, index::Integer) where {P} = particle_species(ParticleSector{P}, index).parameters[1]::Symbol
 
+
+exchangesign(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = exchangesign(particle_species(PS, iptl))
+function exchangesign(::Type{PS}, iptl1::Integer, iptl2::Integer) where {PS<:ParticleSector}
+    return iptl1 == iptl2 ? exchangesign(PS, iptl) : 1
+end
 
 # occupation representaiton
 
@@ -48,6 +58,19 @@ function bitoffset(::Type{P}, iptl::Integer)::Int where {P<:ParticleSector}
         offset += bitwidth(species[i])
     end
     return offset
+end
+
+
+function bitoffsets(::Type{P}) where {P<:ParticleSector}
+    species = particle_species(P)
+    offset = 0
+    out = Vector{Int}(undef, length(species)+1)
+    for i in 1:iptl
+        out[i] = offset
+        offset += bitwidth(species[i])
+    end
+    out[end] = offset
+    return out
 end
 
 
@@ -113,29 +136,29 @@ for fname in [
 end
 
 
-# Mainly for the ladder operators
-struct ParticleIndex{P<:ParticleSector}
-    index::Int
+# # Mainly for the ladder operators
+# struct ParticleIndex{P<:ParticleSector}
+#     index::Int
 
-    function ParticleIndex(::Type{P}, index::Integer) where {P<:ParticleSector}
-        NP = num_particle_species(P)
-        (0 < index <= NP) || throw(ArgumentError("index should be 0 < index <= NP"))
-        new{P}(index)
-    end
+#     function ParticleIndex(::Type{P}, index::Integer) where {P<:ParticleSector}
+#         NP = num_particle_species(P)
+#         (0 < index <= NP) || throw(ArgumentError("index should be 0 < index <= NP"))
+#         new{P}(index)
+#     end
 
-    ParticleIndex(::P, args...) where {P<:ParticleSector} = ParticleIndex(P, args...)
-end
-
-
-Base.convert(::Type{T}, pi::ParticleIndex) where {T<:Integer} = convert(T, pi.index)
+#     ParticleIndex(::P, args...) where {P<:ParticleSector} = ParticleIndex(P, args...)
+# end
 
 
-Base.isless(lhs::ParticleIndex{P}, rhs::ParticleIndex{P}) where P = Base.isless(lhs.index, rhs.index)
-Base.:(==)(lhs::ParticleIndex{P}, rhs::ParticleIndex{P}) where P = lhs.index == rhs.index
+# Base.convert(::Type{T}, pi::ParticleIndex) where {T<:Integer} = convert(T, pi.index)
 
 
-particle_species(p::ParticleIndex{P}) where {P<:ParticleSector} = P.parameters[1].parameters[p.index]
-particle_species_name(p::ParticleIndex{P}) where {P<:ParticleSector} = particle_species(p).parameters[1]
-bitwidth(p::ParticleIndex{P}) where {P<:ParticleSector} = bitwidth(P, p.index)
-bitoffset(p::ParticleIndex{P}) where {P<:ParticleSector} = bitoffset(P, p.index)
-get_bitmask(p::ParticleIndex{P}) where {P<:ParticleSector} = get_bitmask(P, p.index)
+# Base.isless(lhs::ParticleIndex{P}, rhs::ParticleIndex{P}) where P = Base.isless(lhs.index, rhs.index)
+# Base.:(==)(lhs::ParticleIndex{P}, rhs::ParticleIndex{P}) where P = lhs.index == rhs.index
+
+
+# particle_species(p::ParticleIndex{P}) where {P<:ParticleSector} = P.parameters[1].parameters[p.index]
+# particle_species_name(p::ParticleIndex{P}) where {P<:ParticleSector} = particle_species(p).parameters[1]
+# bitwidth(p::ParticleIndex{P}) where {P<:ParticleSector} = bitwidth(P, p.index)
+# bitoffset(p::ParticleIndex{P}) where {P<:ParticleSector} = bitoffset(P, p.index)
+# get_bitmask(p::ParticleIndex{P}) where {P<:ParticleSector} = get_bitmask(P, p.index)

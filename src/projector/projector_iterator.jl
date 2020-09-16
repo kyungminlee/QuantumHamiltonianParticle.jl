@@ -1,6 +1,9 @@
+import ExactDiagonalization.get_column_iterator
+import ExactDiagonalization.get_row_iterator
+
 
 function get_column_iterator(
-    pureop::ParticleProjectionUnitOperator{BR, S},
+    pureop::ParticleProjectorUnitOperator{BR, S},
     bcol::BR2
 ) where {BR, S, BR2<:Unsigned}
     match::Bool = (bcol & pureop.bitmask) == pureop.bitcol
@@ -15,11 +18,11 @@ end
 
 
 
-function get_column_iterator(sumop::ParticleProjectionSumOperator{BR, S}, bcol::BR2) where {S, BR<:Unsigned, BR2<:Unsigned}
+function get_column_iterator(sumop::ParticleProjectorSumOperator{BR, S}, bcol::BR2) where {S, BR<:Unsigned, BR2<:Unsigned}
     let bcol::BR = BR(bcol),
-        terms::Vector{ParticleProjectionUnitOperator{BR, S}} = sumop.terms
-        match(pureop::ParticleProjectionUnitOperator{BR, S})::Bool = (bcol & pureop.bitmask) == pureop.bitcol
-        function element(pureop::ParticleProjectionUnitOperator{BR, S})::Pair{BR, S}
+        terms::Vector{ParticleProjectorUnitOperator{BR, S}} = sumop.terms
+        match(pureop::ParticleProjectorUnitOperator{BR, S})::Bool = (bcol & pureop.bitmask) == pureop.bitcol
+        function element(pureop::ParticleProjectorUnitOperator{BR, S})::Pair{BR, S}
             isparityeven = mod(count_ones(bcol & pureop.parity_bitmask), 2) == 0
             brow = (bcol & ~pureop.bitmask) | pureop.bitrow
             ampl = isparityeven ? pureop.amplitude : -pureop.amplitude

@@ -20,18 +20,18 @@ nsites = 8
 hs = ParticleHilbertSpace([site for i in 1:nsites])
 
 #=
-a = make_projection_operator(hs, c_dag(5))
-b = make_projection_operator(hs, c(2))
+a = make_projector_operator(hs, c_dag(5))
+b = make_projector_operator(hs, c(2))
 b*a |> prettyprintln
 a*b |> prettyprintln
-make_projection_operator(hs, c_dag(5) * c(2)) |> prettyprintln
-make_projection_operator(hs, c_dag(5) * c(2) + c_dag(2) * c(5)) |> prettyprintln
+make_projector_operator(hs, c_dag(5) * c(2)) |> prettyprintln
+make_projector_operator(hs, c_dag(5) * c(2) + c_dag(2) * c(5)) |> prettyprintln
 =#
 
 #get_column_iterator(hs, c(1), UInt(0x1))
 #get_column_iterator(hs, c(2), UInt(0x1))
 hop = c_dag(3) * c(1) + c_dag(1) * c(3)
-hop2 = make_projection_operator(hs, hop)
+hop2 = make_projector_operator(hs, hop)
 
 #get_column_iterator(hs, hop, UInt(0x1))
 
@@ -43,7 +43,7 @@ hopping = sum(
     end
         for i in 1:nsites
 )
-hopping2 = make_projection_operator(hs, hopping)
+hopping2 = make_projector_operator(hs, hopping)
 
 #@show collect( get_column_iterator(hs, hop, UInt(0x1)) )
 #@show collect( get_column_iterator(hop2, UInt(0x1)) )
@@ -59,7 +59,7 @@ hopping2 = make_projection_operator(hs, hopping)
     end
     #@show bitstring(0x5)
 
-    #@show make_projection_operator(hs, c_dag(8)*c(1))
+    #@show make_projector_operator(hs, c_dag(8)*c(1))
 
 end
 #get_column_iterator(hs, c_dag(3) * c(1) + c_dag(4) * c(1), UInt(0x1))

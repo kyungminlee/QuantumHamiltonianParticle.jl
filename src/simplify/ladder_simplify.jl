@@ -3,7 +3,8 @@ export unify_type
 
 import ExactDiagonalization.simplify
 
-function normal_order(arg::LadderSumOperator{P, O, S}) ::LadderSumOperator{P, O, S} where {P, O, S}
+
+function normal_order(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg
     dirty = true
     while dirty
@@ -13,12 +14,12 @@ function normal_order(arg::LadderSumOperator{P, O, S}) ::LadderSumOperator{P, O,
 end
 
 
-function simplify(arg::LadderSumOperator{P, O, S}) ::LadderSumOperator{P, O, S} where {P, O, S}
+function simplify(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg
     arg = normal_order(arg)
 
     terms = sort(arg.terms)
-    new_terms = Tuple{LadderProductOperator{P, O}, S}[]
+    new_terms = Pair{LadderProductOperator{PS, P, O}, S}[]
     t, a = Base.first(terms)
     for i in 2:length(terms)
         t2, a2 = terms[i]
@@ -26,32 +27,32 @@ function simplify(arg::LadderSumOperator{P, O, S}) ::LadderSumOperator{P, O, S} 
             a += a2
         else
             if a != 0
-                push!(new_terms, (t, a))
+                push!(new_terms, t => a)
             end
             t, a = t2, a2
         end
     end
     if a != 0
-        push!(new_terms, (t, a))
+        push!(new_terms, t => a)
     end
     return LadderSumOperator(new_terms)
 end
 
 
-function _normal_order(arg::LadderProductOperator{P, O}) where {P, O}
+function _normal_order(arg::LadderProductOperator{PS, P, O}) where {PS, P, O}
     if length(arg.factors) <= 1
-        return (LadderSumOperator([(arg, 1)]), false)
+        return (LadderSumOperator([arg => 1]), false)
     end
 
     factors = arg.factors
     f1, f2 = factors[1], factors[2]
     if maxoccupancy(f1) == 1 && isequal(f1, f2)
-        return (zero(LadderSumOperator{P,O,Int}), true)
+        return (zero(LadderSumOperator{PS, P, O, Int}), true)
     end
 
     if isless(f2, f1)
         (tail_op, dirty) = _normal_order(LadderProductOperator(vcat(f1, factors[3:end])))
-        f2s = LadderSumOperator([(LadderProductOperator([f2]), exchangesign(f1, f2))])
+        f2s = LadderSumOperator([LadderProductOperator([f2]) => exchangesign(f1, f2)])
         swapped_op = f2s * tail_op
         if (f1.particle_index == f2.particle_index) && (f1.orbital == f2.orbital) && (f1.ladder == ANNIHILATION) && (f2.ladder == CREATION)
             (resid_op, _) = _normal_order(LadderProductOperator(factors[3:end]))
@@ -61,19 +62,16 @@ function _normal_order(arg::LadderProductOperator{P, O}) where {P, O}
         end
     else
         (tail_op, dirty) = _normal_order(LadderProductOperator(vcat(f2, factors[3:end])))
-        f1s = LadderSumOperator([(LadderProductOperator([f1]), exchangesign(f1, f2))])
+        f1s = LadderSumOperator([LadderProductOperator([f1]) => 1])
         return (f1s * tail_op, dirty)
     end
 end
 
 
-function _normal_order(arg::LadderSumOperator{P, O, S})::Tuple{LadderSumOperator{P, O, S}, Bool} where {P, O, S}
-    terms = arg.terms
-    out = zero(LadderSumOperator{P, O, S})
+function _normal_order(arg::LadderSumOperator{PS, P, O, S})::Tuple{LadderSumOperator{PS, P, O, S}, Bool} where {PS, P, O, S}
+    out = zero(LadderSumOperator{PS, P, O, S})
     dirty = false
-    out_terms = Tuple{LadderProductOperator{P, O}, S}[]
-
-    for (t, a) in terms
+    for (t, a) in arg.terms
         (t2, d) = _normal_order(t)
         dirty = dirty || d
         out += t2 * a

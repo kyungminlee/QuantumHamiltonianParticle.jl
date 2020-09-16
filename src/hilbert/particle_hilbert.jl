@@ -45,16 +45,16 @@ end
 
 
 
-scalartype(arg::Type{<:ParticleHilbertSpace}) = Bool
-scalartype(arg::ParticleHilbertSpace) = Bool
+scalartype(::Type{<:ParticleHilbertSpace}) = Bool
+scalartype(::ParticleHilbertSpace) = Bool
 
 
-Base.valtype(arg::Type{<:ParticleHilbertSpace}) = Bool
-Base.valtype(arg::ParticleHilbertSpace) = Bool
+Base.valtype(::Type{<:ParticleHilbertSpace}) = Bool
+Base.valtype(::ParticleHilbertSpace) = Bool
 
 
-qntype(arg::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = QN
-qntype(arg::ParticleHilbertSpace{PS, BR, QN}) where {PS, BR, QN} = QN
+qntype(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = QN
+qntype(::ParticleHilbertSpace{PS, BR, QN}) where {PS, BR, QN} = QN
 
 
 basespace(hs::ParticleHilbertSpace) = hs
@@ -68,6 +68,10 @@ num_particle_species(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN
 
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
     return phs.bitoffsets[isite] + bitoffset(PS, iptl)
+end
+
+function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
+    return phs.bitoffsets[isite]
 end
 
 
@@ -161,7 +165,7 @@ function get_occupancy(
     iptl::Integer,
     isite::Integer,
     bvec::BR,
-    ) where {PS, BR, QN}
+) where {PS, BR, QN}
     bm = get_bitmask(hs, iptl, isite)
     return Int( (bm & bvec) >> bitoffset(hs, iptl, isite) )
 end
@@ -203,7 +207,6 @@ function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
             for (isite, site) in enumerate(hs.sites)
     )
 end
-
 
 
 function get_quantum_number(hs::ParticleHilbertSpace, statevec::AbstractVector{<:Integer})

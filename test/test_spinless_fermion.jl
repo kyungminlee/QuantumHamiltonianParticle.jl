@@ -14,8 +14,8 @@ using Formatting
     nsites = 8
     hs = ParticleHilbertSpace([site for i in 1:nsites])
 
-    c_dag(i) = LadderUnitOperator(1, i, CREATION)
-    c(i) = LadderUnitOperator(1, i, ANNIHILATION)
+    c_dag(i) = LadderUnitOperator(particle_sector, 1, i, CREATION)
+    c(i) = LadderUnitOperator(particle_sector, 1, i, ANNIHILATION)
 
     @testset "checks" begin
         @test length(hs.sites) == nsites
@@ -78,7 +78,7 @@ using Formatting
                 end
                     for i in 1:nsites
             )
-            hopping2 = make_projection_operator(hs, hopping1)
+            hopping2 = make_projector_operator(hs, hopping1)
 
             for bcol in UInt(0):UInt(1<<nsites-1)
                 a = Dict( get_column_iterator(hs, hopping1, bcol) )
@@ -134,7 +134,7 @@ using Formatting
 
             @testset "eigenspectrum: three particles" begin
                 eigenenergies0 = [
-                    2*t1*(cos(2π*i/nsites) + cos(2π*j/nsites) + cos(2π*k/nsites)) + 
+                    2*t1*(cos(2π*i/nsites) + cos(2π*j/nsites) + cos(2π*k/nsites)) +
                     2*t2*(cos(4π*i/nsites) + cos(4π*j/nsites) + cos(4π*k/nsites))
                         for i in 0:(nsites-1) for j in 0:(i-1) for k in 0:(j-1)
                 ]
@@ -208,18 +208,23 @@ using Formatting
 
     end
 
+    prettyprintln(simplify(2*c(4)*c(8) + 4*c(8)*c(2)))
+    prettyprintln(simplify(2*c(4)*c_dag(8) + 4*c(8)*c_dag(2)))
+    prettyprintln(simplify(2*c(4)*c_dag(8) + 4*c(2)*c_dag(2)))
+    prettyprintln(simplify(2*c_dag(2)*c(2) + 4*c(2)*c_dag(2)))
+
     #=
     for i in 3:5
         println("# c†($i)")
-        prettyprintln(make_projection_operator(hs, c_dag(i)))
+        prettyprintln(make_projector_operator(hs, c_dag(i)))
         println("# c($i)")
-        prettyprintln(make_projection_operator(hs, c(i)))
+        prettyprintln(make_projector_operator(hs, c(i)))
     end
-    a = make_projection_operator(hs, c_dag(5))
-    b = make_projection_operator(hs, c(2))
+    a = make_projector_operator(hs, c_dag(5))
+    b = make_projector_operator(hs, c(2))
     prettyprintln(b*a)
     prettyprintln(a*b)
-    prettyprintln(make_projection_operator(hs, c_dag(5) * c(2)))
+    prettyprintln(make_projector_operator(hs, c_dag(5) * c(2)))
     =#
 
 end

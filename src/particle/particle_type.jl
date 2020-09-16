@@ -20,16 +20,16 @@ struct Boson{Species, Max}<:AbstractParticle end
 particle_species(p::Type{<:AbstractParticle}) = p.parameters[1]
 
 # in units of 1/q where q is the ``charge'' of the particle
-particleflux(p::Type{<:Boson}) = 0//1
-particleflux(p::Type{<:HardcoreBoson}) = 0//1
-particleflux(p::Type{<:Fermion}) = 1//2 # TODO: is 1 a good number? or should i say 1/2 == pi/(2pi) ?
+particleflux(::Type{<:Boson}) = 0//1
+particleflux(::Type{<:HardcoreBoson}) = 0//1
+particleflux(::Type{<:Fermion}) = 1//2 # TODO: is 1 a good number? or should i say 1/2 == pi/(2pi) ?
 
-exchangesign(p::Type{<:Boson}) = 1
-exchangesign(p::Type{<:HardcoreBoson}) = 1
-exchangesign(p::Type{<:Fermion}) = -1
+exchangesign(::Type{<:Boson}) = 1
+exchangesign(::Type{<:HardcoreBoson}) = 1
+exchangesign(::Type{<:Fermion}) = -1
 
-isfermion(p::Type{<:AbstractParticle}) = false
-isfermion(p::Type{<:Fermion}) = true
+isfermion(::Type{<:AbstractParticle}) = false
+isfermion(::Type{<:Fermion}) = true
 
 isboson(::Type{<:AbstractParticle}) = false
 isboson(::Type{<:HardcoreBoson}) = true

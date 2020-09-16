@@ -104,7 +104,6 @@ function statevec2occmat(
 end
 
 
-
 function statevec2locvec(
     phs::ParticleHilbertSpace{PS, BR, QN},
     statevec::AbstractVector{<:Integer},
