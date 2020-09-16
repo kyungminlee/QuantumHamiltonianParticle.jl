@@ -23,10 +23,7 @@ include("ladder/ladder_apply.jl")
 
 include("simplify/ladder_simplify.jl")
 
-# Free representation
-#include("projection/particle_projection_unit_operator.jl")
-#include("projection/particle_projection_sum_operator.jl")
-
+# Projectors
 include("projector/projector_unit.jl")
 include("projector/projector_sum.jl")
 include("projector/projector_conversion.jl")

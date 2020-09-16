@@ -12,9 +12,6 @@ export bitoffset, bitoffsets
 
 
 struct ParticleSector{P<:Tuple{Vararg{AbstractParticle}}}
-    # function ParticleSector{P}() where {P<:Tuple{Vararg{AbstractParticle}}}
-    #     return new{P}()
-    # end
     function ParticleSector(::Type{P}) where {P<:Tuple{Vararg{AbstractParticle}}}
         return new{P}()
     end
