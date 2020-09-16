@@ -2,7 +2,7 @@ using ExactDiagonalization
 using Particle
 using Test
 using LinearAlgebra
-using Formatting
+# using Formatting
 
 @testset "Hubbard" begin
     electron_up = Fermion{Symbol("↑")}()
@@ -33,7 +33,7 @@ using Formatting
             for i in 1:nsites
     ) |> simplify
 
-    prettyprintln( interaction_hamiltonian )
-    prettyprintln( hopping_hamiltonian )
+    # prettyprintln( interaction_hamiltonian )
+    # prettyprintln( hopping_hamiltonian )
 
 end

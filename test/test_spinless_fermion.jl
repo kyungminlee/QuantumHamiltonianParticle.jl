@@ -2,7 +2,7 @@ using ExactDiagonalization
 using Particle
 using Test
 using LinearAlgebra
-using Formatting
+# using Formatting
 
 @testset "spinless fermion" begin
     fermion = Fermion{:f}()
@@ -208,10 +208,10 @@ using Formatting
 
     end
 
-    prettyprintln(simplify(2*c(4)*c(8) + 4*c(8)*c(2)))
-    prettyprintln(simplify(2*c(4)*c_dag(8) + 4*c(8)*c_dag(2)))
-    prettyprintln(simplify(2*c(4)*c_dag(8) + 4*c(2)*c_dag(2)))
-    prettyprintln(simplify(2*c_dag(2)*c(2) + 4*c(2)*c_dag(2)))
+    # prettyprintln(simplify(2*c(4)*c(8) + 4*c(8)*c(2)))
+    # prettyprintln(simplify(2*c(4)*c_dag(8) + 4*c(8)*c_dag(2)))
+    # prettyprintln(simplify(2*c(4)*c_dag(8) + 4*c(2)*c_dag(2)))
+    # prettyprintln(simplify(2*c_dag(2)*c(2) + 4*c(2)*c_dag(2)))
 
     #=
     for i in 3:5
