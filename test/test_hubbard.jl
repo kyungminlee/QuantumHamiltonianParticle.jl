@@ -1,4 +1,5 @@
 using ExactDiagonalization
+using LatticeTools
 using Particle
 using Test
 using LinearAlgebra
@@ -33,6 +34,12 @@ using LinearAlgebra
             for i in 1:nsites
     ) |> simplify
 
+    @testset "symmetry" begin
+        t = SitePermutation([2,3,4,1])
+        @test isinvariant(t, interaction_hamiltonian)
+        @test isinvariant(t, hopping_hamiltonian)
+        @test !isinvariant(t, c_up_dag(1)*c_up(1))
+    end
     # prettyprintln( interaction_hamiltonian )
     # prettyprintln( hopping_hamiltonian )
 
