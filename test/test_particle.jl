@@ -60,6 +60,7 @@ end
 
     end
 
+    @test numspecies(p) == 2
     @test speciescount(p) == 2
     @test getspecies(p) == (Boson{:b,3}, Fermion{:f})
 
@@ -82,9 +83,16 @@ end
     @test bitoffset(p, 2) == 2
 
     @test bitoffset(p) == [0, 2, 3]
+    @test get_bitmask(p, 1, UInt) == UInt(0b0011)
+    @test get_bitmask(p, 2, UInt) == UInt(0b0100)
 
-
+    @test typeof(compress(p, [1,1], UInt8)) === UInt8
+    @test compress(p, [1,1]) == 0b101
+    @test compress(p, [2,1]) == 0b110
+    @test compress(p, [3,1]) == 0b111
     @test_throws ArgumentError compress(p, [0,0,0], UInt)
+    @test_throws ArgumentError compress(p, [-1,1])
+    @test_throws ArgumentError compress(p, [4,1])
 
     @testset "large" begin
         b1 = Boson(:b, 256)

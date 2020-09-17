@@ -119,7 +119,7 @@ for fname in [
     :exchangesign,
     :bitwidth, :bitoffset, :get_bitmask,
     :compress, :extract,
-    :speciescount, :getspecies, :getspeciesname,
+    :numspecies, :speciescount, :getspecies, :getspeciesname,
 ]
     @eval begin
         #($fname)(p::P, args...) where {P<:ParticleSector} = ($fname)(P, args...)
