@@ -38,35 +38,37 @@ using ExactDiagonalization
         end
 
         @testset "particlesector" begin
-            @test exchangesign(state, 1) == 1
-            @test exchangesign(state, 2) == -1
-            @test bitwidth(state) == 3
-            @test bitwidth(state, 1) == 2
-            @test bitwidth(state, 2) == 1
-            @test bitoffset(state, 1) == 0
-            @test bitoffset(state, 2) == 2
-            @test get_bitmask(state, 1) == 0b0011
-            @test get_bitmask(state, 2) == 0b0100
-            @test compress(state, [0,0]) == 0b000
-            @test compress(state, [1,0]) == 0b001
-            @test compress(state, [2,0]) == 0b010
-            @test compress(state, [0,1]) == 0b100
-            @test compress(state, [1,1]) == 0b101
-            @test compress(state, [2,1]) == 0b110
+            for s in [state, typeof(state)]
+                @test exchangesign(s, 1) == 1
+                @test exchangesign(s, 2) == -1
+                @test bitwidth(s) == 3
+                @test bitwidth(s, 1) == 2
+                @test bitwidth(s, 2) == 1
+                @test bitoffset(s, 1) == 0
+                @test bitoffset(s, 2) == 2
+                @test get_bitmask(s, 1) == 0b0011
+                @test get_bitmask(s, 2) == 0b0100
+                @test compress(s, [0,0]) == 0b000
+                @test compress(s, [1,0]) == 0b001
+                @test compress(s, [2,0]) == 0b010
+                @test compress(s, [0,1]) == 0b100
+                @test compress(s, [1,1]) == 0b101
+                @test compress(s, [2,1]) == 0b110
 
-            @test extract(state, 0b000) == [0, 0]
-            @test extract(state, 0b001) == [1, 0]
-            @test extract(state, 0b010) == [2, 0]
-            @test extract(state, 0b100) == [0, 1]
-            @test extract(state, 0b101) == [1, 1]
-            @test extract(state, 0b110) == [2, 1]
+                @test extract(s, 0b000) == [0, 0]
+                @test extract(s, 0b001) == [1, 0]
+                @test extract(s, 0b010) == [2, 0]
+                @test extract(s, 0b100) == [0, 1]
+                @test extract(s, 0b101) == [1, 1]
+                @test extract(s, 0b110) == [2, 1]
 
-            @test numspecies(state) == 2
-            @test speciescount(state) == 2
-            @test getspecies(state, 1) == Boson{:m, 2}
-            @test getspecies(state, 2) == Fermion{:f}
-            @test getspeciesname(state, 1) == :m
-            @test getspeciesname(state, 2) == :f
+                @test numspecies(s) == 2
+                @test speciescount(s) == 2
+                @test getspecies(s, 1) == Boson{:m, 2}
+                @test getspecies(s, 2) == Fermion{:f}
+                @test getspeciesname(s, 1) == :m
+                @test getspeciesname(s, 2) == :f
+            end
         end
     end
 
@@ -96,35 +98,37 @@ using ExactDiagonalization
         end
 
         @testset "particlesector" begin
-            @test exchangesign(site, 1) == 1
-            @test exchangesign(site, 2) == -1
-            @test bitwidth(site) == 3
-            @test bitwidth(site, 1) == 2
-            @test bitwidth(site, 2) == 1
-            @test bitoffset(site, 1) == 0
-            @test bitoffset(site, 2) == 2
-            @test get_bitmask(site, 1) == 0b0011
-            @test get_bitmask(site, 2) == 0b0100
-            @test compress(site, [0,0]) == 0b000
-            @test compress(site, [1,0]) == 0b001
-            @test compress(site, [2,0]) == 0b010
-            @test compress(site, [0,1]) == 0b100
-            @test compress(site, [1,1]) == 0b101
-            @test compress(site, [2,1]) == 0b110
+            for s in [site, typeof(site)]
+                @test exchangesign(s, 1) == 1
+                @test exchangesign(s, 2) == -1
+                @test bitwidth(s) == 3
+                @test bitwidth(s, 1) == 2
+                @test bitwidth(s, 2) == 1
+                @test bitoffset(s, 1) == 0
+                @test bitoffset(s, 2) == 2
+                @test get_bitmask(s, 1) == 0b0011
+                @test get_bitmask(s, 2) == 0b0100
+                @test compress(s, [0,0]) == 0b000
+                @test compress(s, [1,0]) == 0b001
+                @test compress(s, [2,0]) == 0b010
+                @test compress(s, [0,1]) == 0b100
+                @test compress(s, [1,1]) == 0b101
+                @test compress(s, [2,1]) == 0b110
 
-            @test extract(site, 0b000) == [0, 0]
-            @test extract(site, 0b001) == [1, 0]
-            @test extract(site, 0b010) == [2, 0]
-            @test extract(site, 0b100) == [0, 1]
-            @test extract(site, 0b101) == [1, 1]
-            @test extract(site, 0b110) == [2, 1]
+                @test extract(s, 0b000) == [0, 0]
+                @test extract(s, 0b001) == [1, 0]
+                @test extract(s, 0b010) == [2, 0]
+                @test extract(s, 0b100) == [0, 1]
+                @test extract(s, 0b101) == [1, 1]
+                @test extract(s, 0b110) == [2, 1]
 
-            @test numspecies(site) == 2
-            @test speciescount(site) == 2
-            @test getspecies(site, 1) == Boson{:m, 2}
-            @test getspecies(site, 2) == Fermion{:f}
-            @test getspeciesname(site, 1) == :m
-            @test getspeciesname(site, 2) == :f
+                @test numspecies(s) == 2
+                @test speciescount(s) == 2
+                @test getspecies(s, 1) == Boson{:m, 2}
+                @test getspecies(s, 2) == Fermion{:f}
+                @test getspeciesname(s, 1) == :m
+                @test getspeciesname(s, 2) == :f
+            end
         end
     end
 end

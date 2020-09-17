@@ -39,14 +39,16 @@ using Particle
     @test basespace(hilbert) == hilbert
 
     @testset "particlesector" begin
-        @test exchangesign(hilbert, 1) == 1
-        @test exchangesign(hilbert, 2) == -1
-        @test numspecies(hilbert) == 2
-        @test speciescount(hilbert) == 2
-        @test getspecies(hilbert, 1) == Boson{:m, 2}
-        @test getspecies(hilbert, 2) == Fermion{:f}
-        @test getspeciesname(hilbert, 1) == :m
-        @test getspeciesname(hilbert, 2) == :f
+        for h in [hilbert, typeof(hilbert)]
+            @test exchangesign(h, 1) == 1
+            @test exchangesign(h, 2) == -1
+            @test numspecies(h) == 2
+            @test speciescount(h) == 2
+            @test getspecies(h, 1) == Boson{:m, 2}
+            @test getspecies(h, 2) == Fermion{:f}
+            @test getspeciesname(h, 1) == :m
+            @test getspeciesname(h, 2) == :f
+        end
     end
 
 
