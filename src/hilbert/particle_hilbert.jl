@@ -231,7 +231,7 @@ end
 
 function get_quantum_number(hs::ParticleHilbertSpace, statevec::AbstractVector{<:Integer})
     return mapreduce(identity, tupleadd,
-        site.states[indexarray[isite]].quantum_number
+        site.states[statevec[isite]].quantum_number
         for (isite, site) in enumerate(hs.sites)
     )
 end
