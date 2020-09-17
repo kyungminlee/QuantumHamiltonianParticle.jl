@@ -6,10 +6,10 @@ using LinearAlgebra
 # using Formatting
 
 @testset "Hubbard" begin
-    electron_up = Fermion{Symbol("↑")}()
-    electron_down = Fermion{Symbol("↓")}()
+    electron_up = Fermion("↑")
+    electron_down = Fermion("↓")
 
-    particle_sector = make_particle_sector(electron_up, electron_down)
+    particle_sector = ParticleSector(electron_up, electron_down)
     site = ParticleSite([
         ParticleState(particle_sector, "__", [0, 0], ( 0, 0)),
         ParticleState(particle_sector, "↑_", [1, 0], ( 1, 1)),

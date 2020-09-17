@@ -5,8 +5,8 @@ using LinearAlgebra
 # using Formatting
 
 @testset "spinless fermion" begin
-    fermion = Fermion{:f}()
-    particle_sector = make_particle_sector(fermion)
+    fermion = Fermion(:f)
+    particle_sector = ParticleSector(fermion)
     site = ParticleSite([
         ParticleState(particle_sector, "_", [0], (0,)),
         ParticleState(particle_sector, "c", [1], (1,)),

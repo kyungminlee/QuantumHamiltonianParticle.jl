@@ -24,14 +24,9 @@ struct ParticleSector{P<:Tuple{Vararg{AbstractParticle}}}
 end
 
 
-function make_particle_sector(p::AbstractParticle...)
-    P = typeof(p)
-    return ParticleSector(P)
-end
-
-
 num_particle_species(::Type{ParticleSector{P}}) where {P} = tuplelength(P)
-particle_species(::Type{P}) where {P<:ParticleSector} = P.parameters[1].parameters
+#particle_species(::Type{P}) where {P<:ParticleSector} = tuple([x() for x in P.parameters[1].parameters]...)
+particle_species(::Type{P}) where {P<:ParticleSector} = tuple(P.parameters[1].parameters...)
 
 particle_species(::Type{ParticleSector{P}}, index::Integer) where {P} = P.parameters[index]
 particle_species_name(::Type{ParticleSector{P}}, index::Integer) where {P} = particle_species(ParticleSector{P}, index).parameters[1]::Symbol
