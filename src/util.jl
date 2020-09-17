@@ -1,7 +1,15 @@
 export tuplelength
 
+
+
 tuplelength(::Type{<:NTuple{N, Any}}) where N = N
 tuplelength(::NTuple{N, Any}) where N = N
+
+tuplezero(::Type{<:NTuple{N, Any}}) where N = ([0 for i in 1:N]...,)
+tuplezero(::NTuple{N, Any}) where N = tuplezero(NTuple{N, Any})
+
+
+tupleadd(x::NTuple{N, Any}, y::NTuple{N, Any}) where {N} = x .+ y
 
 export isparityodd
 
