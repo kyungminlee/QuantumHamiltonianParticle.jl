@@ -55,16 +55,12 @@ struct ParticleState{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstra
     ParticleState(::PS, args...) where {PS<:ParticleSector} = ParticleState(PS, args...)
 end
 
-import Base.==
-function ==(lhs::ParticleState{PS, BR, QN}, rhs::ParticleState{PS, BR, QN}) where {PS, BR, QN}
+function Base.:(==)(lhs::ParticleState{PS, BR, QN}, rhs::ParticleState{PS, BR, QN}) where {PS, BR, QN}
     return lhs.name == rhs.name && lhs.occupancy_binary == rhs.occupancy_binary && lhs.quantum_number == rhs.quantum_number
 end
 
 
 qntype(::Type{ParticleState{PS, BR, QN}}) where {PS, BR, QN} = QN
-
-speciescount(::P) where {P<:ParticleState} = speciescount(P)
-speciescount(::Type{ParticleState{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
 
 
 export ParticleSite
@@ -88,13 +84,11 @@ struct ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstrac
     end
 end
 
-speciescount(::P) where {P<:ParticleSite} = speciescount(P)
-speciescount(::Type{ParticleSite{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
-
-
 qntype(::Type{ParticleSite{PS, BR, QN}}) where {PS, BR, QN} = QN
 
-bitwidth(site::ParticleSite{PS, BR, QN}) where {PS, BR, QN} = bitwidth(PS)
+# speciescount(::P) where {P<:ParticleSite} = speciescount(P)
+# speciescount(::Type{ParticleSite{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
+# bitwidth(site::ParticleSite{PS, BR, QN}) where {PS, BR, QN} = bitwidth(PS)
 
 dimension(site::ParticleSite) = length(site.states)
 
@@ -116,4 +110,17 @@ end
 
 function get_quantum_number(site::ParticleSite{PS, BR, QN}, state_index::Integer)::QN where {PS, BR, QN}
     return site.states[state_index].quantum_number
+end
+
+
+for fname in [
+    :exchangesign,
+    :bitwidth, :bitoffset, :get_bitmask,
+    :compress, :extract,
+    :numspecies, :speciescount, :getspecies, :getspeciesname,
+]
+    @eval begin
+        ($fname)(p::Type{ParticleState{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(p::Type{ParticleSite{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+    end
 end
