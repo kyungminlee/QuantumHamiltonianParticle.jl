@@ -148,6 +148,5 @@ using Particle
         0b110110000, 0b110110001, 0b110110010, 0b110110100, 0b110110101, 0b110110110,
     ]
     @test length(basis_list) == 6^3
-
-
+    @test_throws ArgumentError ExactDiagonalization.hs_get_basis_list(hilbert, UInt8)
 end

@@ -214,11 +214,12 @@ function locvec2occmat(
     occmat = zeros(Int, (n_particles, n_sites)) # occupation matrix
     for (iptl, p) in enumerate(particle_locations)
         if exchangesign(getspecies(PS, iptl)) != 1
-            sgn *= isparityodd(p) ? -1 : 1
+            sgn = isparityodd(p) ? -sgn : sgn
         end
         for isite in p
             occmat[iptl, isite] += 1
         end
+        # should not do `occmat[iptl, p] .+= 1`  (may contain duplicates)
     end
     return (occmat, sgn)
 end

@@ -37,6 +37,37 @@ using ExactDiagonalization
     end
 
     @testset "hilbert" begin
+        hilbert = ParticleHilbertSpace([site, site])
+        for sv in keys(hilbert)
+            sv = collect(sv.I)
+            om = statevec2occmat(hilbert, sv)
+            ob = statevec2occbin(hilbert, sv)
 
+            sv1 = occmat2statevec(hilbert, om)
+            ob1 = occmat2occbin(hilbert, om)
+            @test sv1 == sv
+            @test ob1 == ob
+
+            sv2 = occbin2statevec(hilbert, ob)
+            om2 = occbin2occmat(hilbert, ob)
+            @test sv2 == sv
+            @test om2 == om
+        end
+
+        @test statevec2locvec(hilbert, [2,1]) == [[1], []]
+        @test statevec2locvec(hilbert, [2,2]) == [[1,2], []]
+        @test statevec2locvec(hilbert, [2,3]) == [[1,2,2], []]
+        @test statevec2locvec(hilbert, [2,4]) == [[1], [2]]
+        @test statevec2locvec(hilbert, [2,5]) == [[1,2], [2]]
+        @test statevec2locvec(hilbert, [2,6]) == [[1,2,2], [2]]
+
+        @test locvec2statevec(hilbert, [[1], Int[]]) == ([2,1], 1)
+        @test locvec2statevec(hilbert, [[1,2], Int[]]) == ([2,2], 1)
+        @test locvec2statevec(hilbert, [[1,2,2], Int[]]) == ([2,3], 1)
+        @test locvec2statevec(hilbert, [[1], [2]]) == ([2,4], 1)
+        @test locvec2statevec(hilbert, [[1,2], [2]]) ==  ([2,5], 1)
+        @test locvec2statevec(hilbert, [[1,2,2], [2]]) == ([2,6], 1)
+
+        # TODO(kyungminlee) statevec2occmat, statevec2occbin, locvec2occmat locvec2occbin
     end
 end
