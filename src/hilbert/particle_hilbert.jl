@@ -31,15 +31,14 @@ struct ParticleHilbertSpace{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<
         bitwidths = map(bitwidth, sites)
         bitoffsets = Int[0, cumsum(bitwidths)...]
         if sizeof(BR) * 8 < bitoffsets[end]
-            throw(ArgumentError("type $BR too small to represent the hilbert space (need $(bitoffset[end]) bits)"))
+            throw(ArgumentError("type $BR too small to represent the hilbert space (need $(bitoffsets[end]) bits)"))
         end
         return new{PS, BR, QN}(sites, bitwidths, bitoffsets)
     end
 end
 
 
-import Base.==
-function (==)(lhs::ParticleHilbertSpace, rhs::ParticleHilbertSpace)
+function Base.:(==)(lhs::ParticleHilbertSpace, rhs::ParticleHilbertSpace)
     return lhs.sites == rhs.sites
 end
 
@@ -62,11 +61,23 @@ basespace(hs::ParticleHilbertSpace) = hs
 
 bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
 
-numspecies(::P) where {P<:ParticleHilbertSpace} = numspecies(P)
-numspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = numspecies(PS)
-speciescount(::P) where {P<:ParticleHilbertSpace} = speciescount(P)
-speciescount(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
-getspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}, args...) where {PS, BR, QN} = getspecies(PS, args...)
+# numspecies(::P) where {P<:ParticleHilbertSpace} = numspecies(P)
+# numspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = numspecies(PS)
+# speciescount(::P) where {P<:ParticleHilbertSpace} = speciescount(P)
+# speciescount(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
+# getspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}, args...) where {PS, BR, QN} = getspecies(PS, args...)
+
+
+for fname in [
+    :exchangesign,
+    :numspecies, :speciescount, :getspecies, :getspeciesname,
+]
+    @eval begin
+        ($fname)(p::Type{ParticleHilbertSpace{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+    end
+end
+
+
 
 
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
