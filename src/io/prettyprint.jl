@@ -1,7 +1,6 @@
 export prettyprint
 import ExactDiagonalization.prettyprintln
 
-#function prettyprint()
 prettyprintln(xs...) = prettyprintln(stdout::IO, xs...)
 prettyprint(xs...) = prettyprint(stdout::IO, xs...)
 

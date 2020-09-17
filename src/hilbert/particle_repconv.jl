@@ -29,7 +29,7 @@ function occbin2occvec(ps::ParticleSite{PS, BR, QN}, occbin::Unsigned) where {PS
 end
 
 function occvec2occbin(ps::ParticleSite{PS, BR, QN}, occarr::AbstractVector{<:Integer}) where {PS, BR, QN}
-    return extract(PS, occarr)
+    return compress(PS, occarr)
 end
 
 function state2occbin(ps::ParticleSite{PS, BR, QN}, index::Integer)::BR where {PS, BR, QN}
@@ -91,11 +91,9 @@ function statevec2occmat(
 )::Matrix{Int} where {PS, BR, QN}
     n_particles = speciescount(PS)
     n_sites = length(ps.sites)
-
     if length(statevec) != length(ps.sites)
         throw(ArgumentError("Length of statevec does not match the number of sites"))
     end
-
     occarr = zeros(Int, (n_particles, n_sites))
     for (isite, (site, istate)) in enumerate(zip(ps.sites, statevec))
         occarr[:, isite] = extract(PS, state2occbin(site, istate))
@@ -112,14 +110,11 @@ function statevec2locvec(
     n_particles = speciescount(PS)
     occmat = statevec2occmat(phs, statevec)
     out = [Int[] for i in 1:n_particles]
-    for iptl in 1:n_particles
-        for isite in 1:n_sites
-            append!(out[iptl], isite for c in 1:occmat[iptl, isite])
-        end
+    for iptl in 1:n_particles, isite in 1:n_sites
+        append!(out[iptl], isite for c in 1:occmat[iptl, isite])
     end
     return out
 end
-
 
 
 function occmat2occbin(
@@ -128,9 +123,7 @@ function occmat2occbin(
 ) where {PS, BR, QN}
     n_particles = speciescount(PS)
     n_sites = length(phs.sites)
-    if size(occmat) != (n_particles, n_sites)
-        throw(ArgumentError("Wrong occmat size"))
-    end
+    size(occmat) != (n_particles, n_sites) && throw(ArgumentError("Wrong occmat size"))
     occbin = zero(BR)
     for isite in 1:n_sites
         occbin |= compress(PS, occmat[:, isite]) << phs.bitoffsets[isite]
@@ -139,18 +132,13 @@ function occmat2occbin(
 end
 
 
-
 function occmat2statevec(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occmat::AbstractMatrix{<:Integer},
 ) where {PS, BR, QN}
     n_particles = speciescount(PS)
     n_sites = length(phs.sites)
-
-    if size(occmat) != (n_particles, n_sites)
-        throw(ArgumentError("Wrong occmat size"))
-    end
-
+    size(occmat) != (n_particles, n_sites) && throw(ArgumentError("Wrong occmat size"))
     out = Vector{Int}(undef, length(phs.sites))
     for (isite, site) in enumerate(phs.sites)
         siteoccbin = compress(PS, occmat[:,isite], BR)
@@ -168,10 +156,8 @@ function occmat2locvec(
     n_sites = length(phs.sites)
     n_particles = speciescount(PS)
     out = [Int[] for i in 1:n_particles]
-    for iptl in 1:n_particles
-        for isite in 1:n_sites
-            append!(out[iptl], isite for c in 1:occmat[iptl, isite])
-        end
+    for iptl in 1:n_particles, isite in 1:n_sites
+        append!(out[iptl], isite for c in 1:occmat[iptl, isite])
     end
     return out
 end
@@ -221,19 +207,17 @@ function locvec2occmat(
 ) where {PS, BR, QN}
     n_sites = length(phs.sites)
     n_particles = speciescount(PS)
-
     if length(particle_locations) != n_particles
         throw(ArgumentError("length of particle locations does not match the number of particles"))
     end
-
     sgn = 1
     occmat = zeros(Int, (n_particles, n_sites)) # occupation matrix
     for (iptl, p) in enumerate(particle_locations)
         if exchangesign(getspecies(PS, iptl)) != 1
-        sgn *= isparityodd(p) ? -1 : 1
+            sgn *= isparityodd(p) ? -1 : 1
         end
         for isite in p
-        occmat[iptl, isite] += 1
+            occmat[iptl, isite] += 1
         end
     end
     return (occmat, sgn)
