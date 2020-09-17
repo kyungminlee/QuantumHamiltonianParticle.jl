@@ -7,6 +7,7 @@ import ExactDiagonalization.qntype
 import ExactDiagonalization.dimension
 import ExactDiagonalization.bitwidth
 import ExactDiagonalization.get_state
+import ExactDiagonalization.get_state_index
 import ExactDiagonalization.get_quantum_number
 import ExactDiagonalization.quantum_number_sectors
 import ExactDiagonalization.compress
@@ -72,7 +73,7 @@ struct ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstrac
 
     function ParticleSite(states::AbstractVector{ParticleState{PS, BR, QN}}) where {QN, PS, BR}
         n_states = length(states)
-        n_particles = speciescount(PS)
+        n_particles = numspecies(PS)
 
         lookup = Dict{BR, Int}()
         for (i, s) in enumerate(states)
@@ -92,17 +93,17 @@ qntype(::Type{ParticleSite{PS, BR, QN}}) where {PS, BR, QN} = QN
 
 dimension(site::ParticleSite) = length(site.states)
 
-function get_state(site::ParticleSite, binrep::Unsigned)
-    return site.states[get_state_index(site, binrep)]
-end
-
 function get_state_index(site::ParticleSite, binrep::Unsigned)
     return site.state_lookup[binrep]
 end
 
-function compress(site::ParticleSite{PS, BR, QN}, state_index::Integer) where {PS, BR, QN}
-    return site.states[state_index]
+function get_state(site::ParticleSite, binrep::Unsigned)
+    return site.states[get_state_index(site, binrep)]
 end
+
+# function compress(site::ParticleSite{PS, BR, QN}, state_index::Integer) where {PS, BR, QN}
+#     return site.states[state_index]
+# end
 
 function quantum_number_sectors(site::ParticleSite{PS, BR, QN})::Vector{QN} where {PS, BR, QN}
     return sort(collect(Set([state.quantum_number for state in site.states])))

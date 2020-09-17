@@ -56,7 +56,7 @@ maxoccupancy(::Type{<:Fermion}) = 1
 # TODO: Edge case: when maxoccupancy is 0.
 bitwidth(::Type{P}) where {P<:AbstractParticle} = Int(ceil(log2(maxoccupancy(P)+1)))
 
-for fname in [:species, :exchangesign, :isfermion, :isboson, :maxoccupancy, :bitwidth, :bitoffset]
+for fname in [:exchangesign, :isfermion, :isboson, :maxoccupancy, :bitwidth, :bitoffset]
     @eval begin
         ($fname)(::T, args...) where {T<:AbstractParticle} = ($fname)(T, args...)
     end
