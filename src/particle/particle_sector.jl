@@ -110,7 +110,7 @@ function extract(::Type{P}, occbin::BR)::Vector{Int} where {P<:ParticleSector, B
         occ[i] = n
         occbin >>= bitwidth(p)
     end
-    @assert(iszero(occbin))
+    # @assert(iszero(occbin))
     return occ
 end
 

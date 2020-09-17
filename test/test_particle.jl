@@ -46,7 +46,7 @@ end
 
 
 @testset "particle sector" begin
-    b = Boson(:b, 3)
+    b = Boson(:b, 5)
     f = Fermion(:f)
     m = HardcoreBoson(:m)
 
@@ -62,7 +62,7 @@ end
 
     @test numspecies(p) == 2
     @test speciescount(p) == 2
-    @test getspecies(p) == (Boson{:b,3}, Fermion{:f})
+    @test getspecies(p) == (Boson{:b,5}, Fermion{:f})
 
     @test getspeciesname(p, 1) == :b
     @test getspeciesname(p, 2) == :f
@@ -75,29 +75,33 @@ end
     @test exchangesign(p, 2, 1) == 1
     @test exchangesign(p, 2, 2) == -1
 
-    @test bitwidth(p) == 3
-    @test bitwidth(p, 1) == 2
+    @test bitwidth(p) == 4
+    @test bitwidth(p, 1) == 3
     @test bitwidth(p, 2) == 1
 
     @test bitoffset(p, 1) == 0
-    @test bitoffset(p, 2) == 2
+    @test bitoffset(p, 2) == 3
 
-    @test bitoffset(p) == [0, 2, 3]
-    @test get_bitmask(p, 1, UInt) == UInt(0b0011)
-    @test get_bitmask(p, 2, UInt) == UInt(0b0100)
+    @test bitoffset(p) == [0, 3, 4]
+    @test get_bitmask(p, 1, UInt) == UInt(0b00111)
+    @test get_bitmask(p, 2, UInt) == UInt(0b01000)
 
     @test typeof(compress(p, [1,1], UInt8)) === UInt8
-    @test compress(p, [1,1]) == 0b101
-    @test compress(p, [2,1]) == 0b110
-    @test compress(p, [3,1]) == 0b111
+    @test compress(p, [1,1]) == 0b1001
+    @test compress(p, [2,1]) == 0b1010
+    @test compress(p, [3,1]) == 0b1011
     @test_throws ArgumentError compress(p, [0,0,0], UInt)
     @test_throws ArgumentError compress(p, [-1,1])
-    @test_throws ArgumentError compress(p, [4,1])
+    @test_throws ArgumentError compress(p, [8,1])
 
     @testset "large" begin
         b1 = Boson(:b, 256)
         p1 = ParticleSector(b1, f)
         @test_throws ArgumentError compress(p1, [0,0], UInt8)
     end
+
+    @test extract(p, 0b1010) == [2, 1]
+    @test_throws ArgumentError extract(p, 0b1111)
+    @test extract(p, 0b10000000) == [0, 0]
 
 end
