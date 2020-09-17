@@ -55,6 +55,12 @@ using ExactDiagonalization
         end
 
         @test_throws ArgumentError statevec2locvec(hilbert, [2,1])
+        @test_throws ArgumentError statevec2occbin(hilbert, [2,1])
+        @test_throws ArgumentError statevec2occmat(hilbert, [2,1])
+        @test_throws ArgumentError locvec2occbin(hilbert, [[2]])
+        @test_throws ArgumentError locvec2occmat(hilbert, [[2]])
+        @test_throws ArgumentError locvec2statevec(hilbert, [[2]])
+
 
         @test statevec2locvec(hilbert, [2,1,1]) == [[1], []]
         @test statevec2locvec(hilbert, [2,2,1]) == [[1,2], []]
