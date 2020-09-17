@@ -69,6 +69,11 @@ end
     @test exchangesign(p, 1) == 1
     @test exchangesign(p, 2) == -1
 
+    @test exchangesign(p, 1, 1) == 1
+    @test exchangesign(p, 1, 2) == 1
+    @test exchangesign(p, 2, 1) == 1
+    @test exchangesign(p, 2, 2) == -1
+
     @test bitwidth(p) == 3
     @test bitwidth(p, 1) == 2
     @test bitwidth(p, 2) == 1

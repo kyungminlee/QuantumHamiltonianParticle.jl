@@ -34,7 +34,7 @@ particle_species_name(::Type{ParticleSector{P}}, index::Integer) where {P} = par
 
 exchangesign(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = exchangesign(particle_species(PS, iptl))
 function exchangesign(::Type{PS}, iptl1::Integer, iptl2::Integer) where {PS<:ParticleSector}
-    return iptl1 == iptl2 ? exchangesign(PS, iptl) : 1
+    return iptl1 == iptl2 ? exchangesign(PS, iptl1) : 1
 end
 
 

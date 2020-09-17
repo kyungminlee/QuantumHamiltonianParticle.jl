@@ -31,7 +31,7 @@ struct ParticleHilbertSpace{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<
         bitwidths = map(bitwidth, sites)
         bitoffsets = Int[0, cumsum(bitwidths)...]
         if sizeof(BR) * 8 < bitoffsets[end]
-        throw(ArgumentError("type $BR too small to represent the hilbert space (need $(bitoffset[end]) bits)"))
+            throw(ArgumentError("type $BR too small to represent the hilbert space (need $(bitoffset[end]) bits)"))
         end
         return new{PS, BR, QN}(sites, bitwidths, bitoffsets)
     end
