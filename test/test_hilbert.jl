@@ -75,6 +75,8 @@ using Particle
     @test get_bitmask(hilbert, [1,2], 2)    == 0b000000111000
     @test get_bitmask(hilbert, [1,], [2,3]) == 0b000011011000
 
+    @test get_bitmask(hilbert) == 0b111111111111
+
     @test_throws BoundsError get_bitmask(hilbert, 3, 1)
     @test_throws BoundsError get_bitmask(hilbert, 1, 8)
 
@@ -85,8 +87,18 @@ using Particle
     @test_throws BoundsError get_bitmask(hilbert, [1,2], 8)
 
 
+    @test get_occupancy(hilbert, 1, 1, 0b100_001_110_100) == 0
+    @test get_occupancy(hilbert, 2, 1, 0b100_001_110_100) == 1
+    @test get_occupancy(hilbert, 1, 2, 0b100_001_110_100) == 2
+    @test get_occupancy(hilbert, 2, 2, 0b100_001_110_100) == 1
+    @test get_occupancy(hilbert, 1, 3, 0b100_001_110_100) == 1
+    @test get_occupancy(hilbert, 2, 3, 0b100_001_110_100) == 0
+    @test get_occupancy(hilbert, 1, 4, 0b100_001_110_100) == 0
+    @test get_occupancy(hilbert, 2, 4, 0b100_001_110_100) == 1
 
+    @test set_occupancy(hilbert, 1, 3, 0b100_001_110_100, 0) == 0b100_000_110_100
+    @test_throws ArgumentError set_occupancy(hilbert, 1, 3, 0b100_001_110_100, 3)
 
-    # @test get_bitmask(hi)
-    # @show hilbert
+    @test Set(quantum_number_sectors(hilbert)) == Set([(sz, c) for sz in -4:4, c in 0:4])
+    @test get_quantum_number(hilbert, 0b100_001_110_100) == (1+0-1+1, 1+1+1)
 end
