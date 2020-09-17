@@ -170,6 +170,9 @@ function get_bitmask(
     return make_bitmask(bitwidth(phs), BR)
 end
 
+# colon & vector.
+
+
 function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, QN}
     return make_bitmask(bitwidth(phs), BR)
 end
