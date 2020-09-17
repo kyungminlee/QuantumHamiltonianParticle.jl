@@ -119,8 +119,10 @@ for fname in [
     :numspecies, :speciescount, :getspecies, :getspeciesname,
 ]
     @eval begin
-        ($fname)(p::Type{ParticleState{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
-        ($fname)(p::Type{ParticleSite{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::Type{ParticleState{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::Type{ParticleSite{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::ParticleState{PS, BR, QN}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::ParticleSite{PS, BR, QN}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
     end
 end
 
@@ -129,7 +131,9 @@ for fname in [
     :compress, :extract,
 ]
     @eval begin
-        ($fname)(p::Type{ParticleState{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
-        ($fname)(p::Type{ParticleSite{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::Type{ParticleState{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::Type{ParticleSite{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::ParticleState{PS, BR, QN}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::ParticleSite{PS, BR, QN}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
     end
 end

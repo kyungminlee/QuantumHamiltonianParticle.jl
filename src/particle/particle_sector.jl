@@ -117,16 +117,21 @@ end
 
 for fname in [
     :exchangesign,
-    :bitwidth, :bitoffset, :get_bitmask,
-    :compress, :extract,
     :numspecies, :speciescount, :getspecies, :getspeciesname,
 ]
     @eval begin
-        #($fname)(p::P, args...) where {P<:ParticleSector} = ($fname)(P, args...)
-        ($fname)(p::P, args...) where P = ($fname)(P, args...)
+        ($fname)(p::P, args...) where {P<:ParticleSector} = ($fname)(P, args...)
     end
 end
 
+for fname in [
+    :bitwidth, :bitoffset, :get_bitmask,
+    :compress, :extract,
+]
+    @eval begin
+        ($fname)(p::P, args...) where {P<:ParticleSector} = ($fname)(P, args...)
+    end
+end
 
 # # Mainly for the ladder operators
 # struct ParticleIndex{P<:ParticleSector}

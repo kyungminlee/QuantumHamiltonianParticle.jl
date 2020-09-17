@@ -5,7 +5,7 @@ export get_bitmask_particle
 export ParticleHilbertSpace
 
 export get_fermion_parity
-export get_occupancy
+export get_occupancy, set_occupancy
 
 import ExactDiagonalization.scalartype
 # import ExactDiagonalization.valtype
@@ -73,7 +73,8 @@ for fname in [
     :numspecies, :speciescount, :getspecies, :getspeciesname,
 ]
     @eval begin
-        ($fname)(p::Type{ParticleHilbertSpace{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::Type{ParticleHilbertSpace{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(::ParticleHilbertSpace{PS, BR, QN}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
     end
 end
 
@@ -178,11 +179,11 @@ function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, Q
 end
 
 function get_occupancy(
-    hs::ParticleHilbertSpace{PS, BR, QN},
+    hs::ParticleHilbertSpace,
     iptl::Integer,
     isite::Integer,
-    bvec::BR,
-) where {PS, BR, QN}
+    bvec::Unsigned,
+)
     bm = get_bitmask(hs, iptl, isite)
     return Int( (bm & bvec) >> bitoffset(hs, iptl, isite) )
 end
@@ -192,12 +193,12 @@ function set_occupancy(
     hs::ParticleHilbertSpace{PS, BR, QN},
     iptl::Integer,
     isite::Integer,
-    bvec::BR,
+    bvec::BR2,
     count::Integer,
-) where {PS, BR, QN}
+) where {PS, BR, QN, BR2}
     @boundscheck !(0 <= count <= maxoccupancy(getspecies(PS, iptl))) && throw(ArgumentError("count out of bounds"))
     bm = get_bitmask(hs, iptl, isite)
-    return (bvec & ~bm) | (BR(count) << bitoffset(hs, iptl, isite))
+    return (bvec & ~bm) | (BR2(count) << bitoffset(hs, iptl, isite))
 end
 
 
@@ -218,8 +219,10 @@ function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
     return mapreduce(
         identity,
         tupleadd,
-        let i = get_state_index(hs, binrep, isite)
-            site.states[i].quantum_number
+        let b = (get_bitmask(hs, :, isite) & binrep) >> bitoffset(hs, isite)
+            #i = get_state_index(site, binrep)
+            #site.states[i].quantum_number
+            get_state(site, b).quantum_number
         end
             for (isite, site) in enumerate(hs.sites)
     )
