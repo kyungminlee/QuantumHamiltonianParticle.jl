@@ -116,9 +116,17 @@ end
 
 for fname in [
     :exchangesign,
+    :numspecies, :speciescount, :getspecies, :getspeciesname,
+]
+    @eval begin
+        ($fname)(p::Type{ParticleState{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+        ($fname)(p::Type{ParticleSite{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
+    end
+end
+
+for fname in [
     :bitwidth, :bitoffset, :get_bitmask,
     :compress, :extract,
-    :numspecies, :speciescount, :getspecies, :getspeciesname,
 ]
     @eval begin
         ($fname)(p::Type{ParticleState{PS, BR, QN}}, args...) where {PS, BR, QN} = ($fname)(PS, args...)
