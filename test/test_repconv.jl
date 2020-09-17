@@ -37,7 +37,7 @@ using ExactDiagonalization
     end
 
     @testset "hilbert" begin
-        hilbert = ParticleHilbertSpace([site, site])
+        hilbert = ParticleHilbertSpace([site, site, site])
         for sv in keys(hilbert)
             sv = collect(sv.I)
             om = statevec2occmat(hilbert, sv)
@@ -54,20 +54,33 @@ using ExactDiagonalization
             @test om2 == om
         end
 
-        @test statevec2locvec(hilbert, [2,1]) == [[1], []]
-        @test statevec2locvec(hilbert, [2,2]) == [[1,2], []]
-        @test statevec2locvec(hilbert, [2,3]) == [[1,2,2], []]
-        @test statevec2locvec(hilbert, [2,4]) == [[1], [2]]
-        @test statevec2locvec(hilbert, [2,5]) == [[1,2], [2]]
-        @test statevec2locvec(hilbert, [2,6]) == [[1,2,2], [2]]
+        @test_throws ArgumentError statevec2locvec(hilbert, [2,1])
 
-        @test locvec2statevec(hilbert, [[1], Int[]]) == ([2,1], 1)
-        @test locvec2statevec(hilbert, [[1,2], Int[]]) == ([2,2], 1)
-        @test locvec2statevec(hilbert, [[1,2,2], Int[]]) == ([2,3], 1)
-        @test locvec2statevec(hilbert, [[1], [2]]) == ([2,4], 1)
-        @test locvec2statevec(hilbert, [[1,2], [2]]) ==  ([2,5], 1)
-        @test locvec2statevec(hilbert, [[1,2,2], [2]]) == ([2,6], 1)
+        @test statevec2locvec(hilbert, [2,1,1]) == [[1], []]
+        @test statevec2locvec(hilbert, [2,2,1]) == [[1,2], []]
+        @test statevec2locvec(hilbert, [2,3,1]) == [[1,2,2], []]
+        @test statevec2locvec(hilbert, [2,4,1]) == [[1], [2]]
+        @test statevec2locvec(hilbert, [2,5,1]) == [[1,2], [2]]
+        @test statevec2locvec(hilbert, [2,6,1]) == [[1,2,2], [2]]
 
-        # TODO(kyungminlee) statevec2occmat, statevec2occbin, locvec2occmat locvec2occbin
+        @test locvec2statevec(hilbert, [[1], Int[]]) == ([2,1,1], 1)
+        @test locvec2statevec(hilbert, [[1,2], Int[]]) == ([2,2,1], 1)
+        @test locvec2statevec(hilbert, [[1,2,2], Int[]]) == ([2,3,1], 1)
+        @test locvec2statevec(hilbert, [[1], [2]]) == ([2,4,1], 1)
+        @test locvec2statevec(hilbert, [[1,2], [2]]) ==  ([2,5,1], 1)
+        @test locvec2statevec(hilbert, [[1,2,2], [2]]) == ([2,6,1], 1)
+
+
+        @test locvec2statevec(hilbert, [[1,2,2], [1,2]]) == ([5,6,1],  1)
+        @test locvec2statevec(hilbert, [[1,2,2], [2,1]]) == ([5,6,1], -1)
+
+        @test locvec2occmat(hilbert, [[1,2,2], [1,2]]) == ([1 2 0; 1 1 0],  1)
+        @test locvec2occmat(hilbert, [[1,2,2], [2,1]]) == ([1 2 0; 1 1 0], -1)
+
+        @test locvec2occbin(hilbert, [[1,2,2], [1,2]]) == (0b000_110_101,  1)
+        @test locvec2occbin(hilbert, [[1,2,2], [2,1]]) == (0b000_110_101, -1)
+
+        @test occmat2locvec(hilbert, [1 2 0; 1 1 0]) == [[1,2,2], [1,2]]
+        @test occbin2locvec(hilbert, 0b000_110_101) == [[1,2,2], [1,2]]
     end
 end

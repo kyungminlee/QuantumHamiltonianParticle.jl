@@ -196,7 +196,7 @@ function occbin2locvec(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occbin::Unsigned,
 ) where {PS, BR, QN}
-    occmat = occbin2occvec(phs, occbin)
+    occmat = occbin2occmat(phs, occbin)
     return occmat2locvec(phs, occmat)
 end
 
@@ -231,7 +231,7 @@ function locvec2occbin(
     particle_locations::AbstractVector{<:AbstractVector{<:Integer}},
 ) where {PS, BR, QN}
     occmat, sgn = locvec2occmat(phs, particle_locations)
-    return (occvec2occbin(phs, occmat), sgn)
+    return (occmat2occbin(phs, occmat), sgn)
 end
 
 
