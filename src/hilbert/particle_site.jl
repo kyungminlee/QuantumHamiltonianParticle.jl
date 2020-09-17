@@ -63,8 +63,8 @@ end
 
 qntype(::Type{ParticleState{PS, BR, QN}}) where {PS, BR, QN} = QN
 
-num_particle_species(::P) where {P<:ParticleState} = num_particle_species(P)
-num_particle_species(::Type{ParticleState{PS, BR, QN}}) where {PS, BR, QN} = num_particle_species(PS)
+speciescount(::P) where {P<:ParticleState} = speciescount(P)
+speciescount(::Type{ParticleState{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
 
 
 export ParticleSite
@@ -76,7 +76,7 @@ struct ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstrac
 
     function ParticleSite(states::AbstractVector{ParticleState{PS, BR, QN}}) where {QN, PS, BR}
         n_states = length(states)
-        n_particles = num_particle_species(PS)
+        n_particles = speciescount(PS)
 
         lookup = Dict{BR, Int}()
         for (i, s) in enumerate(states)
@@ -88,8 +88,8 @@ struct ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstrac
     end
 end
 
-num_particle_species(::P) where {P<:ParticleSite} = num_particle_species(P)
-num_particle_species(::Type{ParticleSite{PS, BR, QN}}) where {PS, BR, QN} = num_particle_species(PS)
+speciescount(::P) where {P<:ParticleSite} = speciescount(P)
+speciescount(::Type{ParticleSite{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
 
 
 qntype(::Type{ParticleSite{PS, BR, QN}}) where {PS, BR, QN} = QN

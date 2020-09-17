@@ -1,7 +1,7 @@
 abstract type AbstractParticle end
 
 export Fermion, HardcoreBoson, Boson
-export particle_species
+export species
 export exchangesign
 export isfermion, isboson
 export maxoccupancy
@@ -31,7 +31,7 @@ struct Boson{Species, Max}<:AbstractParticle
     Boson{Species, Max}() where {Species, Max} = new{Species, Max}()
 end
 
-# particle_species(p::Type{<:AbstractParticle}) = p.parameters[1]
+# getspecies(p::Type{<:AbstractParticle}) = p.parameters[1]
 
 # in units of 1/q where q is the ``charge'' of the particle
 # particleflux(::Type{<:Boson}) = 0//1
@@ -56,8 +56,8 @@ maxoccupancy(::Type{<:Fermion}) = 1
 # TODO: Edge case: when maxoccupancy is 0.
 bitwidth(::Type{P}) where {P<:AbstractParticle} = Int(ceil(log2(maxoccupancy(P)+1)))
 
-for fname in [:particle_species, :exchangesign, :isfermion, :isboson, :maxoccupancy, :bitwidth]
+for fname in [:species, :exchangesign, :isfermion, :isboson, :maxoccupancy, :bitwidth, :bitoffset]
     @eval begin
-        ($fname)(::T) where {T<:AbstractParticle} = ($fname)(T)
+        ($fname)(::T, args...) where {T<:AbstractParticle} = ($fname)(T, args...)
     end
 end

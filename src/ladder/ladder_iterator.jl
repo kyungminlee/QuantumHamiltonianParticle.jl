@@ -7,7 +7,7 @@ function get_column_iterator(
     bvec::BR,
     ::Type{S}=Float64,
 ) where {PS, BR, QN, S<:Number}
-    particle = particle_species(PS, op.particle_index)
+    particle = getspecies(PS, op.particle_index)
     # @show particle
     # @show typeof(particle)
     occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
@@ -99,7 +99,7 @@ function apply(
     bvec::BR2,
 ) where {PS, BR, QN, BR2<:Unsigned}
 
-    particle = particle_species(PS, op.particle_index)
+    particle = getspecies(PS, op.particle_index)
     occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
     # let
     #     occmat = occbin2occmat(hs, bvec)

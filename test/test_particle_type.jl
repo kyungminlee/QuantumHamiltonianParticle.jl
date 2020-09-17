@@ -60,11 +60,11 @@ end
 
     end
 
-    @test num_particle_species(p) == 2
-    @test particle_species(p) == (Boson{:b,3}, Fermion{:f})
+    @test speciescount(p) == 2
+    @test getspecies(p) == (Boson{:b,3}, Fermion{:f})
 
-    @test particle_species_name(p, 1) == :b
-    @test particle_species_name(p, 2) == :f
+    @test getspeciesname(p, 1) == :b
+    @test getspeciesname(p, 2) == :f
 
     @test exchangesign(p, 1) == 1
     @test exchangesign(p, 2) == -1

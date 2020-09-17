@@ -21,7 +21,7 @@ include("ladder/ladder_parity.jl")
 include("ladder/ladder_iterator.jl")
 include("ladder/ladder_apply.jl")
 
-include("simplify/ladder_simplify.jl")
+include("ladder/ladder_simplify.jl")
 
 # Projectors
 include("projector/projector_unit.jl")

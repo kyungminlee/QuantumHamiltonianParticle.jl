@@ -68,12 +68,12 @@ end
 
 function exchangesign(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
     lhs.particle_index != rhs.particle_index && return 1
-    isfermion(particle_species(PS, lhs.particle_index)) && return -1
+    isfermion(getspecies(PS, lhs.particle_index)) && return -1
     return 1
 end
 
 function maxoccupancy(arg::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-    return maxoccupancy(particle_species(PS, arg.particle_index))
+    return maxoccupancy(getspecies(PS, arg.particle_index))
 end
 
 

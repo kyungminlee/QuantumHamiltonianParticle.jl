@@ -76,7 +76,7 @@ function represent(
     isite = op.orbital
     ladder = op.ladder
 
-    particle = particle_species(PS, iptl)
+    particle = getspecies(PS, iptl)
     bitmask = get_bitmask(phs, iptl, isite)
 
     terms = Tuple{ParticleProjectorUnitOperator{BR}, Int}[]

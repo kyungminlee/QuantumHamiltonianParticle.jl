@@ -8,7 +8,7 @@ prettyprint(xs...) = prettyprint(stdout::IO, xs...)
 function prettyprint(io::IO, arg::LadderUnitOperator{PS, PI, OI}) where {PS, PI, OI}
     print(io, "ψ")
     arg.ladder == CREATION && print(io, "†")
-    print(io, "(", particle_species_name(PS, arg.particle_index), ",", arg.orbital, ")")
+    print(io, "(", getspeciesname(PS, arg.particle_index), ",", arg.orbital, ")")
 end
 
 function prettyprint(io::IO, arg::LadderProductOperator)

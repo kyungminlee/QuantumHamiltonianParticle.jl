@@ -89,7 +89,7 @@ function statevec2occmat(
     ps::ParticleHilbertSpace{PS, BR, QN},
     statevec::AbstractVector{<:Integer},
 )::Matrix{Int} where {PS, BR, QN}
-    n_particles = num_particle_species(PS)
+    n_particles = speciescount(PS)
     n_sites = length(ps.sites)
 
     if length(statevec) != length(ps.sites)
@@ -109,7 +109,7 @@ function statevec2locvec(
     statevec::AbstractVector{<:Integer},
 ) where {PS, BR, QN}
     n_sites = length(phs.sites)
-    n_particles = num_particle_species(PS)
+    n_particles = speciescount(PS)
     occmat = statevec2occmat(phs, statevec)
     out = [Int[] for i in 1:n_particles]
     for iptl in 1:n_particles
@@ -126,7 +126,7 @@ function occmat2occbin(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occmat::AbstractMatrix{<:Integer},
 ) where {PS, BR, QN}
-    n_particles = num_particle_species(PS)
+    n_particles = speciescount(PS)
     n_sites = length(phs.sites)
     if size(occmat) != (n_particles, n_sites)
         throw(ArgumentError("Wrong occmat size"))
@@ -144,7 +144,7 @@ function occmat2statevec(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occmat::AbstractMatrix{<:Integer},
 ) where {PS, BR, QN}
-    n_particles = num_particle_species(PS)
+    n_particles = speciescount(PS)
     n_sites = length(phs.sites)
 
     if size(occmat) != (n_particles, n_sites)
@@ -166,7 +166,7 @@ function occmat2locvec(
     occmat::AbstractMatrix{<:Integer},
 ) where {PS, BR, QN}
     n_sites = length(phs.sites)
-    n_particles = num_particle_species(PS)
+    n_particles = speciescount(PS)
     out = [Int[] for i in 1:n_particles]
     for iptl in 1:n_particles
         for isite in 1:n_sites
@@ -195,7 +195,7 @@ function occbin2occmat(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occbin::Unsigned,
 ) where {PS, BR, QN}
-    n_particles = num_particle_species(PS)
+    n_particles = speciescount(PS)
     n_sites = length(phs.sites)
     occmat = Matrix{Int}(undef, (n_particles, n_sites))
     for isite in 1:n_sites
@@ -220,7 +220,7 @@ function locvec2occmat(
     particle_locations::AbstractVector{<:AbstractVector{<:Integer}},
 ) where {PS, BR, QN}
     n_sites = length(phs.sites)
-    n_particles = num_particle_species(PS)
+    n_particles = speciescount(PS)
 
     if length(particle_locations) != n_particles
         throw(ArgumentError("length of particle locations does not match the number of particles"))
@@ -229,7 +229,7 @@ function locvec2occmat(
     sgn = 1
     occmat = zeros(Int, (n_particles, n_sites)) # occupation matrix
     for (iptl, p) in enumerate(particle_locations)
-        if exchangesign(particle_species(PS, iptl)) != 1
+        if exchangesign(getspecies(PS, iptl)) != 1
         sgn *= isparityodd(p) ? -1 : 1
         end
         for isite in p

@@ -38,8 +38,11 @@ function Base.convert(::Type{LadderProductOperator{PS, P, O}}, obj::LadderUnitOp
 end
 
 Base.iszero(arg::LadderProductOperator) = false
+Base.isone(arg::LadderProductOperator) = isempty(arg.factors)
 
-
+function Base.one(::Type{LadderProductOperator{PS, PI, OI}}) where {PS, PI, OI}
+    return LadderOperator(LadderUnitOperator{PS, P, O}[])
+end
 
 function Base.isless(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
     ll = length(lhs.factors)

@@ -71,7 +71,7 @@ function make_projector_operator(
     hs::ParticleHilbertSpace{PS, BR, QN},
     op::LadderUnitOperator{PS, PI, OI},
 ) where {PS, BR, QN, PI<:Integer, OI<:Integer}
-    particle = particle_species(PS, op.particle_index)
+    particle = getspecies(PS, op.particle_index)
     bm  = get_bitmask(hs, op.particle_index, op.orbital)
     if isfermion(particle)
         pbm = get_parity_mask(hs, op.particle_index, op.orbital)

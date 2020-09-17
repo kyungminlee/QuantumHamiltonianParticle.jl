@@ -62,8 +62,11 @@ basespace(hs::ParticleHilbertSpace) = hs
 
 bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
 
-num_particle_species(::P) where {P<:ParticleHilbertSpace} = num_particle_species(P)
-num_particle_species(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = num_particle_species(PS)
+numspecies(::P) where {P<:ParticleHilbertSpace} = numspecies(P)
+numspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = numspecies(PS)
+speciescount(::P) where {P<:ParticleHilbertSpace} = speciescount(P)
+speciescount(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
+getspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}, args...) where {PS, BR, QN} = getspecies(PS, args...)
 
 
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
@@ -80,7 +83,7 @@ function get_bitmask(
     iptl::Integer,
     isite::Integer,
 )::BR where {PS, BR, QN}
-    @boundscheck !(1<= iptl <= num_particle_species(PS)) && throw(BoundsError(PS.parameters, iptl))
+    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
     @boundscheck !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
     n_sites = length(phs.sites)
     bm = get_bitmask(PS, iptl, BR)
@@ -93,7 +96,7 @@ function get_bitmask(
     isites::AbstractVector{<:Integer},
 )::BR where {PS, BR, QN}
     @boundscheck for iptl in iptls
-        !(1<= iptl <= num_particle_species(PS)) && throw(BoundsError(PS.parameters, iptl))
+        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
     end
     @boundscheck for isite in isites
         !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
@@ -107,7 +110,7 @@ function get_bitmask(
     iptl::Integer,
     isites::AbstractVector{<:Integer},
 )::BR where {PS, BR, QN}
-    @boundscheck !(1<= iptl <= num_particle_species(PS)) && throw(BoundsError(PS.parameters, iptl))
+    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
     @boundscheck for isite in isites
         !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
     end
@@ -121,7 +124,7 @@ function get_bitmask(
     isite::Integer,
 )::BR where {PS, BR, QN}
     @boundscheck for iptl in iptls
-        !(1<= iptl <= num_particle_species(PS)) && throw(BoundsError(PS.parameters, iptl))
+        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
     end
     @boundscheck !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
     bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
@@ -133,7 +136,7 @@ function get_bitmask(
     iptl::Integer,
     ::Colon,
 )::BR where {PS, BR, QN}
-    @boundscheck !(1<= iptl <= num_particle_species(PS)) && throw(BoundsError(PS.parameters, iptl))
+    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
     n_sites = length(phs.sites)
     bm = get_bitmask(PS, iptl, BR)
     return mapreduce((isite) -> bm << phs.bitoffsets[isite], |, 1:n_sites; init=zero(BR))
@@ -178,7 +181,7 @@ function set_occupancy(
     bvec::BR,
     count::Integer,
 ) where {PS, BR, QN}
-    @boundscheck !(0 <= count <= maxoccupancy(particle_species(PS, iptl))) && throw(ArgumentError("count out of bounds"))
+    @boundscheck !(0 <= count <= maxoccupancy(getspecies(PS, iptl))) && throw(ArgumentError("count out of bounds"))
     bm = get_bitmask(hs, iptl, isite)
     return (bvec & ~bm) | (BR(count) << bitoffset(hs, iptl, isite))
 end

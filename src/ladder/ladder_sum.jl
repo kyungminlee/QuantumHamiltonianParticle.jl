@@ -119,7 +119,6 @@ function Base.:(-)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOpera
 end
 
 Base.:(+)(lhs::LadderSumOperator{PS, P, O, S1}, rhs::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S1, S2} = LadderSumOperator(vcat(lhs.terms, rhs.terms))
-# Base.:(-)(lhs::LadderSumOperator{PS, P, O, S1}, rhs::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S1, S2} = (lhs) + (-rhs)
 
 function Base.:(+)(lhs::LadderSumOperator{PS, P, O, S}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O, S}
     return LadderSumOperator([lhs.terms..., rhs=>one(S)])

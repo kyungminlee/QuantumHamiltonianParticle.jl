@@ -59,7 +59,7 @@ spin_site = ParticleSite([
 
 hs = ParticleHilbertSpace([tjs_site, spin_site, tjs_site, tjs_site, tjs_site])
 
-nptls = num_particle_species(hs)
+nptls = speciescount(hs)
 nsites = length(hs.sites)
 
 for isite in 1:nsites, iptl in 1:nptls

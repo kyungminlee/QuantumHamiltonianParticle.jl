@@ -19,7 +19,7 @@ using LinearAlgebra
 
     @testset "checks" begin
         @test length(hs.sites) == nsites
-        @test num_particle_species(hs) == 1
+        @test speciescount(hs) == 1
         for isite in 1:nsites
             @test get_bitmask(hs, 1, isite) == one(UInt) << (isite-1)
         end
