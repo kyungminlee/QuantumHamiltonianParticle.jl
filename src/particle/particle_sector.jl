@@ -37,6 +37,7 @@ function exchangesign(::Type{PS}, iptl1::Integer, iptl2::Integer) where {PS<:Par
     return iptl1 == iptl2 ? exchangesign(PS, iptl) : 1
 end
 
+
 # occupation representaiton
 
 bitwidth(::Type{P}) where {P<:ParticleSector} = sum(bitwidth(p) for p in particle_species(P))
@@ -53,11 +54,12 @@ function bitoffset(::Type{P}, iptl::Integer)::Int where {P<:ParticleSector}
 end
 
 
-function bitoffsets(::Type{P}) where {P<:ParticleSector}
+function bitoffset(::Type{P}) where {P<:ParticleSector}
     species = particle_species(P)
+    nptls = length(species)
     offset = 0
     out = Vector{Int}(undef, length(species)+1)
-    for i in 1:iptl
+    for i in 1:nptls
         out[i] = offset
         offset += bitwidth(species[i])
     end
@@ -118,6 +120,7 @@ end
 
 
 for fname in [
+    :exchangesign,
     :bitwidth, :bitoffset, :get_bitmask,
     :compress, :extract,
     :num_particle_species, :particle_species, :particle_species_name,
