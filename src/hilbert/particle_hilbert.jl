@@ -20,6 +20,8 @@ import ExactDiagonalization.get_quantum_number
 
 import ExactDiagonalization.AbstractHilbertSpace
 
+import ExactDiagonalization.hs_get_basis_list
+
 
 # Add a decoration to the existing Hilbert space
 struct ParticleHilbertSpace{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:AbstractQuantumNumber}}}<:AbstractHilbertSpace
@@ -236,6 +238,24 @@ function get_quantum_number(hs::ParticleHilbertSpace, statevec::AbstractVector{<
     )
 end
 
+
+function Base.keys(hs::ParticleHilbertSpace)
+    return CartesianIndices(((1:length(site.states) for site in hs.sites)...,))
+end
+
+
+
+function hs_get_basis_list(hs::ParticleHilbertSpace{PS, BR, QN}, ::Type{BR2}=BR)::Vector{BR2} where {PS, BR<:Unsigned, QN, BR2}
+    if sizeof(BR) * 8 <= bitwidth(hs)
+        throw(ArgumentError("type $(BR) not enough to represent the hilbert space (need $(bitwidth(hs)) bits)"))
+    end
+    basis_list = BR[]
+    for indexarray in keys(hs)
+        push!(basis_list, statevec2occbin(hs, collect(indexarray.I) ))
+    end
+    sort!(basis_list)
+    return basis_list
+end
 
 #
 # function extract(hs::ParticleHilbertSpace{PS, BR, QN}, binrep::Unsigned)::CartesianIndex where {PS, BR, QN}
