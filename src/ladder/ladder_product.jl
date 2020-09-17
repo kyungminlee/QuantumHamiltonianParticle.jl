@@ -44,11 +44,39 @@ function Base.one(::Type{LadderProductOperator{PS, PI, OI}}) where {PS, PI, OI}
     return LadderProductOperator(LadderUnitOperator{PS, PI, OI}[])
 end
 
+# Orderings
+
+
 function Base.isless(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
     ll = length(lhs.factors)
     lr = length(rhs.factors)
-    return (ll == lr) ? isless(lhs.factors, rhs.factors) : isless(ll, lr)
+    return (ll == lr) ? Base.isless(lhs.factors, rhs.factors) : isless(ll, lr)
 end
+
+# function isless_localnormalorder(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
+#     ll = length(lhs.factors)
+#     lr = length(rhs.factors)
+#     return (ll == lr) ? isless_localnormalorder(lhs.factors, rhs.factors) : isless(ll, lr)
+# end
+
+# function isless_normalorder(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
+#     ll = length(lhs.factors)
+#     lr = length(rhs.factors)
+#     return (ll == lr) ? isless_normalorder(lhs.factors, rhs.factors) : isless(ll, lr)
+# end
+
+# function isless_localnormalorder(
+#     lhs::Pair{LadderProductOperator{PS, P, O}, A},
+#     rhs::Pair{LadderProductOperator{PS, P, O}, B},
+# ) where {PS, P, O, A, B}
+#     return isless_localnormalorder(lhs[1], rhs[1])
+# end
+
+# function isless_normalorder(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
+#     ll = length(lhs.factors)
+#     lr = length(rhs.factors)
+#     return (ll == lr) ? isless_normalorder(lhs.factors, rhs.factors) : isless(ll, lr)
+# end
 
 function Base.adjoint(arg::LadderProductOperator{PS, P, O}) where {PS, P, O}
     return LadderProductOperator([adjoint(f) for f in reverse(arg.factors)])

@@ -23,23 +23,25 @@ function Base.:(==)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{P
 end
 
 
+
+
 # local normal ordering
-function isless_localnormalorder(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
     lhs.orbital != rhs.orbital && return isless(lhs.orbital, rhs.orbital)
     lhs.particle_index != rhs.particle_index && return isless(lhs.particle_index, rhs.particle_index)
     return isless(lhs.ladder, rhs.ladder)
 end
 
-function isless_normalorder(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-    (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
-    if lhs.ladder == CREATION # both CREATION
-        (lhs.particle_index != rhs.particle_index) && return isless(lhs.particle_index, rhs.particle_index)
-        return isless(lhs.orbital, rhs.orbital)
-    else # both ANNIHILATION
-        (lhs.particle_index != rhs.particle_index) && return isless(rhs.particle_index, lhs.particle_index)
-        return isless(rhs.orbital, lhs.orbital)
-    end
-end
+# function isless_normalorder(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+#     (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
+#     if lhs.ladder == CREATION # both CREATION
+#         (lhs.particle_index != rhs.particle_index) && return isless(lhs.particle_index, rhs.particle_index)
+#         return isless(lhs.orbital, rhs.orbital)
+#     else # both ANNIHILATION
+#         (lhs.particle_index != rhs.particle_index) && return isless(rhs.particle_index, lhs.particle_index)
+#         return isless(rhs.orbital, lhs.orbital)
+#     end
+# end
 
 
 # Particle first
@@ -55,16 +57,16 @@ end
 # end
 
 # Site first
-function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-    (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
-    if lhs.ladder == CREATION # both CREATION
-        (lhs.orbital != rhs.orbital) && return isless(lhs.orbital, rhs.orbital)
-        return isless(lhs.particle_index, rhs.particle_index)
-    else # both ANNIHILATION
-        (lhs.orbital != rhs.orbital) && return isless(rhs.orbital, lhs.orbital)
-        return isless(rhs.particle_index, lhs.particle_index)
-    end
-end
+# function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+#     (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
+#     if lhs.ladder == CREATION # both CREATION
+#         (lhs.orbital != rhs.orbital) && return isless(lhs.orbital, rhs.orbital)
+#         return isless(lhs.particle_index, rhs.particle_index)
+#     else # both ANNIHILATION
+#         (lhs.orbital != rhs.orbital) && return isless(rhs.orbital, lhs.orbital)
+#         return isless(rhs.particle_index, lhs.particle_index)
+#     end
+# end
 
 function exchangesign(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
     lhs.particle_index != rhs.particle_index && return 1

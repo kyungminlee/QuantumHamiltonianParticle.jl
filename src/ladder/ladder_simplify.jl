@@ -3,6 +3,16 @@ export unify_type
 
 import ExactDiagonalization.simplify
 
+# struct LocalNormalOrdering <: Ordering end
+# struct NormalOrdering <: Ordering end
+
+# function lt(
+#     ::LocalNormalOrdering,
+#     a::LadderUnitOperator{PS, PI, OI},
+#     b::LadderUnitOperator{PS, PI, OI})
+#     isless_localnormalorder(a, b)
+# end
+
 
 function normal_order(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg

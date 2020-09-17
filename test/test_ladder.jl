@@ -42,5 +42,18 @@ using Particle
         @test ishermitian(n11)
         @test !ishermitian(hop)
 
+        @test exchangesign(c(1,1), c(1,1)) == 1
+        @test exchangesign(c(1,1), c(2,1)) == 1
+        @test exchangesign(c(2,1), c(2,1)) == -1
+
+        @testset "ordering" begin
+            @test c(1,1) < c(1,2)
+            @test !(c(1,1) < c(1,1))
+            @test !(c(1,2) < c(1,1))
+
+            @test cdag(1,1) < cdag(1,2)
+            @test !(cdag(1,1) < cdag(1,1))
+            @test !(cdag(1,2) < cdag(1,1))
+        end
     end
 end
