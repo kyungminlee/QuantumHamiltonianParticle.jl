@@ -41,7 +41,7 @@ Base.iszero(arg::LadderProductOperator) = false
 Base.isone(arg::LadderProductOperator) = isempty(arg.factors)
 
 function Base.one(::Type{LadderProductOperator{PS, PI, OI}}) where {PS, PI, OI}
-    return LadderOperator(LadderUnitOperator{PS, P, O}[])
+    return LadderProductOperator(LadderUnitOperator{PS, PI, OI}[])
 end
 
 function Base.isless(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
@@ -54,7 +54,6 @@ function Base.adjoint(arg::LadderProductOperator{PS, P, O}) where {PS, P, O}
     return LadderProductOperator([adjoint(f) for f in reverse(arg.factors)])
 end
 
-
 function LinearAlgebra.ishermitian(arg::LadderProductOperator{PS, P, O}) where {PS, P, O}
-    return isequiv(arg, adjoint(arg))
+    return iszero(simplify(arg - adjoint(arg)))
 end
