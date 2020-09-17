@@ -103,5 +103,4 @@ end
     @test extract(p, 0b1010) == [2, 1]
     @test_throws ArgumentError extract(p, 0b1111)
     @test extract(p, 0b10000000) == [0, 0]
-
 end

@@ -101,4 +101,5 @@ using Particle
 
     @test Set(quantum_number_sectors(hilbert)) == Set([(sz, c) for sz in -4:4, c in 0:4])
     @test get_quantum_number(hilbert, 0b100_001_110_100) == (1+0-1+1, 1+1+1)
+    @test get_quantum_number(hilbert, [4, 6, 2, 4]) == (1+0-1+1, 1+1+1)
 end
