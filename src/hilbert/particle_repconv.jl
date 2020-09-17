@@ -155,6 +155,7 @@ function occmat2locvec(
 ) where {PS, BR, QN}
     n_sites = length(phs.sites)
     n_particles = speciescount(PS)
+    size(occmat) != (n_particles, n_sites) && throw(ArgumentError("Wrong occmat size"))
     out = [Int[] for i in 1:n_particles]
     for iptl in 1:n_particles, isite in 1:n_sites
         append!(out[iptl], isite for c in 1:occmat[iptl, isite])
