@@ -246,10 +246,10 @@ end
 
 
 function hs_get_basis_list(hs::ParticleHilbertSpace{PS, BR, QN}, ::Type{BR2}=BR)::Vector{BR2} where {PS, BR<:Unsigned, QN, BR2}
-    if sizeof(BR) * 8 <= bitwidth(hs)
-        throw(ArgumentError("type $(BR) not enough to represent the hilbert space (need $(bitwidth(hs)) bits)"))
+    if sizeof(BR2) * 8 <= bitwidth(hs)
+        throw(ArgumentError("type $(BR2) not enough to represent the hilbert space (need $(bitwidth(hs)) bits)"))
     end
-    basis_list = BR[]
+    basis_list = BR2[]
     for indexarray in keys(hs)
         push!(basis_list, statevec2occbin(hs, collect(indexarray.I) ))
     end
