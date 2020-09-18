@@ -112,7 +112,9 @@ using Particle
         @test op*2 == 2*n11 + 4*n12
         @test op/2 == 0.5*n11 + 1.0*n12
         @test op//2 == (1//2)*n11 + (1//1)*n12
+        @test 2*op == 2*n11 + 4*n12
         @test 2\op == 0.5*n11 + 1.0*n12
+
 
         @test c(1,1) * op == ∑([∏([c(1,1), cdag(1,1), c(1,1)])=>1, ∏([c(1,1), cdag(1,2), c(1,2)])=>2])
         @test op * c(1,1) == ∑([∏([cdag(1,1), c(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2), c(1,1)])=>2])
@@ -120,6 +122,14 @@ using Particle
         @test n11 * op == ∑([∏([cdag(1,1), c(1,1), cdag(1,1), c(1,1)])=>1, ∏([cdag(1,1), c(1,1), cdag(1,2), c(1,2)])=>2])
         @test op * n11 == ∑([∏([cdag(1,1), c(1,1), cdag(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2), cdag(1,1), c(1,1)])=>2])
 
+        @test c(1,1) + 1 == ∑([∏([c(1,1)])=>1, one(∏{PS, Int, Int})=>1])
+        @test 1 + c(1,1) == ∑([one(∏{PS, Int, Int})=>1, ∏([c(1,1)])=>1])
+
+        @test n11 + 1 == ∑([n11=>1, one(∏{PS, Int, Int})=>1])
+        @test 1 + n11 == ∑([one(∏{PS, Int, Int})=>1, n11=>1])
+
+        @test op + 1 == ∑([∏([cdag(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2)])=>2, one(∏{PS, Int, Int})=>1 ])
+        @test 1 + op == ∑([ one(∏{PS, Int, Int})=>1, ∏([cdag(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2)])=>2 ])
 
         @test !ishermitian(n11 + hop)
         @test ishermitian(hop + adjoint(hop))
@@ -143,7 +153,6 @@ using Particle
     @testset "simplify" begin
         @test simplify( c(2,1) ) == c(2,1)
         @test simplify( c(2,1)*cdag(2,1)*c(2,1) ) == c(2,1)*1
-        @show cdag(1,1)*c(1,1) + 1
         @test iszero(simplify( c(2,1)*cdag(2,1) + cdag(2,1)*c(2,1) + (-1)))
         @test iszero(simplify( c(2,1)*cdag(2,1) + cdag(2,1)*c(2,1) - 1))
         @test iszero(simplify( c(2,1)*c(2,1)*c(2,1) ))

@@ -29,6 +29,9 @@ function Base.one(::Type{ParticleProjectorUnitOperator{BR, S}}) where {BR, S}
     return ParticleProjectorUnitOperator(z, z, z, z, one(S))
 end
 
+Base.zero(::ParticleProjectorUnitOperator{BR, S}) where {BR, S} = Base.zero(ParticleProjectorUnitOperator{BR, S})
+Base.one(::ParticleProjectorUnitOperator{BR, S}) where {BR, S} = Base.one(ParticleProjectorUnitOperator{BR, S})
+
 Base.iszero(arg::ParticleProjectorUnitOperator) = Base.iszero(arg.amplitude)
 
 

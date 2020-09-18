@@ -39,9 +39,10 @@ function Base.zero(::Type{LadderSumOperator{PS, P, O, S}}) where {PS, P, O, S}
     return LadderSumOperator(Pair{LadderProductOperator{PS, P, O}, S}[])
 end
 
+Base.one(::OP) where {OP<:LadderSumOperator} = Base.one(OP)
+Base.zero(::OP) where {OP<:LadderSumOperator} = Base.zero(OP)
+
 Base.iszero(arg::LadderSumOperator) = Base.isempty(arg.terms)
-
-
 
 function Base.convert(::Type{LadderSumOperator{PS, P, O, S}}, obj::LadderUnitOperator{PS, P, O}) where {PS, P, O, S}
     return LadderSumOperator([LadderProductOperator([obj])=>one(S)])
