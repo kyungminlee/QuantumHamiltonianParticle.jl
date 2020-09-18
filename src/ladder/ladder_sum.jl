@@ -23,13 +23,7 @@ struct LadderSumOperator{PS, P, O, S<:Number}<:AbstractParticleLadderOperator{PS
     end
 end
 
-
-function Base.:(==)(
-    lhs::LadderSumOperator{PS, P, O, S},
-    rhs::LadderSumOperator{PS, P, O, S}
-) where {PS, P, O, S}
-    return lhs.terms == rhs.terms
-end
+Base.:(==)(lhs::OP, rhs::OP) where {OP<:LadderSumOperator} = lhs.terms == rhs.terms
 
 function Base.one(::Type{LadderSumOperator{PS, P, O, S}}) where {PS, P, O, S}
     return LadderSumOperator([one(LadderProductOperator{PS, P, O}) => one(S)])

@@ -75,7 +75,7 @@ function make_projector_operator(
     particle = getspecies(PS, op.particle_index)
     bm  = get_bitmask(hs, op.particle_index, op.orbital)
     if isfermion(particle)
-        pbm = get_parity_mask(hs, op.particle_index, op.orbital)
+        pbm = get_parity_bitmask(hs, op.particle_index, op.orbital)
         if op.ladder == CREATION
             br = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
             bc = zero(BR)

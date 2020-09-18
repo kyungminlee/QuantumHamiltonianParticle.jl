@@ -180,6 +180,16 @@ function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, Q
     return make_bitmask(bitwidth(phs), BR)
 end
 
+
+function get_parity_bitmask(hs::ParticleHilbertSpace, iptl::Integer, isite::Integer)
+    bm_species = get_bitmask(hs, iptl, :)
+    bm_site = get_bitmask(hs, iptl, isite)
+    bm_mask = ( bm_site - 1 ) & bm_species  # σᶻ in jordan wigner string
+    return bm_mask
+end
+
+
+
 function get_occupancy(
     hs::ParticleHilbertSpace,
     iptl::Integer,
