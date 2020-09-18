@@ -52,7 +52,9 @@ function Base.convert(::Type{LadderSumOperator{PS, P, O, S}}, obj::LadderProduct
     return LadderSumOperator([obj=>one(S)])
 end
 
-
+function Base.convert(::Type{LadderSumOperator{PS, P, O, S}}, obj::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S}
+    return LadderSumOperator([t=>convert(S, a) for (t, a) in obj.terms])
+end
 
 
 function isequiv(lhs::LadderSumOperator{PS, P, O, S1}, rhs::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S1, S2}
