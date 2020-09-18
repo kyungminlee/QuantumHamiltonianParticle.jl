@@ -68,6 +68,8 @@ using Particle
         ∑ = LadderSumOperator
         ∏ = LadderProductOperator
 
+
+
         @test ∑(c(1,1)) == ∑([∏([c(1,1)]) => 1])
         n11 = cdag(1,1) * c(1,1)
         n12 = cdag(1,2) * c(1,2)
@@ -107,6 +109,13 @@ using Particle
         @test n11 + n12//2 == ∑([n11=>1//1, n12=>1//2])
 
         op = n11 + 2*n12
+
+        @test one(LadderSumOperator{PS, Int, Int, Int}) == one(op)
+        @test zero(LadderSumOperator{PS, Int, Int, Int}) == zero(op)
+        @test isone(one(op)) && !iszero(one(op))
+        @test iszero(zero(op)) && !isone(zero(op))
+
+
         @test adjoint(op) == op
         @test ishermitian(op)
         @test op*2 == 2*n11 + 4*n12
@@ -125,8 +134,8 @@ using Particle
         @test c(1,1) + 1 == ∑([∏([c(1,1)])=>1, one(∏{PS, Int, Int})=>1])
         @test 1 + c(1,1) == ∑([one(∏{PS, Int, Int})=>1, ∏([c(1,1)])=>1])
 
-        @test n11 + 1 == ∑([n11=>1, one(∏{PS, Int, Int})=>1])
-        @test 1 + n11 == ∑([one(∏{PS, Int, Int})=>1, n11=>1])
+        @test n11 + 1 == ∑([n11=>1, one(n11)=>1])
+        @test 1 + n11 == ∑([one(n11)=>1, n11=>1])
 
         @test op + 1 == ∑([∏([cdag(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2)])=>2, one(∏{PS, Int, Int})=>1 ])
         @test 1 + op == ∑([ one(∏{PS, Int, Int})=>1, ∏([cdag(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2)])=>2 ])

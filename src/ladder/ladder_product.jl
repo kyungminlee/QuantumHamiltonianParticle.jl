@@ -27,6 +27,7 @@ Base.isone(arg::LadderProductOperator) = isempty(arg.factors)
 function Base.one(::Type{LadderProductOperator{PS, PI, OI}}) where {PS, PI, OI}
     return LadderProductOperator(LadderUnitOperator{PS, PI, OI}[])
 end
+Base.one(::OP) where {OP<:LadderProductOperator} = Base.one(OP)
 
 # Orderings
 
