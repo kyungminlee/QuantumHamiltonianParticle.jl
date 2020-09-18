@@ -23,25 +23,25 @@ function Base.:(==)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{P
 end
 
 
-
-
-# local normal ordering
-function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-    lhs.orbital != rhs.orbital && return isless(lhs.orbital, rhs.orbital)
-    lhs.particle_index != rhs.particle_index && return isless(lhs.particle_index, rhs.particle_index)
-    return isless(lhs.ladder, rhs.ladder)
-end
-
-# function isless_normalorder(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-#     (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
-#     if lhs.ladder == CREATION # both CREATION
-#         (lhs.particle_index != rhs.particle_index) && return isless(lhs.particle_index, rhs.particle_index)
-#         return isless(lhs.orbital, rhs.orbital)
-#     else # both ANNIHILATION
-#         (lhs.particle_index != rhs.particle_index) && return isless(rhs.particle_index, lhs.particle_index)
-#         return isless(rhs.orbital, lhs.orbital)
-#     end
+# # local normal ordering
+# function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+#     lhs.orbital != rhs.orbital && return isless(lhs.orbital, rhs.orbital)
+#     lhs.particle_index != rhs.particle_index && return isless(lhs.particle_index, rhs.particle_index)
+#     return isless(lhs.ladder, rhs.ladder)
 # end
+
+
+# normal ordering
+function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+    (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
+    if lhs.ladder == CREATION # both CREATION
+        (lhs.particle_index != rhs.particle_index) && return isless(lhs.particle_index, rhs.particle_index)
+        return isless(lhs.orbital, rhs.orbital)
+    else # both ANNIHILATION
+        (lhs.particle_index != rhs.particle_index) && return isless(rhs.particle_index, lhs.particle_index)
+        return isless(rhs.orbital, lhs.orbital)
+    end
+end
 
 
 # Particle first
