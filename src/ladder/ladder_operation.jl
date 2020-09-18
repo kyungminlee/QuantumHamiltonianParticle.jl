@@ -85,6 +85,40 @@ end
 
 # 3. Addition
 
+
+
+
+
+
+
+function Base.:(+)(lhs::S, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O, S<:Number}
+    return LadderSumOperator([
+        one(LadderProductOperator{PS, P, O})=>lhs,
+        LadderProductOperator([rhs])=>one(S)
+    ])
+end
+
+function Base.:(+)(lhs::S, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O, S<:Number}
+    return LadderSumOperator([
+        one(LadderProductOperator{PS, P, O})=>lhs,
+        rhs=>one(S),
+    ])
+end
+
+function Base.:(+)(lhs::Number, rhs::LadderSumOperator{PS, P, O, S}) where {PS, P, O, S}
+    return LadderSumOperator([
+        one(LadderProductOperator{PS, P, O})=>lhs,
+        rhs.terms...,
+    ])
+end
+
+function Base.:(+)(lhs::LadderUnitOperator{PS, P, O}, rhs::S) where {PS, P, O, S<:Number}
+    return LadderSumOperator([
+        LadderProductOperator([lhs])=>one(S),
+        one(LadderProductOperator{PS, P, O})=>rhs,
+    ])
+end
+
 function Base.:(+)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
     return LadderSumOperator([
         LadderProductOperator([lhs])=>one(Int),
@@ -106,6 +140,12 @@ function Base.:(+)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderSumOperator{PS,
     ])
 end
 
+function Base.:(+)(lhs::LadderProductOperator{PS, P, O}, rhs::S) where {PS, P, O, S<:Number}
+    return LadderSumOperator([
+        lhs=>one(S),
+        one(LadderProductOperator{PS, P, O})=>rhs,
+    ])
+end
 
 function Base.:(+)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
     return LadderSumOperator([
@@ -122,8 +162,14 @@ function Base.:(+)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderSumOperator{
     return LadderSumOperator([lhs=>one(S), rhs.terms...])
 end
 
+function Base.:(+)(lhs::LadderSumOperator{PS, P, O, S}, rhs::Number) where {PS, P, O, S}
+    return LadderSumOperator([
+        lhs.terms...,
+        one(LadderProductOperator{PS, P, O})=>rhs,
+    ])
+end
 
-function Base.:(+)(lhs::LadderSumOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+function Base.:(+)(lhs::LadderSumOperator{PS, P, O, S}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O, S}
     return LadderSumOperator([
         lhs.terms...,
         LadderProductOperator([rhs])=>one(Int),

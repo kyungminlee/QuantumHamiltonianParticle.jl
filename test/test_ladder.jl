@@ -107,4 +107,11 @@ using Particle
         @test !ishermitian(n11 + hop)
         @test ishermitian(hop + adjoint(hop))
     end
+
+    @testset "simplify" begin
+        # @show simplify( c(1,1)*c(1,1)*c(1,1) )
+        @test simplify( c(2,1)*cdag(2,1)*c(2,1) ) == c(2,1)*1
+        @show simplify( c(1,1)*cdag(1,1) + cdag(1,1) * c(1,1) ) == cdag(1,1)*c(1,1) + 1
+        @test iszero(simplify( c(2,1)*c(2,1)*c(2,1) ))
+    end
 end

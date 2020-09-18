@@ -23,10 +23,16 @@ function normal_order(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS
     arg
 end
 
+function simplify(arg::LadderProductOperator{PS, P, O})::LadderSumOperator{PS, P, O, Int} where {PS, P, O}
+    return simplify(LadderSumOperator([arg=>1]))
+end
+
+simplify(arg::LadderUnitOperator) = arg
 
 function simplify(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg
     arg = normal_order(arg)
+    isempty(arg.terms) && return arg
 
     terms = sort(arg.terms)
     new_terms = Pair{LadderProductOperator{PS, P, O}, S}[]
