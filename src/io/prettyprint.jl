@@ -1,4 +1,4 @@
-export prettyprint
+export prettyprint, prettyprintln
 import ExactDiagonalization.prettyprintln
 
 prettyprintln(xs...) = prettyprintln(stdout::IO, xs...)
