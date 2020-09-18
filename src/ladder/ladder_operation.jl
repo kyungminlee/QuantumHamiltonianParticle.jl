@@ -34,8 +34,6 @@ Base.:(//)(lhs::LadderSumOperator, rhs::Number) = LadderSumOperator([(t => a // 
 
 # 2b. Complex
 
-
-
 function Base.:(*)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
     return LadderProductOperator([lhs, rhs])
 end
@@ -84,12 +82,6 @@ end
 
 
 # 3. Addition
-
-
-
-
-
-
 
 function Base.:(+)(lhs::S, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O, S<:Number}
     return LadderSumOperator([
@@ -181,6 +173,10 @@ function Base.:(+)(lhs::LadderSumOperator{PS, P, O, S}, rhs::LadderProductOperat
 end
 
 Base.:(+)(lhs::LadderSumOperator{PS, P, O, S1}, rhs::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S1, S2} = LadderSumOperator(vcat(lhs.terms, rhs.terms))
+
+
+
+
 
 # function Base.:(-)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
 #     return LadderSumOperator([lhs=>one(Int), rhs=>-one(Int)])

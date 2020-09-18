@@ -65,53 +65,87 @@ using Particle
     end
 
     @testset "sum" begin
-        Σ = LadderSumOperator
+        ∑ = LadderSumOperator
         ∏ = LadderProductOperator
 
-        @test Σ(c(1,1)) == Σ([∏([c(1,1)]) => 1])
+        @test ∑(c(1,1)) == ∑([∏([c(1,1)]) => 1])
         n11 = cdag(1,1) * c(1,1)
         n12 = cdag(1,2) * c(1,2)
         hop = cdag(1,2) * c(1,1)
 
-        @test Σ(n11) == Σ([n11=>1])
-        @test Σ(n11=>10, n12=>20) == Σ([n11=>10, n12=>20])
-        @test Σ(n11=>10, n12=>20) != Σ([n11=>10, n12=>2])
-        @test Σ(n11=>10, n12=>20) != Σ([n11=>10])
-        @test one(Σ{PS, Int, Int, Float64}) == Σ([one(∏{PS, Int, Int}) => one(Float64)])
+        @test ∑(n11) == ∑([n11=>1])
+        @test ∑(n11=>10, n12=>20) == ∑([n11=>10, n12=>20])
+        @test ∑(n11=>10, n12=>20) != ∑([n11=>10, n12=>2])
+        @test ∑(n11=>10, n12=>20) != ∑([n11=>10])
+        @test one(∑{PS, Int, Int, Float64}) == ∑([one(∏{PS, Int, Int}) => one(Float64)])
 
         let out = [n11+n12]
             push!(out, n11)
             push!(out, c(1,1))
-            @test out[2] == Σ([n11=>1])
-            @test out[3] != Σ([n11=>1])
-            @test out[3] == Σ([∏([c(1,1)])=>1])
+            @test out[2] == ∑([n11=>1])
+            @test out[3] != ∑([n11=>1])
+            @test out[3] == ∑([∏([c(1,1)])=>1])
         end
 
-        @test c(1,1)*2.3 == Σ([∏([c(1,1)]) => 2.3])
-        @test c(1,1)*2 + c(2,2) == Σ([∏([c(1,1)])=>2, ∏([c(2,2)])=>1])
-        @test c(1,1)/2 + c(2,2) == Σ([∏([c(1,1)])=>0.5, ∏([c(2,2)])=>1.0])
-        @test c(1,1)//2 + c(2,2) == Σ([∏([c(1,1)])=>1//2, ∏([c(2,2)])=>1//1])
-        @test 2*c(1,1) + c(2,2) == Σ([∏([c(1,1)])=>2, ∏([c(2,2)])=>1])
-        @test 2\c(1,1) + c(2,2) == Σ([∏([c(1,1)])=>0.5, ∏([c(2,2)])=>1.0])
-        @test 2\c(1,1) + c(2,2)*3 == Σ([∏([c(1,1)])=>0.5, ∏([c(2,2)])=>3.0])
+        @test c(1,1)*2.3 == ∑([∏([c(1,1)]) => 2.3])
 
-        @test n11 + n12 == Σ([n11=>1, n12=>1])
-        @test n11 + 2*n12 == Σ([n11=>1, n12=>2])
-        @test n11 + n12*2 == Σ([n11=>1, n12=>2])
-        @test n11 + n12/2 == Σ([n11=>1.0, n12=>0.5])
-        @test n11 + 2\n12 == Σ([n11=>1.0, n12=>0.5])
-        @test n11 + n12//2 == Σ([n11=>1//1, n12=>1//2])
+        @test c(1,1) + c(2,2) == ∑([∏([c(1,1)])=>1, ∏([c(2,2)])=>1])
+        @test c(1,1)*2 + c(2,2) == ∑([∏([c(1,1)])=>2, ∏([c(2,2)])=>1])
+        @test c(1,1)/2 + c(2,2) == ∑([∏([c(1,1)])=>0.5, ∏([c(2,2)])=>1.0])
+        @test c(1,1)//2 + c(2,2) == ∑([∏([c(1,1)])=>1//2, ∏([c(2,2)])=>1//1])
+        @test 2*c(1,1) + c(2,2) == ∑([∏([c(1,1)])=>2, ∏([c(2,2)])=>1])
+        @test 2\c(1,1) + c(2,2) == ∑([∏([c(1,1)])=>0.5, ∏([c(2,2)])=>1.0])
+        @test 2\c(1,1) + c(2,2)*3 == ∑([∏([c(1,1)])=>0.5, ∏([c(2,2)])=>3.0])
 
-        @test adjoint(n11+2*n12) == n11 + 2*n12
-        @test ishermitian(2*n12+n11)
+        @test c(1,1) + n12 == ∑([∏([c(1,1)])=>1, n12=>1])
+
+        @test n11 + n12 == ∑([n11=>1, n12=>1])
+        @test n11 + 2*n12 == ∑([n11=>1, n12=>2])
+        @test n11 + n12*2 == ∑([n11=>1, n12=>2])
+        @test n11 + n12/2 == ∑([n11=>1.0, n12=>0.5])
+        @test n11 + 2\n12 == ∑([n11=>1.0, n12=>0.5])
+        @test n11 + n12//2 == ∑([n11=>1//1, n12=>1//2])
+
+        op = n11 + 2*n12
+        @test adjoint(op) == op
+        @test ishermitian(op)
+        @test op*2 == 2*n11 + 4*n12
+        @test op/2 == 0.5*n11 + 1.0*n12
+        @test op//2 == (1//2)*n11 + (1//1)*n12
+        @test 2\op == 0.5*n11 + 1.0*n12
+
+        @test c(1,1) * op == ∑([∏([c(1,1), cdag(1,1), c(1,1)])=>1, ∏([c(1,1), cdag(1,2), c(1,2)])=>2])
+        @test op * c(1,1) == ∑([∏([cdag(1,1), c(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2), c(1,1)])=>2])
+
+        @test n11 * op == ∑([∏([cdag(1,1), c(1,1), cdag(1,1), c(1,1)])=>1, ∏([cdag(1,1), c(1,1), cdag(1,2), c(1,2)])=>2])
+        @test op * n11 == ∑([∏([cdag(1,1), c(1,1), cdag(1,1), c(1,1)])=>1, ∏([cdag(1,2), c(1,2), cdag(1,1), c(1,1)])=>2])
+
+
         @test !ishermitian(n11 + hop)
         @test ishermitian(hop + adjoint(hop))
     end
 
+    @testset "operation" begin
+        ∑ = LadderSumOperator
+        ∏ = LadderProductOperator
+
+        @test +c(1,1) == c(1,1)
+        @test -c(1,1) == ∑([∏([c(1,1)])=>-1])
+        n11 = cdag(1,1)*c(1,1)
+        @test +n11 == n11
+        @test -n11 == ∑([n11=>-1])
+        hop = cdag(1,2)*c(1,1) + cdag(1,1)*c(1,2)
+        @test +hop == hop
+        @test -hop == ∑([cdag(1,2)*c(1,1)=>-1, cdag(1,1)*c(1,2)=>-1])
+    end
+
+
     @testset "simplify" begin
-        # @show simplify( c(1,1)*c(1,1)*c(1,1) )
+        @test simplify( c(2,1) ) == c(2,1)
         @test simplify( c(2,1)*cdag(2,1)*c(2,1) ) == c(2,1)*1
-        @show simplify( c(1,1)*cdag(1,1) + cdag(1,1) * c(1,1) ) == cdag(1,1)*c(1,1) + 1
+        @show cdag(1,1)*c(1,1) + 1
+        @test iszero(simplify( c(2,1)*cdag(2,1) + cdag(2,1)*c(2,1) + (-1)))
+        @test iszero(simplify( c(2,1)*cdag(2,1) + cdag(2,1)*c(2,1) - 1))
         @test iszero(simplify( c(2,1)*c(2,1)*c(2,1) ))
     end
 end
