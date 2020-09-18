@@ -17,22 +17,6 @@ function Base.:(==)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOper
     return lhs.factors == rhs.factors
 end
 
-function Base.:(*)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-    return LadderProductOperator([lhs, rhs])
-end
-
-function Base.:(*)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-    return LadderProductOperator([lhs.factors..., rhs])
-end
-
-function Base.:(*)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
-    return LadderProductOperator([lhs, rhs.factors...])
-end
-
-function Base.:(*)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
-    return LadderProductOperator([lhs.factors..., rhs.factors...])
-end
-
 function Base.convert(::Type{LadderProductOperator{PS, P, O}}, obj::LadderUnitOperator{PS, P, O}) where {PS, P, O}
     return LadderProductOperator([obj])
 end
