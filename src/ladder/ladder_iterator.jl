@@ -1,5 +1,56 @@
 import ExactDiagonalization.apply
+import ExactDiagonalization.get_row_iterator
 import ExactDiagonalization.get_column_iterator
+
+
+function get_row_iterator(
+    hs::ParticleHilbertSpace{PS, BR, QN},
+    op::LadderUnitOperator{PS, <:Integer, <:Integer},
+    bvec::BR,
+    ::Type{S}=Float64,
+) where {PS, BR, QN, S<:Number}
+    particle = getspecies(PS, op.particle_index)
+    occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
+
+    newbvec::BR = zero(BR)
+    match::Bool = false
+    ampl::S = zero(S)
+
+    if op.ladder == ANNIHILATION
+        if occupancy_at_site < maxoccupancy(particle)
+            if isfermion(particle)
+                wj_parity = get_fermion_parity(hs, op, bvec)
+                ampl = wj_parity == 0 ? one(S) : -one(S)
+            elseif isboson(particle)
+                ampl = Base.sqrt(S(occupancy_at_site+1))
+            elseif isspin(particle)
+                ampl = one(S)
+            else
+                throw(ArgumentError("unsupported particle type $particle"))
+            end
+            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, occupancy_at_site+1)
+            match = true
+        end
+    else # op.ladder == CREATION
+        if occupancy_at_site > 0
+            if isfermion(particle)
+                wj_parity = get_fermion_parity(hs, op, bvec)
+                ampl = wj_parity == 0 ? one(S) : -one(S)
+            elseif isboson(particle)
+                ampl = Base.sqrt(S(occupancy_at_site))
+            elseif isspin(particle)
+                ampl = one(S)
+            else
+                throw(ArgumentError("unsupported particle type $particle"))
+            end
+            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, occupancy_at_site-1)
+            match = true
+        end
+    end
+    element::Pair{BR, S} = newbvec => ampl
+    return (element for i in 1:(match ? 1 : 0))
+end
+
 
 function get_column_iterator(
     hs::ParticleHilbertSpace{PS, BR, QN},
@@ -8,8 +59,6 @@ function get_column_iterator(
     ::Type{S}=Float64,
 ) where {PS, BR, QN, S<:Number}
     particle = getspecies(PS, op.particle_index)
-    # @show particle
-    # @show typeof(particle)
     occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
 
     newbvec::BR = zero(BR)
@@ -23,6 +72,8 @@ function get_column_iterator(
                 ampl = wj_parity == 0 ? one(S) : -one(S)
             elseif isboson(particle)
                 ampl = Base.sqrt(S(occupancy_at_site+1))
+            elseif isspin(particle)
+                ampl = one(S)
             else
                 throw(ArgumentError("unsupported particle type $particle"))
             end
@@ -48,16 +99,41 @@ function get_column_iterator(
 end
 
 
+function get_row_iterator(
+    hs::ParticleHilbertSpace{PS, BR, QN},
+    op::LadderProductOperator{PS, <:Integer, <:Integer},
+    bvec::BR,
+   ::Type{S}=Float64,
+) where {PS, BR, QN, S<:Number}
+    match::Bool = true
+    ampl::S = one(S)
+    for f in op.factors
+        newout = get_row_iterator(hs, f, bvec)
+        if isempty(newout) || iszero(ampl)
+            bvec = zero(BR)
+            ampl = zero(S)
+            match = false
+            break
+        end
+        (newbvec, newampl) = first(newout)
+        @assert length(newout) == 1
+        (newbvec, newampl) = first(newout)
+        bvec = newbvec
+        ampl *= newampl
+    end
+    element::Pair{BR, S} = (bvec => ampl)
+    return (element for i in 1:(match ? 1 : 0))
+end
+
+
 function get_column_iterator(
     hs::ParticleHilbertSpace{PS, BR, QN},
     op::LadderProductOperator{PS, <:Integer, <:Integer},
     bvec::BR,
    ::Type{S}=Float64,
 ) where {PS, BR, QN, S<:Number}
-
     match::Bool = true
     ampl::S = one(S)
-
     for f in reverse(op.factors)
         newout = get_column_iterator(hs, f, bvec)
         if isempty(newout) || iszero(ampl)
@@ -77,6 +153,19 @@ function get_column_iterator(
 end
 
 
+function get_row_iterator(
+    hs::ParticleHilbertSpace{PS, BR, QN},
+    op::LadderSumOperator{PS, <:Integer, <:Integer, S},
+    bvec::BR,
+    ::Type{Sout}=promote_type(S, Float64),
+) where {PS, BR, QN, S, Sout}
+    return (
+        newbvec => a * newampl
+            for (t, a) in op.terms
+            for (newbvec, newampl) in get_row_iterator(hs, t, bvec)
+    )
+end
+
 
 function get_column_iterator(
     hs::ParticleHilbertSpace{PS, BR, QN},
@@ -90,6 +179,7 @@ function get_column_iterator(
             for (newbvec, newampl) in get_column_iterator(hs, t, bvec)
     )
 end
+
 
 
 #=
