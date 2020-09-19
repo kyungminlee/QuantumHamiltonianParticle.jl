@@ -91,6 +91,8 @@ using Particle
     @test_throws BoundsError get_bitmask(hilbert, 3, [1,2])
     @test_throws BoundsError get_bitmask(hilbert, [1,2], 8)
 
+    @test get_parity_bitmask(hilbert, 2, 3) == 0b000100100  # parity bits for fermions
+    @test get_parity_bitmask(hilbert, 1, 3) == 0b000000000  # nothing for bosons
 
     @test get_occupancy(hilbert, 1, 1, 0b001_110_100) == 0
     @test get_occupancy(hilbert, 2, 1, 0b001_110_100) == 1

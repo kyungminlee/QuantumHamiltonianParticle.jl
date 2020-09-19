@@ -87,6 +87,8 @@ function get_column_iterator(
                 ampl = wj_parity == 0 ? one(S) : -one(S)
             elseif isboson(particle)
                 ampl = Base.sqrt(S(occupancy_at_site))
+            elseif isspin(particle)
+                ampl = one(S)
             else
                 throw(ArgumentError("unsupported particle type $particle"))
             end
@@ -108,7 +110,7 @@ function get_row_iterator(
     match::Bool = true
     ampl::S = one(S)
     for f in op.factors
-        newout = get_row_iterator(hs, f, bvec)
+        newout = get_row_iterator(hs, f, bvec, S)
         if isempty(newout) || iszero(ampl)
             bvec = zero(BR)
             ampl = zero(S)
@@ -130,12 +132,12 @@ function get_column_iterator(
     hs::ParticleHilbertSpace{PS, BR, QN},
     op::LadderProductOperator{PS, <:Integer, <:Integer},
     bvec::BR,
-   ::Type{S}=Float64,
+    ::Type{S}=Float64,
 ) where {PS, BR, QN, S<:Number}
     match::Bool = true
     ampl::S = one(S)
     for f in reverse(op.factors)
-        newout = get_column_iterator(hs, f, bvec)
+        newout = get_column_iterator(hs, f, bvec, S)
         if isempty(newout) || iszero(ampl)
             bvec = zero(BR)
             ampl = zero(S)
@@ -162,7 +164,7 @@ function get_row_iterator(
     return (
         newbvec => a * newampl
             for (t, a) in op.terms
-            for (newbvec, newampl) in get_row_iterator(hs, t, bvec)
+            for (newbvec, newampl) in get_row_iterator(hs, t, bvec, Sout)
     )
 end
 
@@ -176,7 +178,7 @@ function get_column_iterator(
     return (
         newbvec => a * newampl
             for (t, a) in op.terms
-            for (newbvec, newampl) in get_column_iterator(hs, t, bvec)
+            for (newbvec, newampl) in get_column_iterator(hs, t, bvec, Sout)
     )
 end
 

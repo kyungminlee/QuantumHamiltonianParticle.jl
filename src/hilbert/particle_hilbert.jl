@@ -1,9 +1,9 @@
 using ExactDiagonalization
 import ExactDiagonalization.get_bitmask
-export get_bitmask_particle
 
 export ParticleHilbertSpace
 
+export get_parity_bitmask
 export get_fermion_parity
 export get_occupancy, set_occupancy
 
@@ -181,11 +181,15 @@ function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, Q
 end
 
 
-function get_parity_bitmask(hs::ParticleHilbertSpace, iptl::Integer, isite::Integer)
-    bm_species = get_bitmask(hs, iptl, :)
-    bm_site = get_bitmask(hs, iptl, isite)
-    bm_mask = ( bm_site - 1 ) & bm_species  # σᶻ in jordan wigner string
-    return bm_mask
+function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
+    if isfermion(getspecies(PS, iptl))
+        bm_species = get_bitmask(hs, iptl, :)
+        bm_site = get_bitmask(hs, iptl, isite)
+        bm_mask = ( bm_site - 1 ) & bm_species  # σᶻ in jordan wigner string
+        return bm_mask
+    else
+        return zero(BR)
+    end
 end
 
 
