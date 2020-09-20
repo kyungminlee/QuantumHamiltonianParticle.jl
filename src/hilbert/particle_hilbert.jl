@@ -7,8 +7,9 @@ export get_parity_bitmask
 export get_fermion_parity
 export get_occupancy, set_occupancy
 
+import ExactDiagonalization.AbstractHilbertSpace
+
 import ExactDiagonalization.scalartype
-# import ExactDiagonalization.valtype
 import ExactDiagonalization.qntype
 import ExactDiagonalization.basespace
 import ExactDiagonalization.bitwidth
@@ -16,10 +17,8 @@ import ExactDiagonalization.bitoffset
 import ExactDiagonalization.get_bitmask
 import ExactDiagonalization.quantum_number_sectors
 import ExactDiagonalization.get_quantum_number
-#import ExactDiagonalization.
-
-import ExactDiagonalization.AbstractHilbertSpace
-
+import ExactDiagonalization.compress
+import ExactDiagonalization.extract
 import ExactDiagonalization.hs_get_basis_list
 
 
@@ -45,7 +44,6 @@ function Base.:(==)(lhs::ParticleHilbertSpace, rhs::ParticleHilbertSpace)
 end
 
 
-
 scalartype(::Type{<:ParticleHilbertSpace}) = Bool
 scalartype(::ParticleHilbertSpace) = Bool
 
@@ -61,15 +59,6 @@ qntype(::ParticleHilbertSpace{PS, BR, QN}) where {PS, BR, QN} = QN
 basespace(hs::ParticleHilbertSpace) = hs
 
 
-bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
-
-# numspecies(::P) where {P<:ParticleHilbertSpace} = numspecies(P)
-# numspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = numspecies(PS)
-# speciescount(::P) where {P<:ParticleHilbertSpace} = speciescount(P)
-# speciescount(::Type{ParticleHilbertSpace{PS, BR, QN}}) where {PS, BR, QN} = speciescount(PS)
-# getspecies(::Type{ParticleHilbertSpace{PS, BR, QN}}, args...) where {PS, BR, QN} = getspecies(PS, args...)
-
-
 for fname in [
     :exchangesign,
     :numspecies, :speciescount, :getspecies, :getspeciesname,
@@ -81,7 +70,42 @@ for fname in [
 end
 
 
+function quantum_number_sectors(phs::ParticleHilbertSpace{PS, BR, QN})::Vector{QN} where {PS, BR, QN}
+    qns = Set{QN}([tuplezero(QN)])
+    for site in phs.sites
+        qns_next = Set{QN}()
+        for state in site.states, q in qns
+            push!(qns_next, q .+ state.quantum_number)
+        end
+        qns = qns_next
+    end
+    return sort(collect(qns))
+end
 
+
+function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
+    return mapreduce(
+        identity,
+        tupleadd,
+        let b = (get_bitmask(hs, :, isite) & binrep) >> bitoffset(hs, isite)
+            #i = get_state_index(site, binrep)
+            #site.states[i].quantum_number
+            get_state(site, b).quantum_number
+        end
+            for (isite, site) in enumerate(hs.sites)
+    )
+end
+
+
+function get_quantum_number(hs::ParticleHilbertSpace, statevec::AbstractVector{<:Integer})
+    return mapreduce(identity, tupleadd,
+        site.states[statevec[isite]].quantum_number
+        for (isite, site) in enumerate(hs.sites)
+    )
+end
+
+
+bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
 
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
     return phs.bitoffsets[isite] + bitoffset(PS, iptl)
@@ -173,8 +197,7 @@ function get_bitmask(
     return make_bitmask(bitwidth(phs), BR)
 end
 
-# colon & vector.
-
+# TODO(kyungminlee): Colon & AbstractVector
 
 function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, QN}
     return make_bitmask(bitwidth(phs), BR)
@@ -191,7 +214,6 @@ function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer,
         return zero(BR)
     end
 end
-
 
 
 function get_occupancy(
@@ -218,38 +240,17 @@ function set_occupancy(
 end
 
 
-function quantum_number_sectors(phs::ParticleHilbertSpace{PS, BR, QN})::Vector{QN} where {PS, BR, QN}
-    qns = Set{QN}([tuplezero(QN)])
-    for site in phs.sites
-        qns_next = Set{QN}()
-        for state in site.states, q in qns
-            push!(qns_next, q .+ state.quantum_number)
-        end
-        qns = qns_next
-    end
-    return sort(collect(qns))
+function compress(
+    hs::ParticleHilbertSpace{PS, BR, QN},
+    indexarray::CartesianIndex,
+    ::Type{BR2}=BR,
+) where {PS, BR, QN, BR2<:Unsigned}
+    return BR(statevec2occbin(hs, collect(indexarray.I)))
 end
 
 
-function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
-    return mapreduce(
-        identity,
-        tupleadd,
-        let b = (get_bitmask(hs, :, isite) & binrep) >> bitoffset(hs, isite)
-            #i = get_state_index(site, binrep)
-            #site.states[i].quantum_number
-            get_state(site, b).quantum_number
-        end
-            for (isite, site) in enumerate(hs.sites)
-    )
-end
-
-
-function get_quantum_number(hs::ParticleHilbertSpace, statevec::AbstractVector{<:Integer})
-    return mapreduce(identity, tupleadd,
-        site.states[statevec[isite]].quantum_number
-        for (isite, site) in enumerate(hs.sites)
-    )
+function extract(hs::ParticleHilbertSpace, occbin::Unsigned)
+    return CartesianIndex(occbin2statevec(hs, occbin)...)
 end
 
 
@@ -257,6 +258,13 @@ function Base.keys(hs::ParticleHilbertSpace)
     return CartesianIndices(((1:length(site.states) for site in hs.sites)...,))
 end
 
+
+function Base.getindex(
+    hs::ParticleHilbertSpace{PS, BR, QN},
+    idx::CartesianIndex,
+) where {PS, BR, QN}
+    return compress(hs, idx, BR)
+end
 
 
 function hs_get_basis_list(hs::ParticleHilbertSpace{PS, BR, QN}, ::Type{BR2}=BR)::Vector{BR2} where {PS, BR<:Unsigned, QN, BR2}
@@ -271,7 +279,7 @@ function hs_get_basis_list(hs::ParticleHilbertSpace{PS, BR, QN}, ::Type{BR2}=BR)
     return basis_list
 end
 
-#
+
 # function extract(hs::ParticleHilbertSpace{PS, BR, QN}, binrep::Unsigned)::CartesianIndex where {PS, BR, QN}
 #   out = Int[]
 #   for (isite, site) in enumerate(hs.sites)
@@ -285,39 +293,3 @@ end
 #   end
 #   return CartesianIndex(out...)
 # end
-
-
-
-
-
-
-
-#=
-export canonize
-function canonize(pt::Type{<:Fermion}, locations::AbstractVector{<:Integer})
-  sgn = 1
-  out = Int.(locations)
-  n = length(locations)
-  for i in n:-1:1
-    for j in Base.OneTo(i-1)
-      lhs, rhs = out[j], out[j+1]
-      if lhs > rhs
-        sgn = -sgn
-        out[j], out[j+1] = rhs, lhs
-      end
-    end
-  end
-  return (out, sgn)
-end
-
-function canonize(pt::Type{<:Boson}, locations::AbstractVector{<:Integer})
-    return (sort(locations), 1)
-end
-
-function canonize(pt::Type{<:HardcoreBoson}, locations::AbstractVector{<:Integer})
-    return (sort(locations), 1)
-end
-
-
-
-=#
