@@ -1,14 +1,14 @@
 
 # 1. Unary
 
-Base.:(+)(arg::LadderUnitOperator{PS, P, O}) where {PS, P, O} = arg
-Base.:(-)(arg::LadderUnitOperator{PS, P, O}) where {PS, P, O} = LadderSumOperator([LadderProductOperator([arg])=>-1])
+Base.:(+)(arg::LadderUnitOperator) = arg
+Base.:(-)(arg::LadderUnitOperator) = LadderSumOperator([LadderProductOperator([arg])=>-1])
 
-Base.:(+)(arg::LadderProductOperator{PS, P, O}) where {PS, P, O} = arg
-Base.:(-)(arg::LadderProductOperator{PS, P, O}) where {PS, P, O} = LadderSumOperator([arg=>-1])
+Base.:(+)(arg::LadderProductOperator) = arg
+Base.:(-)(arg::LadderProductOperator) = LadderSumOperator([arg=>-1])
 
-Base.:(+)(arg::LadderSumOperator{PS, P, O, S}) where {PS, P, O, S} = arg
-Base.:(-)(arg::LadderSumOperator{PS, P, O, S}) where {PS, P, O, S} = LadderSumOperator([t => -a for (t, a) in arg.terms])
+Base.:(+)(arg::LadderSumOperator) = arg
+Base.:(-)(arg::LadderSumOperator) = LadderSumOperator([t => -a for (t, a) in arg.terms])
 
 # 2. Products
 
@@ -173,11 +173,3 @@ function Base.:(+)(lhs::LadderSumOperator{PS, P, O, S}, rhs::LadderProductOperat
 end
 
 Base.:(+)(lhs::LadderSumOperator{PS, P, O, S1}, rhs::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S1, S2} = LadderSumOperator(vcat(lhs.terms, rhs.terms))
-
-
-
-
-
-# function Base.:(-)(lhs::LadderProductOperator{PS, P, O}, rhs::LadderProductOperator{PS, P, O}) where {PS, P, O}
-#     return LadderSumOperator([lhs=>one(Int), rhs=>-one(Int)])
-# end
