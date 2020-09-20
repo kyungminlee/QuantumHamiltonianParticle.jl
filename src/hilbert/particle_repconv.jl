@@ -69,6 +69,21 @@ export locvec2occbin
 export locvec2statevec
 
 
+function statevec2occbin(phs::ParticleHilbertSpace, statevec::CartesianIndex)
+    return statevec2occbin(phs, collect(statevec.I))
+end
+
+
+function statevec2occmat(phs::ParticleHilbertSpace, statevec::CartesianIndex)
+    return statevec2occmat(phs, collect(statevec.I))
+end
+
+
+function statevec2locvec(phs::ParticleHilbertSpace, statevec::CartesianIndex)
+    return statevec2locvec(phs, collect(statevec.I))
+end
+
+
 function statevec2occbin(
     phs::ParticleHilbertSpace{PS, BR, QN},
     statevec::AbstractVector{<:Integer},
