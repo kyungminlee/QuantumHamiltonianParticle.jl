@@ -29,7 +29,8 @@ include("ladder/ladder_simplify.jl")
 # Projectors
 include("projector/projector_unit.jl")
 include("projector/projector_sum.jl")
-include("projector/projector_conversion.jl")
+include("projector/projector_convert.jl")
+include("projector/projector_make.jl")
 include("projector/projector_iterator.jl")
 
 include("io/prettyprint.jl")
