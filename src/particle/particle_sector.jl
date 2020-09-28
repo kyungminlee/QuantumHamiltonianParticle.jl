@@ -5,7 +5,7 @@ import ExactDiagonalization.compress
 import ExactDiagonalization.extract
 import ExactDiagonalization.get_bitmask
 
-export bitoffset, bitoffset
+import ExactDiagonalization.bitoffset
 export numspecies, speciescount, getspecies, getspeciesname
 
 

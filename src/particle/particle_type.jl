@@ -7,11 +7,11 @@ export isfermion, isboson
 export maxoccupancy
 
 import ExactDiagonalization.bitwidth
+import ExactDiagonalization.bitoffset
 import ExactDiagonalization.compress
 import ExactDiagonalization.extract
 import ExactDiagonalization.get_bitmask
 
-export bitoffset
 
 struct Fermion{Species}<:AbstractParticle
     Fermion(species::Symbol) = new{species}()
