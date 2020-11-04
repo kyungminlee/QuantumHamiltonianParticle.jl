@@ -98,7 +98,7 @@
 # # TODO: right now it's only one-way
 # function represent(
 #     phs::ParticleHilbertSpace{PS, BR, QN},
-#     op::LadderUnitOperator{ParticleIndex{PS}, <:Integer}
+#     op::ParticleLadderUnit{ParticleIndex{PS}, <:Integer}
 # ) where {PS, BR, QN}
 #     iptl = op.particle_index.index
 #     isite = op.orbital
@@ -126,7 +126,7 @@
 
 # function represent(
 #     phs::ParticleHilbertSpace{PS, BR, QN},
-#     op::LadderProductOperator{ParticleIndex{PS}, <:Integer},
+#     op::ParticleLadderProduct{ParticleIndex{PS}, <:Integer},
 # ) where {PS, BR, QN}
 #     out = prod(represent(phs, f) for f in op.factors)
 #     return out
@@ -135,7 +135,7 @@
 
 # function represent(
 #     phs::ParticleHilbertSpace{PS, BR, QN},
-#     op::LadderSumOperator{ParticleIndex{PS}, <:Integer, S},
+#     op::ParticleLadderSum{ParticleIndex{PS}, <:Integer, S},
 # ) where {PS, BR, QN, S}
 #     out = sum(represent(phs, t)*a for (t, a) in op.terms)
 #     return out

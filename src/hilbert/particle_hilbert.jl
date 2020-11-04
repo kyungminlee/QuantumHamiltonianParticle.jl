@@ -23,7 +23,11 @@ import ExactDiagonalization.hs_get_basis_list
 
 
 # Add a decoration to the existing Hilbert space
-struct ParticleHilbertSpace{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:AbstractQuantumNumber}}}<:AbstractHilbertSpace
+struct ParticleHilbertSpace{
+        PS<:ParticleSector,
+        BR<:Unsigned,
+        QN<:Tuple{Vararg{<:AbstractQuantumNumber}}
+}<:AbstractHilbertSpace{QN}
     sites::Vector{ParticleSite{PS, BR, QN}}
     bitwidths::Vector{Int}
     bitoffsets::Vector{Int}

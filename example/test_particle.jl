@@ -24,10 +24,10 @@ using LinearAlgebra
     @show isless(magnon_index, electron_up_index)
     @show isless(electron_up_index, magnon_index)
 
-    c_up_dag(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_up_index, orbital, CREATION))
-    c_up(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_up_index, orbital, ANNIHILATION))
-    c_dn_dag(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_dn_index, orbital, CREATION))
-    c_dn(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_dn_index, orbital, ANNIHILATION))
+    c_up_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_up_index, orbital, CREATION))
+    c_up(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_up_index, orbital, ANNIHILATION))
+    c_dn_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_dn_index, orbital, CREATION))
+    c_dn(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_dn_index, orbital, ANNIHILATION))
 
     @testset "operator" begin
 
@@ -103,8 +103,8 @@ using LinearAlgebra
     end
 
     @testset "moreop" begin
-        cdag3 = represent(phs, LadderUnitOperator(electron_up_index, 3, CREATION))
-        c3 = represent(phs, LadderUnitOperator(electron_up_index, 3, ANNIHILATION))
+        cdag3 = represent(phs, ParticleLadderUnit(electron_up_index, 3, CREATION))
+        c3 = represent(phs, ParticleLadderUnit(electron_up_index, 3, ANNIHILATION))
 
         println("cdag3")
         prettyprintln(cdag3)
@@ -117,8 +117,8 @@ using LinearAlgebra
         println("n3")
         prettyprintln(n3)
 
-        cup3dag = represent(phs, LadderUnitOperator(electron_up_index, 3, CREATION))
-        cdn3 = represent(phs, LadderUnitOperator(electron_dn_index, 3, ANNIHILATION))
+        cup3dag = represent(phs, ParticleLadderUnit(electron_up_index, 3, CREATION))
+        cdn3 = represent(phs, ParticleLadderUnit(electron_dn_index, 3, ANNIHILATION))
 
         println("cup3dag")
         prettyprintln(cup3dag)
@@ -190,8 +190,8 @@ end
 #=
 
 P = Electron
-cre(orbital::OrbitalType) where OrbitalType = LadderSumOperator(CreationOperator(P, orbital))
-ann(orbital::OrbitalType) where OrbitalType = LadderSumOperator(AnnihilationOperator(P, orbital))
+cre(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(CreationOperator(P, orbital))
+ann(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(AnnihilationOperator(P, orbital))
 
 hopping = sum(cre(mod(i, 4)+1) * ann(i) + cre(i) * ann(mod(i,4)+1) for i in 1:4)
 #hopping = sum(cre(i) * cre(mod(i, 4)+1) + ann(mod(i,4)+1) * ann(i) for i in 1:4)
@@ -217,7 +217,7 @@ end
 
 sample = cre(4) + cre(3) * 2.0 + cre(2) * (3im) + cre(1) * (4.0 * im)
 
-#   Tuple{Vararg{Tuple{<:LadderProductOperator, <:Number}}}
+#   Tuple{Vararg{Tuple{<:ParticleLadderProduct, <:Number}}}
 
 new_sample = unify_type(sample)
 

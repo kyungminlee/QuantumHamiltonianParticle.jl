@@ -4,13 +4,13 @@ import ExactDiagonalization.prettyprintln
 prettyprintln(xs...) = prettyprintln(stdout::IO, xs...)
 prettyprint(xs...) = prettyprint(stdout::IO, xs...)
 
-function prettyprint(io::IO, arg::LadderUnitOperator{PS, PI, OI}) where {PS, PI, OI}
+function prettyprint(io::IO, arg::ParticleLadderUnit{PS, PI, OI}) where {PS, PI, OI}
     print(io, "ψ")
     arg.ladder == CREATION && print(io, "†")
     print(io, "(", getspeciesname(PS, arg.particle_index), ",", arg.orbital, ")")
 end
 
-function prettyprint(io::IO, arg::LadderProductOperator)
+function prettyprint(io::IO, arg::ParticleLadderProduct)
     first = true
     for f in arg.factors
         if !first
@@ -21,7 +21,7 @@ function prettyprint(io::IO, arg::LadderProductOperator)
     end
 end
 
-function prettyprint(io::IO, arg::LadderSumOperator)
+function prettyprint(io::IO, arg::ParticleLadderSum)
     if isempty(arg.terms)
         print(io, "0")
     else
@@ -42,17 +42,17 @@ function prettyprint(io::IO, arg::LadderSumOperator)
 end
 
 
-function prettyprintln(io::IO, arg::LadderUnitOperator)
+function prettyprintln(io::IO, arg::ParticleLadderUnit)
     prettyprint(io, arg)
     println(io)
 end
 
-function prettyprintln(io::IO, arg::LadderProductOperator)
+function prettyprintln(io::IO, arg::ParticleLadderProduct)
     prettyprint(io, arg)
     println(io)
 end
 
-function prettyprintln(io::IO, arg::LadderSumOperator)
+function prettyprintln(io::IO, arg::ParticleLadderSum)
     prettyprint(io, arg)
     println(io)
 end

@@ -1,9 +1,9 @@
 export AbstractParticleProjectorOperator
 export ParticleProjectorUnitOperator
 
-abstract type AbstractParticleProjectorOperator{BR<:Unsigned, S<:Number} end
+abstract type AbstractParticleProjectorOperator{BR<:Unsigned, S<:Number}<:AbstractOperator{S} end
 
-struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number} <: AbstractParticleProjectorOperator{BR, S}
+struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number}<:AbstractParticleProjectorOperator{BR, S}
     bitmask::BR
     bitrow::BR
     bitcol::BR
@@ -65,4 +65,3 @@ end
 function Base.:(*)(lhs::ParticleProjectorUnitOperator, rhs::Number)
     return ParticleProjectorUnitOperator(lhs.bitmask, lhs.bitrow, lhs.bitcol, lhs.parity_bitmask, lhs.amplitude * rhs)
 end
-

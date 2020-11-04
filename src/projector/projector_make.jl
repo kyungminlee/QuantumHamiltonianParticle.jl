@@ -1,8 +1,10 @@
-
 export make_projector_operator
+
+import ExactDiagonalization.get_space
+
 function make_projector_operator(
     hs::ParticleHilbertSpace{PS, BR, QN},
-    op::LadderUnitOperator{PS, PI, OI},
+    op::ParticleLadderUnit{PS, PI, OI},
 ) where {PS, BR, QN, PI<:Integer, OI<:Integer}
     particle = getspecies(PS, op.particle_index)
     bm  = get_bitmask(hs, op.particle_index, op.orbital)
@@ -41,14 +43,18 @@ end
 
 function make_projector_operator(
     hs::ParticleHilbertSpace{PS, BR, QN},
-    op::LadderProductOperator{PS, PI, OI},
+    op::ParticleLadderProduct{PS, PI, OI},
 ) where {PS, BR, QN, PI<:Integer, OI<:Integer}
     return prod(make_projector_operator(hs, f) for f in op.factors)
 end
 
 function make_projector_operator(
     hs::ParticleHilbertSpace{PS, BR, QN},
-    op::LadderSumOperator{PS, PI, OI, S}
+    op::ParticleLadderSum{PS, PI, OI, S}
 ) where {PS, BR, QN, PI<:Integer, OI<:Integer, S}
     return sum(a * make_projector_operator(hs, t) for (t, a) in op.terms)
+end
+
+function make_projector_operator(op::ParticleLadderOperatorEmbedding)
+    return make_projector_operator(get_space(op), get_operator(op))
 end

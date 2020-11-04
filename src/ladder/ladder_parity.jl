@@ -3,7 +3,7 @@ export get_fermion_parity
 
 function get_fermion_parity(
     hs::ParticleHilbertSpace,
-    op::LadderUnitOperator{PS, <:Integer, <:Integer},
+    op::ParticleLadderUnit{PS, <:Integer, <:Integer},
     bvec::Unsigned,
 ) where {PS}
     bm_mask = get_parity_bitmask(hs, op.particle_index, op.orbital)

@@ -23,21 +23,19 @@ using ExactDiagonalization
         @test speciescount(state) == 2
         @test numspecies(state) == 2
 
-        let
-            state3 = ParticleState(p, "↑f", [0, 1])
+        let state3 = ParticleState(p, "↑f", [0, 1])
             @test state3.name == "↑f"
             @test state3.occupancy_binary == UInt(0b100)
             @test state3.quantum_number == ()
         end
 
-        let
-            state4 = ParticleState(p, "↑f", [0, 1], 1)
+        let state4 = ParticleState(p, "↑f", [0, 1], 1)
             @test state4.name == "↑f"
             @test state4.occupancy_binary == UInt(0b100)
             @test state4.quantum_number == (1,)
         end
 
-        @testset "particlesector" begin
+        @testset "particle sector" begin
             for s in [state, typeof(state)]
                 @test exchangesign(s, 1) == 1
                 @test exchangesign(s, 2) == -1
@@ -68,9 +66,9 @@ using ExactDiagonalization
                 @test getspecies(s, 2) == Fermion{:f}
                 @test getspeciesname(s, 1) == :m
                 @test getspeciesname(s, 2) == :f
-            end
-        end
-    end
+            end # testset for
+        end # testset particle sector
+    end # testset state
 
     @testset "site" begin
         p = ParticleSector(Boson(:m, 2), Fermion(:f))
@@ -128,7 +126,7 @@ using ExactDiagonalization
                 @test getspecies(s, 2) == Fermion{:f}
                 @test getspeciesname(s, 1) == :m
                 @test getspeciesname(s, 2) == :f
-            end
-        end
-    end
-end
+            end # for s
+        end # testset particlesector
+    end # testset site
+end # state-site
