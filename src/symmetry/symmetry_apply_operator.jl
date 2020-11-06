@@ -58,7 +58,7 @@ end
 
 
 function symmetry_apply(permutation::SitePermutation, op::ParticleLadderOperatorEmbedding)
-    return ParticleLadderOperatorEmbedding(op.hilbert_space, symmetry_apply(permutation, op.operator))
+    return ParticleLadderOperatorEmbedding(op.hilbert_space, symmetry_apply(permutation, op.ladder))
 end
 
 

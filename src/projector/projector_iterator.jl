@@ -53,7 +53,7 @@ function get_row_iterator(sumop::ParticleProjectorSumOperator{BR, S}, brow::BR2)
         match(pureop::ParticleProjectorUnitOperator{BR, S})::Bool = (brow & pureop.bitmask) == pureop.bitrow
         function element(pureop::ParticleProjectorUnitOperator{BR, S})::Pair{BR, S}
             isparityeven = mod(count_ones(brow & pureop.parity_bitmask), 2) == 0
-            bcol = (bcol & ~pureop.bitmask) | pureop.bitcol
+            bcol = (brow & ~pureop.bitmask) | pureop.bitcol
             ampl = isparityeven ? pureop.amplitude : -pureop.amplitude
             return bcol => ampl
         end

@@ -35,6 +35,7 @@ function make_projector_operator(
             end
         else
             @error "make_projector_operator for bosons and other particles not implemented yet"
+            # TODO: Implement ParticleProjectorSumOperator
         end
     else
         @error "unsupported particle $particle"
@@ -55,6 +56,13 @@ function make_projector_operator(
     return sum(a * make_projector_operator(hs, t) for (t, a) in op.terms)
 end
 
+function make_projector_operator(
+    hs::HilbertSpaceSector{<:ParticleHilbertSpace, <:Any},
+    op...
+)
+    return make_projector_operator(basespace(hs), op...)
+end
+
 function make_projector_operator(op::ParticleLadderOperatorEmbedding)
-    return make_projector_operator(get_space(op), get_operator(op))
+    return make_projector_operator(get_space(op), get_ladder(op))
 end
