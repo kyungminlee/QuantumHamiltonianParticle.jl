@@ -7,8 +7,8 @@ using Formatting
 fermion = Fermion{:f}()
 particle_sector = make_particle_sector(fermion)
 
-c_dag(i) = LadderUnitOperator(1, i, CREATION)
-c(i) = LadderUnitOperator(1, i, ANNIHILATION)
+c_dag(i) = ParticleLadderUnit(1, i, CREATION)
+c(i) = ParticleLadderUnit(1, i, ANNIHILATION)
 
 
 site = ParticleSite([

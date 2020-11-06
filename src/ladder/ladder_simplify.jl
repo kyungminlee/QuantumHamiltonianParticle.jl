@@ -8,13 +8,13 @@ import ExactDiagonalization.simplify
 
 # function lt(
 #     ::LocalNormalOrdering,
-#     a::LadderUnitOperator{PS, PI, OI},
-#     b::LadderUnitOperator{PS, PI, OI})
+#     a::ParticleLadderUnit{PS, PI, OI},
+#     b::ParticleLadderUnit{PS, PI, OI})
 #     isless_localnormalorder(a, b)
 # end
 
 
-function normal_order(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS, P, O, S} where {PS, P, O, S}
+function normal_order(arg::ParticleLadderSum{PS, P, O, S})::ParticleLadderSum{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg
     dirty = true
     while dirty
@@ -23,19 +23,19 @@ function normal_order(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS
     arg
 end
 
-function simplify(arg::LadderProductOperator{PS, P, O})::LadderSumOperator{PS, P, O, Int} where {PS, P, O}
-    return simplify(LadderSumOperator([arg=>1]))
+function simplify(arg::ParticleLadderProduct{PS, P, O})::ParticleLadderSum{PS, P, O, Int} where {PS, P, O}
+    return simplify(ParticleLadderSum([arg=>1]))
 end
 
-simplify(arg::LadderUnitOperator) = arg
+simplify(arg::ParticleLadderUnit) = arg
 
-function simplify(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS, P, O, S} where {PS, P, O, S}
+function simplify(arg::ParticleLadderSum{PS, P, O, S})::ParticleLadderSum{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg
     arg = normal_order(arg)
     isempty(arg.terms) && return arg
 
     terms = sort(arg.terms)
-    new_terms = Pair{LadderProductOperator{PS, P, O}, S}[]
+    new_terms = Pair{ParticleLadderProduct{PS, P, O}, S}[]
     t, a = Base.first(terms)
     for i in 2:length(terms)
         t2, a2 = terms[i]
@@ -51,41 +51,41 @@ function simplify(arg::LadderSumOperator{PS, P, O, S})::LadderSumOperator{PS, P,
     if a != 0
         push!(new_terms, t => a)
     end
-    return LadderSumOperator(new_terms)
+    return ParticleLadderSum(new_terms)
 end
 
 
-function _normal_order(arg::LadderProductOperator{PS, P, O}) where {PS, P, O}
+function _normal_order(arg::ParticleLadderProduct{PS, P, O}) where {PS, P, O}
     if length(arg.factors) <= 1
-        return (LadderSumOperator([arg => 1]), false)
+        return (ParticleLadderSum([arg => 1]), false)
     end
 
     factors = arg.factors
     f1, f2 = factors[1], factors[2]
     if maxoccupancy(f1) == 1 && isequal(f1, f2)
-        return (zero(LadderSumOperator{PS, P, O, Int}), true)
+        return (zero(ParticleLadderSum{PS, P, O, Int}), true)
     end
 
     if isless(f2, f1)
-        (tail_op, dirty) = _normal_order(LadderProductOperator(vcat(f1, factors[3:end])))
-        f2s = LadderSumOperator([LadderProductOperator([f2]) => exchangesign(f1, f2)])
+        (tail_op, dirty) = _normal_order(ParticleLadderProduct(vcat(f1, factors[3:end])))
+        f2s = ParticleLadderSum([ParticleLadderProduct([f2]) => exchangesign(f1, f2)])
         swapped_op = f2s * tail_op
         if (f1.particle_index == f2.particle_index) && (f1.orbital == f2.orbital) && (f1.ladder == ANNIHILATION) && (f2.ladder == CREATION)
-            (resid_op, _) = _normal_order(LadderProductOperator(factors[3:end]))
+            (resid_op, _) = _normal_order(ParticleLadderProduct(factors[3:end]))
             return (swapped_op + resid_op, true)
         else
             return (swapped_op, true)
         end
     else
-        (tail_op, dirty) = _normal_order(LadderProductOperator(vcat(f2, factors[3:end])))
-        f1s = LadderSumOperator([LadderProductOperator([f1]) => 1])
+        (tail_op, dirty) = _normal_order(ParticleLadderProduct(vcat(f2, factors[3:end])))
+        f1s = ParticleLadderSum([ParticleLadderProduct([f1]) => 1])
         return (f1s * tail_op, dirty)
     end
 end
 
 
-function _normal_order(arg::LadderSumOperator{PS, P, O, S})::Tuple{LadderSumOperator{PS, P, O, S}, Bool} where {PS, P, O, S}
-    out = zero(LadderSumOperator{PS, P, O, S})
+function _normal_order(arg::ParticleLadderSum{PS, P, O, S})::Tuple{ParticleLadderSum{PS, P, O, S}, Bool} where {PS, P, O, S}
+    out = zero(ParticleLadderSum{PS, P, O, S})
     dirty = false
     for (t, a) in arg.terms
         (t2, d) = _normal_order(t)

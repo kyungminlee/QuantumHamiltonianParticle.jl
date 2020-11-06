@@ -14,8 +14,8 @@ using LinearAlgebra
     nsites = 8
     hs = ParticleHilbertSpace([site for i in 1:nsites])
 
-    c_dag(i) = LadderUnitOperator(particle_sector, 1, i, CREATION)
-    c(i) = LadderUnitOperator(particle_sector, 1, i, ANNIHILATION)
+    c_dag(i) = ParticleLadderUnit(particle_sector, 1, i, CREATION)
+    c(i) = ParticleLadderUnit(particle_sector, 1, i, ANNIHILATION)
 
     @testset "checks" begin
         @test length(hs.sites) == nsites
@@ -26,6 +26,7 @@ using LinearAlgebra
     end
 
     @testset "application" begin
+
         @testset "ladder unit" begin
             #             87654321
             bvec = UInt(0b01010110)
@@ -66,7 +67,6 @@ using LinearAlgebra
             out = get_column_iterator(hs, c_dag(8)*c(5) + c_dag(8)*c(3) * 0.5, bvec)
             @test Dict(out) == Dict(UInt(0b11000110) => -1.0, UInt(0b11010010) => 0.5)
         end
-
 
         @testset "hopping" begin
             t1 = 1.0

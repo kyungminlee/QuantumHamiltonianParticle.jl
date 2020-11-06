@@ -4,7 +4,7 @@
 |:-----------------:|:----------------:|:-----------------:|
 | [![**STABLE**][docs-stable-img]][docs-stable-url] [![**DEV**][docs-dev-img]][docs-dev-url] | [![Build Status][travis-img]][travis-url] | [![Code Coverage][codecov-img]][codecov-url] [![Code Coverage][coveralls-img]][coveralls-url] |
 
-Particle extension to [`ExactDiagonalization.jl`](https://github.com/kyungminlee/Particle.jl).
+Particle extension to [`ExactDiagonalization.jl`](https://github.com/kyungminlee/ExactDiagonalization.jl).
 
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg

@@ -1,65 +1,65 @@
-export LadderSumOperator
+export ParticleLadderSum
 
 import LinearAlgebra
 import ExactDiagonalization.isequiv
 
-struct LadderSumOperator{PS, P, O, S<:Number}<:AbstractParticleLadderOperator{PS}
-    terms::Vector{Pair{LadderProductOperator{PS, P, O}, S}}
+struct ParticleLadderSum{PS, P, O, S<:Number}<:AbstractParticleLadder{PS, S}
+    terms::Vector{Pair{ParticleLadderProduct{PS, P, O}, S}}
 
-    function LadderSumOperator(op::LadderUnitOperator{PS, P, O}) where {PS, P, O}
-        return new{PS, P, O, Int}([LadderProductOperator([op])=>1,])
+    function ParticleLadderSum(op::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
+        return new{PS, P, O, Int}([ParticleLadderProduct([op])=>1,])
     end
 
-    function LadderSumOperator(op::LadderProductOperator{PS, P, O}) where {PS, P, O}
+    function ParticleLadderSum(op::ParticleLadderProduct{PS, P, O}) where {PS, P, O}
         return new{PS, P, O, Int}([op=>1,])
     end
 
-    function LadderSumOperator(ops::Vararg{Pair{LadderProductOperator{PS, P, O}, S}}) where {PS, P, O, S<:Number}
+    function ParticleLadderSum(ops::Vararg{Pair{ParticleLadderProduct{PS, P, O}, S}}) where {PS, P, O, S<:Number}
         return new{PS, P, O, S}([op=>am for (op, am) in ops])
     end
 
-    function LadderSumOperator(terms::AbstractVector{Pair{LadderProductOperator{PS, P, O}, S}}) where {PS, P, O, S<:Number}
+    function ParticleLadderSum(terms::AbstractVector{Pair{ParticleLadderProduct{PS, P, O}, S}}) where {PS, P, O, S<:Number}
         return new{PS, P, O, S}(terms)
     end
 end
 
-Base.:(==)(lhs::OP, rhs::OP) where {OP<:LadderSumOperator} = lhs.terms == rhs.terms
+Base.:(==)(lhs::OP, rhs::OP) where {OP<:ParticleLadderSum} = lhs.terms == rhs.terms
 
-function Base.one(::Type{LadderSumOperator{PS, P, O, S}}) where {PS, P, O, S}
-    return LadderSumOperator([one(LadderProductOperator{PS, P, O}) => one(S)])
+function Base.one(::Type{ParticleLadderSum{PS, P, O, S}}) where {PS, P, O, S}
+    return ParticleLadderSum([one(ParticleLadderProduct{PS, P, O}) => one(S)])
 end
 
-function Base.zero(::Type{LadderSumOperator{PS, P, O, S}}) where {PS, P, O, S}
-    return LadderSumOperator(Pair{LadderProductOperator{PS, P, O}, S}[])
+function Base.zero(::Type{ParticleLadderSum{PS, P, O, S}}) where {PS, P, O, S}
+    return ParticleLadderSum(Pair{ParticleLadderProduct{PS, P, O}, S}[])
 end
 
-Base.one(::OP) where {OP<:LadderSumOperator} = Base.one(OP)
-Base.zero(::OP) where {OP<:LadderSumOperator} = Base.zero(OP)
+Base.one(::OP) where {OP<:ParticleLadderSum} = Base.one(OP)
+Base.zero(::OP) where {OP<:ParticleLadderSum} = Base.zero(OP)
 
-Base.iszero(arg::LadderSumOperator) = Base.isempty(arg.terms)
+Base.iszero(arg::ParticleLadderSum) = Base.isempty(arg.terms)
 
-function Base.convert(::Type{LadderSumOperator{PS, P, O, S}}, obj::LadderUnitOperator{PS, P, O}) where {PS, P, O, S}
-    return LadderSumOperator([LadderProductOperator([obj])=>one(S)])
+function Base.convert(::Type{ParticleLadderSum{PS, P, O, S}}, obj::ParticleLadderUnit{PS, P, O}) where {PS, P, O, S}
+    return ParticleLadderSum([ParticleLadderProduct([obj])=>one(S)])
 end
 
-function Base.convert(::Type{LadderSumOperator{PS, P, O, S}}, obj::LadderProductOperator{PS, P, O}) where {PS, P, O, S}
-    return LadderSumOperator([obj=>one(S)])
+function Base.convert(::Type{ParticleLadderSum{PS, P, O, S}}, obj::ParticleLadderProduct{PS, P, O}) where {PS, P, O, S}
+    return ParticleLadderSum([obj=>one(S)])
 end
 
-function Base.convert(::Type{LadderSumOperator{PS, P, O, S}}, obj::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S, S2}
-    return LadderSumOperator([t=>convert(S, a) for (t, a) in obj.terms])
+function Base.convert(::Type{ParticleLadderSum{PS, P, O, S}}, obj::ParticleLadderSum{PS, P, O, S2}) where {PS, P, O, S, S2}
+    return ParticleLadderSum([t=>convert(S, a) for (t, a) in obj.terms])
 end
 
 
-function isequiv(lhs::LadderSumOperator{PS, P, O, S1}, rhs::LadderSumOperator{PS, P, O, S2}) where {PS, P, O, S1, S2}
+function isequiv(lhs::ParticleLadderSum{PS, P, O, S1}, rhs::ParticleLadderSum{PS, P, O, S2}) where {PS, P, O, S1, S2}
     return iszero(simplify(lhs - rhs))
 end
 
 
-function Base.adjoint(arg::LadderSumOperator{PS, P, O, S}) where {PS, P, O, S}
-    return LadderSumOperator([(adjoint(t)=>conj(a)) for (t, a) in arg.terms])
+function Base.adjoint(arg::ParticleLadderSum{PS, P, O, S}) where {PS, P, O, S}
+    return ParticleLadderSum([(adjoint(t)=>conj(a)) for (t, a) in arg.terms])
 end
 
-function LinearAlgebra.ishermitian(arg::LadderSumOperator{PS, P, O, S}) where {PS, P, O, S}
+function LinearAlgebra.ishermitian(arg::ParticleLadderSum{PS, P, O, S}) where {PS, P, O, S}
     return isequiv(arg, adjoint(arg))
 end

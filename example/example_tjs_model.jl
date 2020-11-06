@@ -14,20 +14,20 @@ particle_sector = make_particle_sector(magnon, electronUp, electronDn)
 # electron_up_index = ParticleIndex(particle_sector, 2)
 # electron_dn_index = ParticleIndex(particle_sector, 3)
 
-# c_up_dag(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_up_index, orbital, CREATION))
-# c_up(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_up_index, orbital, ANNIHILATION))
-# c_dn_dag(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_dn_index, orbital, CREATION))
-# c_dn(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(electron_dn_index, orbital, ANNIHILATION))
+# c_up_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_up_index, orbital, CREATION))
+# c_up(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_up_index, orbital, ANNIHILATION))
+# c_dn_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_dn_index, orbital, CREATION))
+# c_dn(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(electron_dn_index, orbital, ANNIHILATION))
 
-# c_up_dag(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(2, orbital, CREATION))
-# c_up(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(2, orbital, ANNIHILATION))
-# c_dn_dag(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(3, orbital, CREATION))
-# c_dn(orbital::OrbitalType) where OrbitalType = LadderSumOperator(LadderUnitOperator(3, orbital, ANNIHILATION))
+# c_up_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(2, orbital, CREATION))
+# c_up(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(2, orbital, ANNIHILATION))
+# c_dn_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(3, orbital, CREATION))
+# c_dn(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(3, orbital, ANNIHILATION))
 
-c_up_dag(orbital::OrbitalType) where OrbitalType = LadderUnitOperator(2, orbital, CREATION)
-c_up(orbital::OrbitalType) where OrbitalType = LadderUnitOperator(2, orbital, ANNIHILATION)
-c_dn_dag(orbital::OrbitalType) where OrbitalType = LadderUnitOperator(3, orbital, CREATION)
-c_dn(orbital::OrbitalType) where OrbitalType = LadderUnitOperator(3, orbital, ANNIHILATION)
+c_up_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(2, orbital, CREATION)
+c_up(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(2, orbital, ANNIHILATION)
+c_dn_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(3, orbital, CREATION)
+c_dn(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(3, orbital, ANNIHILATION)
 
 # sf_site = ParticleSite([
 #     ParticleState(particle_sector, "↑,e↑", [0,1,0], 2+1),
@@ -69,7 +69,7 @@ for isite in 1:nsites, iptl in 1:nptls
 end
 
 
-# function getfermionparity(hs::ParticleHilbertSpace, op::LadderUnitOperator{<:Integer, <:Integer}, bvec::Unsigned)
+# function getfermionparity(hs::ParticleHilbertSpace, op::ParticleLadderUnit{<:Integer, <:Integer}, bvec::Unsigned)
 #     bm_species = get_bitmask(hs, op.particle_index, :)
 #     bm_site = get_bitmask(hs, op.particle_index, op.orbital)
 #     bm_mask = ( bm_site - 1 ) & bm_species  # σᶻ in jordan wigner string
@@ -95,7 +95,7 @@ println(newbvec |> bitstring)
 println(ampl)
 
 println("# Density")
-n3u = LadderProductOperator([c_up_dag(3), c_up(3)])
+n3u = ParticleLadderProduct([c_up_dag(3), c_up(3)])
 newbvec, ampl = apply(hs, n3u, bvec)
 println(bvec |> bitstring)
 println(newbvec |> bitstring)
@@ -103,7 +103,7 @@ println(ampl)
 
 
 println("# Hopping 4->5")
-hop = LadderProductOperator([c_up_dag(5), c_up(4)])
+hop = ParticleLadderProduct([c_up_dag(5), c_up(4)])
 newbvec, ampl = apply(hs, hop, bvec)
 println(bvec |> bitstring)
 println(newbvec |> bitstring)
@@ -111,7 +111,7 @@ println(ampl)
 
 
 println("# Hopping 4->2")
-hop = LadderProductOperator([c_up_dag(2), c_up(4)])
+hop = ParticleLadderProduct([c_up_dag(2), c_up(4)])
 newbvec, ampl = apply(hs, hop, bvec)
 println(bvec |> bitstring)
 println(newbvec |> bitstring)

@@ -6,7 +6,7 @@ makedocs(
     doctest=true,
     sitename="Particle.jl",
     format=Documenter.HTML(prettyurls=!("local" in ARGS)),
-    author="Kyungmin Lee",
+    authors="Kyungmin Lee",
     checkdocs=:all,
     pages = [
         "Home" => "index.md",

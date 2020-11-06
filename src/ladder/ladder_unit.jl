@@ -1,30 +1,30 @@
-export LadderUnitOperator
+export ParticleLadderUnit
 export LadderType, CREATION, ANNIHILATION
 
 import LinearAlgebra
 
 @enum LadderType CREATION ANNIHILATION
 
-struct LadderUnitOperator{PS<:ParticleSector, PI, OI}<:AbstractParticleLadderOperator{PS}
+struct ParticleLadderUnit{PS<:ParticleSector, PI, OI}<:AbstractParticleLadder{PS, Int}
     particle_index::PI   # which particle
     orbital::OI          # which orbital
     ladder::LadderType   # creation or annihilation
 
-    function LadderUnitOperator(::Type{PS}, p::P, o::O, l::LadderType) where {PS<:ParticleSector, P, O}
+    function ParticleLadderUnit(::Type{PS}, p::P, o::O, l::LadderType) where {PS<:ParticleSector, P, O}
         return new{PS, P, O}(p, o, l)
     end
-    function LadderUnitOperator(::PS, p::P, o::O, l::LadderType) where {PS<:ParticleSector, P, O}
+    function ParticleLadderUnit(::PS, p::P, o::O, l::LadderType) where {PS<:ParticleSector, P, O}
         return new{PS, P, O}(p, o, l)
     end
 end
 
-function Base.:(==)(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+function Base.:(==)(lhs::ParticleLadderUnit{PS, P, O}, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
     return (lhs.particle_index == rhs.particle_index) && (lhs.orbital == rhs.orbital) && (lhs.ladder == rhs.ladder)
 end
 
 
 # # local normal ordering
-# function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+# function Base.isless(lhs::ParticleLadderUnit{PS, P, O}, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
 #     lhs.orbital != rhs.orbital && return isless(lhs.orbital, rhs.orbital)
 #     lhs.particle_index != rhs.particle_index && return isless(lhs.particle_index, rhs.particle_index)
 #     return isless(lhs.ladder, rhs.ladder)
@@ -32,7 +32,7 @@ end
 
 
 # normal ordering
-function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+function Base.isless(lhs::ParticleLadderUnit{PS, P, O}, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
     (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
     if lhs.ladder == CREATION # both CREATION
         (lhs.particle_index != rhs.particle_index) && return isless(lhs.particle_index, rhs.particle_index)
@@ -45,7 +45,7 @@ end
 
 
 # Particle first
-# function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+# function Base.isless(lhs::ParticleLadderUnit{PS, P, O}, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
 #     (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
 #     if lhs.ladder == CREATION # both CREATION
 #         (lhs.particle_index != rhs.particle_index) && return isless(lhs.particle_index, rhs.particle_index)
@@ -57,7 +57,7 @@ end
 # end
 
 # Site first
-# function Base.isless(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+# function Base.isless(lhs::ParticleLadderUnit{PS, P, O}, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
 #     (lhs.ladder != rhs.ladder) && return isless(lhs.ladder, rhs.ladder)
 #     if lhs.ladder == CREATION # both CREATION
 #         (lhs.orbital != rhs.orbital) && return isless(lhs.orbital, rhs.orbital)
@@ -68,25 +68,25 @@ end
 #     end
 # end
 
-function exchangesign(lhs::LadderUnitOperator{PS, P, O}, rhs::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+function exchangesign(lhs::ParticleLadderUnit{PS, P, O}, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
     lhs.particle_index != rhs.particle_index && return 1
     isfermion(getspecies(PS, lhs.particle_index)) && return -1
     return 1
 end
 
-function maxoccupancy(arg::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+function maxoccupancy(arg::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
     return maxoccupancy(getspecies(PS, arg.particle_index))
 end
 
 
-Base.iszero(arg::LadderUnitOperator) = false
+Base.iszero(arg::ParticleLadderUnit) = false
 
-function Base.adjoint(arg::LadderUnitOperator{PS, P, O}) where {PS, P, O}
+function Base.adjoint(arg::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
     new_ladder = arg.ladder == CREATION ? ANNIHILATION : CREATION
-    return LadderUnitOperator(PS, arg.particle_index, arg.orbital, new_ladder)
+    return ParticleLadderUnit(PS, arg.particle_index, arg.orbital, new_ladder)
 end
 
-LinearAlgebra.ishermitian(arg::LadderUnitOperator) = false
+LinearAlgebra.ishermitian(arg::ParticleLadderUnit) = false
 
 
 

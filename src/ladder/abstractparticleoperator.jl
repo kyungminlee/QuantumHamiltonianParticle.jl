@@ -1,5 +1,5 @@
 export AbstractParticleOperator
-export AbstractParticleLadderOperator
+export AbstractParticleLadder
 
-abstract type AbstractParticleOperator{PS<:ParticleSector} <: AbstractOperator{Int} end
-abstract type AbstractParticleLadderOperator{PS<:ParticleSector} <: AbstractParticleOperator{PS} end
+abstract type AbstractParticleLadder{PS<:ParticleSector, S<:Number} end
+abstract type AbstractParticleOperator{PS<:ParticleSector, S<:Number} <: AbstractOperator{S} end
