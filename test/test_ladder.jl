@@ -5,15 +5,34 @@ using Particle
 @testset "ladder" begin
     p = ParticleSector(Boson(:m, 2), Fermion(:f))
     PS = typeof(p)
+
+    @testset "null" begin
+        nop1 = ParticleLadderNull(PS)
+        nop2 = ParticleLadderNull(p)
+        nop3 = ParticleLadderNull{PS}()
+        @test nop1 == nop2 == nop3
+        @test nop1 === nop2 === nop3
+        @test exchangesign(nop1, nop2) == 1
+        @test iszero(nop1)
+        @test adjoint(nop1) == nop1
+        @test ishermitian(nop1)
+    end
+
     @testset "unit" begin
-        c = ParticleLadderUnit(p, 1, 2, CREATION)
-        @test c == ParticleLadderUnit(typeof(p), 1, 2, CREATION)
-        @test c != ParticleLadderUnit(typeof(p), 1, 2, ANNIHILATION)
-        @test c != ParticleLadderUnit(typeof(p), 1, 1, CREATION)
-        @test c != ParticleLadderUnit(typeof(p), 2, 2, CREATION)
-        @test !iszero(c)
-        @test adjoint(c) == ParticleLadderUnit(p, 1, 2, ANNIHILATION)
-        @test !ishermitian(c)
+        b1 = ParticleLadderUnit(p, 1, 2, CREATION)
+        @test b1 == ParticleLadderUnit(typeof(p), 1, 2, CREATION)
+        @test b1 != ParticleLadderUnit(typeof(p), 1, 2, ANNIHILATION)
+        @test b1 != ParticleLadderUnit(typeof(p), 1, 1, CREATION)
+        @test b1 != ParticleLadderUnit(typeof(p), 2, 2, CREATION)
+        @test !iszero(b1)
+        @test adjoint(b1) == ParticleLadderUnit(p, 1, 2, ANNIHILATION)
+        @test !ishermitian(b1)
+        b2 = ParticleLadderUnit(p, 1, 3, ANNIHILATION)
+        c1 = ParticleLadderUnit(p, 2, 1, CREATION)
+        c2 = ParticleLadderUnit(p, 2, 2, CREATION)
+        @test exchangesign(b1, b2) == 1
+        @test exchangesign(b1, c1) == 1
+        @test exchangesign(c1, c2) == -1
     end
 
     cdag(i, j) = ParticleLadderUnit(p, i, j, CREATION)
