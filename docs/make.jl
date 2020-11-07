@@ -10,6 +10,8 @@ makedocs(
     checkdocs=:all,
     pages = [
         "Home" => "index.md",
+        "Particle" => "particle.md",
+        "Ladder" => "ladder.md",
         "API" => "api.md",
     ]
 )
