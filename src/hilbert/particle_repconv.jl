@@ -229,8 +229,12 @@ function locvec2occmat(
     sgn = 1
     occmat = zeros(Int, (n_particles, n_sites)) # occupation matrix
     for (iptl, p) in enumerate(particle_locations)
-        if exchangesign(getspecies(PS, iptl)) != 1
+        if exchangesign(getspecies(PS, iptl)) == 1
+
+        elseif exchangesign(getspecies(PS, iptl)) == -1
             sgn = isparityodd(p) ? -sgn : sgn
+        else
+            @error "Unsupported exchange sign"
         end
         for isite in p
             occmat[iptl, isite] += 1

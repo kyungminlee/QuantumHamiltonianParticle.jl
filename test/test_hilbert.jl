@@ -109,13 +109,6 @@ using Particle
     @test hilbert[CartesianIndex(2, 1, 6)] == UInt(0b110_000_001)
     @test hilbert[2, 1, 6] == UInt(0b110_000_001)
 
-    #=
-    @test get_bitmask(hilbert, 1, 1) == 0b000000011
-    @test get_bitmask(hilbert, 2, 1) == 0b000000100
-    @test get_bitmask(hilbert, 1, 2) == 0b000011000
-    @test get_bitmask(hilbert, 2, 2) == 0b000100000
-    =#
-
     @test Set(quantum_number_sectors(hilbert)) == Set([(sz, c) for sz in -3:3, c in 0:3])
     @test get_quantum_number(hilbert, 0b001_110_100) == (0-1+1, 1+1)
     @test get_quantum_number(hilbert, [4, 6, 2]) == (0-1+1, 1+1)
