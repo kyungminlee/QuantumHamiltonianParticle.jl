@@ -5,6 +5,24 @@ import ExactDiagonalization.get_element
 
 function get_row_iterator(
     hs::ParticleHilbertSpace{PS, BR, QN},
+    op::ParticleLadderNull{PS},
+    bvec::BR,
+    ::Type{S}=Float64,
+) where {PS, BR, QN, S}
+    return ((zero(BR) => zero(S)) for i in 1:0)
+end
+
+function get_column_iterator(
+    hs::ParticleHilbertSpace{PS, BR, QN},
+    op::ParticleLadderNull{PS},
+    bvec::BR,
+    ::Type{S}=Float64,
+) where {PS, BR, QN, S}
+    return ((zero(BR) => zero(S)) for i in 1:0)
+end
+
+function get_row_iterator(
+    hs::ParticleHilbertSpace{PS, BR, QN},
     op::ParticleLadderUnit{PS, <:Integer, <:Integer},
     bvec::BR,
     ::Type{S}=Float64,
