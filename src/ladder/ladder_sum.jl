@@ -3,7 +3,7 @@ export ParticleLadderSum
 import LinearAlgebra
 import ExactDiagonalization.isequiv
 
-struct ParticleLadderSum{PS, P, O, S<:Number}<:AbstractParticleLadder{PS, S}
+struct ParticleLadderSum{PS<:ParticleSector, P, O, S<:Number}<:AbstractParticleLadder{PS, S}
     terms::Vector{Pair{ParticleLadderProduct{PS, P, O}, S}}
 
     function ParticleLadderSum(op::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
