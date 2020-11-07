@@ -271,6 +271,14 @@ function Base.getindex(
 end
 
 
+function Base.getindex(
+    hs::ParticleHilbertSpace{PS, BR, QN},
+    idx::Integer...
+) where {PS, BR, QN}
+    return compress(hs, CartesianIndex(idx...), BR)
+end
+
+
 function hs_get_basis_list(hs::ParticleHilbertSpace{PS, BR, QN}, ::Type{BR2}=BR)::Vector{BR2} where {PS, BR<:Unsigned, QN, BR2}
     if sizeof(BR2) * 8 <= bitwidth(hs)
         throw(ArgumentError("type $(BR2) not enough to represent the hilbert space (need $(bitwidth(hs)) bits)"))
