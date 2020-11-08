@@ -29,19 +29,21 @@ function get_row_iterator(
 ) where {PS, BR, QN, S<:Number}
     particle = getspecies(PS, op.particle_index)
     occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
+    new_occupancy_at_site = zero(occupancy_at_site)
+    ref_occupancy_at_site = zero(occupancy_at_site)
 
     newbvec::BR = zero(BR)
     match::Bool = false
     ampl::S = zero(S)
 
     if op.ladder == ANNIHILATION
-        if occupancy_at_site < maxoccupancy(particle)
+        if 0 <= occupancy_at_site < maxoccupancy(particle)
             new_occupancy_at_site = occupancy_at_site + 1
             ref_occupancy_at_site = occupancy_at_site + 1  # for amplitude sqrt(n) or sqrt(n+1)
             match = true
         end
     else # op.ladder == CREATION
-        if occupancy_at_site > 0
+        if 0 < occupancy_at_site <= maxoccupancy(particle)
             new_occupancy_at_site = occupancy_at_site - 1
             ref_occupancy_at_site = occupancy_at_site      # for amplitude sqrt(n) or sqrt(n+1)
             match = true
@@ -60,52 +62,8 @@ function get_row_iterator(
         end
         newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
     end
-
     element::Pair{BR, S} = newbvec => ampl
     return (element for i in 1:(match ? 1 : 0))
-
-    #=
-    particle = getspecies(PS, op.particle_index)
-    occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
-
-    newbvec::BR = zero(BR)
-    match::Bool = false
-    ampl::S = zero(S)
-
-    if op.ladder == ANNIHILATION
-        if occupancy_at_site < maxoccupancy(particle)
-            if isfermion(particle)
-                wj_parity = get_fermion_parity(hs, op, bvec)
-                ampl = wj_parity == 0 ? one(S) : -one(S)
-            elseif isboson(particle)
-                ampl = Base.sqrt(S(occupancy_at_site+1))
-            elseif isspin(particle)
-                ampl = one(S)
-            else
-                throw(ArgumentError("unsupported particle type $particle"))
-            end
-            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, occupancy_at_site+1)
-            match = true
-        end
-    else # op.ladder == CREATION
-        if occupancy_at_site > 0
-            if isfermion(particle)
-                wj_parity = get_fermion_parity(hs, op, bvec)
-                ampl = wj_parity == 0 ? one(S) : -one(S)
-            elseif isboson(particle)
-                ampl = Base.sqrt(S(occupancy_at_site))
-            elseif isspin(particle)
-                ampl = one(S)
-            else
-                throw(ArgumentError("unsupported particle type $particle"))
-            end
-            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, occupancy_at_site-1)
-            match = true
-        end
-    end
-    element::Pair{BR, S} = newbvec => ampl
-    return (element for i in 1:(match ? 1 : 0))
-    =#
 end
 
 
@@ -117,19 +75,21 @@ function get_column_iterator(
 ) where {PS, BR, QN, S<:Number}
     particle = getspecies(PS, op.particle_index)
     occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
+    new_occupancy_at_site = zero(occupancy_at_site)
+    ref_occupancy_at_site = zero(occupancy_at_site)
 
     newbvec::BR = zero(BR)
     match::Bool = false
     ampl::S = zero(S)
 
     if op.ladder == CREATION
-        if occupancy_at_site < maxoccupancy(particle)
+        if 0 <= occupancy_at_site < maxoccupancy(particle)
             new_occupancy_at_site = occupancy_at_site + 1
             ref_occupancy_at_site = occupancy_at_site + 1   # for amplitude sqrt(n) or sqrt(n+1)
             match = true
         end
-    else # op.ladder == CREATION
-        if occupancy_at_site > 0
+    else # op.ladder == ANNIHILATION
+        if 0 < occupancy_at_site <= maxoccupancy(particle)
             new_occupancy_at_site = occupancy_at_site - 1
             ref_occupancy_at_site = occupancy_at_site       # for amplitude sqrt(n) or sqrt(n+1)
             match = true
@@ -148,7 +108,6 @@ function get_column_iterator(
         end
         newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
     end
-
     element::Pair{BR, S} = newbvec => ampl
     return (element for i in 1:(match ? 1 : 0))
 end
@@ -162,15 +121,23 @@ function get_element(
 ) where {PS, BR, QN, S<:Number}
     particle = getspecies(PS, op.particle_index)
     occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bcol)
+    new_occupancy_at_site = zero(occupancy_at_site)
+    ref_occupancy_at_site = zero(occupancy_at_site)
 
     if op.ladder == CREATION
-        occupancy_at_site >= maxoccupancy(particle) && return 0
-        new_occupancy_at_site = occupancy_at_site + 1
-        ref_occupancy_at_site = occupancy_at_site + 1   # for amplitude sqrt(n) or sqrt(n+1)
+        if 0 <= occupancy_at_site < maxoccupancy(particle)
+            new_occupancy_at_site = occupancy_at_site + 1
+            ref_occupancy_at_site = occupancy_at_site + 1   # for amplitude sqrt(n) or sqrt(n+1)
+        else
+            return zero(S)
+        end
     else
-        occupancy_at_site == 0 && return 0
-        new_occupancy_at_site = occupancy_at_site - 1
-        ref_occupancy_at_site = occupancy_at_site       # for amplitude sqrt(n) or sqrt(n+1)
+        if 0 < occupancy_at_site <= maxoccupancy(particle)
+            new_occupancy_at_site = occupancy_at_site - 1
+            ref_occupancy_at_site = occupancy_at_site       # for amplitude sqrt(n) or sqrt(n+1)
+        else
+            return zero(S)
+        end
     end
 
     if brow == set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
@@ -201,15 +168,20 @@ function get_row_iterator(
     ampl::S = one(S)
     for f in op.factors
         newout = get_row_iterator(hs, f, bvec, S)
-        if isempty(newout) || iszero(ampl)
+        if isempty(newout)
             bvec = zero(BR)
             ampl = zero(S)
             match = false
             break
         end
-        (newbvec, newampl) = first(newout)
         @assert length(newout) == 1
         (newbvec, newampl) = first(newout)
+        if iszero(newampl)
+            bvec = zero(BR)
+            ampl = zero(S)
+            match = false
+            break
+        end
         bvec = newbvec
         ampl *= newampl
     end
@@ -228,15 +200,20 @@ function get_column_iterator(
     ampl::S = one(S)
     for f in reverse(op.factors)
         newout = get_column_iterator(hs, f, bvec, S)
-        if isempty(newout) || iszero(ampl)
+        if isempty(newout)
             bvec = zero(BR)
             ampl = zero(S)
             match = false
             break
         end
-        (newbvec, newampl) = first(newout)
         @assert length(newout) == 1
         (newbvec, newampl) = first(newout)
+        if iszero(newampl)
+            bvec = zero(BR)
+            ampl = zero(S)
+            match = false
+            break
+        end
         bvec = newbvec
         ampl *= newampl
     end
@@ -255,21 +232,14 @@ function get_element(
     ampl::S = one(S)
     for f in op.factors
         newout = get_row_iterator(hs, f, bvec, S)
-        if isempty(newout) || iszero(ampl)
-            bvec = zero(BR)
-            return zero(S)
-        end
-        (newbvec, newampl) = first(newout)
+        isempty(newout) && return zero(S)
         @assert length(newout) == 1
         (newbvec, newampl) = first(newout)
+        iszero(newampl) && return zero(S)
         bvec = newbvec
         ampl *= newampl
     end
-    if bvec == bcol
-        return ampl
-    else
-        return zero(S)
-    end
+    return bvec == bcol ? ampl : zero(S)
 end
 
 
