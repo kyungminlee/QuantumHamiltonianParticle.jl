@@ -19,6 +19,7 @@ using Particle
     end
 
     @testset "unit" begin
+        n = ParticleLadderNull(p)
         b1 = ParticleLadderUnit(p, 1, 2, CREATION)
         @test b1 == ParticleLadderUnit(typeof(p), 1, 2, CREATION)
         @test b1 != ParticleLadderUnit(typeof(p), 1, 2, ANNIHILATION)
@@ -33,6 +34,11 @@ using Particle
         @test exchangesign(b1, b2) == 1
         @test exchangesign(b1, c1) == 1
         @test exchangesign(c1, c2) == -1
+
+        @test exchangesign(b1, n) == 1
+        @test exchangesign(c1, n) == 1
+        @test exchangesign(n, b1) == 1
+        @test exchangesign(n, c1) == 1
     end
 
     cdag(i, j) = ParticleLadderUnit(p, i, j, CREATION)
