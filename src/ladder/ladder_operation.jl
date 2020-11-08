@@ -1,11 +1,11 @@
 
-Base.:(+)(arg::AbstractParticleLadder) = arg
 Base.:(-)(lhs::AbstractParticleLadder{PS, <:Number}, rhs::AbstractParticleLadder{PS, <:Number}) where {PS} = lhs + (-rhs)
 Base.:(-)(lhs::AbstractParticleLadder, rhs::Number) = lhs + (-rhs)
 Base.:(-)(lhs::Number, rhs::AbstractParticleLadder) = lhs + (-rhs)
 
 # 1. Unary
 
+Base.:(+)(arg::AbstractParticleLadder) = arg
 Base.:(-)(arg::ParticleLadderNull) = arg
 Base.:(-)(arg::ParticleLadderUnit) = ParticleLadderSum([ParticleLadderProduct([arg])=>-1])
 Base.:(-)(arg::ParticleLadderProduct) = ParticleLadderSum([arg=>-1])
@@ -99,14 +99,11 @@ end
 
 # 3. Addition
 
-function Base.:(+)(lhs::Number, rhs::ParticleLadderNull)
-    return lhs
-end
+Base.:(+)(lhs::Number, rhs::ParticleLadderNull) = lhs
+Base.:(+)(lhs::ParticleLadderNull, rhs::Number) = rhs
 
-function Base.:(+)(lhs::ParticleLadderNull, rhs::Number)
-    return rhs
-end
-
+Base.:(+)(lhs::AbstractParticleLadder{PS, S}, rhs::ParticleLadderNull{PS}) where {PS, S} = lhs
+Base.:(+)(lhs::ParticleLadderNull{PS}, rhs::AbstractParticleLadder{PS, S}) where {PS, S}= rhs
 
 function Base.:(+)(lhs::S, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O, S<:Number}
     return ParticleLadderSum([
