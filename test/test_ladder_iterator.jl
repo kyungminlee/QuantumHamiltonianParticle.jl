@@ -21,4 +21,32 @@ using Particle
     @test collect(get_column_iterator(hs, cdag(2,2), UInt(0b000_000_000))) == [UInt(0b000_100_000) => 1.0]
     @test collect(get_column_iterator(hs, cdag(2,2), UInt(0b000_000_001))) == [UInt(0b000_100_001) => 1.0]
     @test collect(get_column_iterator(hs, cdag(2,2), UInt(0b000_000_101))) == [UInt(0b000_100_101) => -1.0]
+
+    @test collect(get_column_iterator(hs, c(1,2), UInt(0b000_001_000))) == [UInt(0b000_000_000) => 1.0]
+    @test collect(get_column_iterator(hs, c(1,2), UInt(0b000_001_001))) == [UInt(0b000_000_001) => 1.0]
+    @test collect(get_column_iterator(hs, c(2,2), UInt(0b000_100_000))) == [UInt(0b000_000_000) => 1.0]
+    @test collect(get_column_iterator(hs, c(2,2), UInt(0b000_100_001))) == [UInt(0b000_000_001) => 1.0]
+    @test collect(get_column_iterator(hs, c(2,2), UInt(0b000_100_101))) == [UInt(0b000_000_101) => -1.0]
+
+    @test collect(get_row_iterator(hs, cdag(1,2), UInt(0b000_001_000))) == [UInt(0b000_000_000) => 1.0]
+    @test collect(get_row_iterator(hs, cdag(1,2), UInt(0b000_001_001))) == [UInt(0b000_000_001) => 1.0]
+    @test collect(get_row_iterator(hs, cdag(2,2), UInt(0b000_100_000))) == [UInt(0b000_000_000) => 1.0]
+    @test collect(get_row_iterator(hs, cdag(2,2), UInt(0b000_100_001))) == [UInt(0b000_000_001) => 1.0]
+    @test collect(get_row_iterator(hs, cdag(2,2), UInt(0b000_100_101))) == [UInt(0b000_000_101) => -1.0]
+
+    @test collect(get_row_iterator(hs, c(1,2), UInt(0b000_000_000))) == [UInt(0b000_001_000) => 1.0]
+    @test collect(get_row_iterator(hs, c(1,2), UInt(0b000_000_001))) == [UInt(0b000_001_001) => 1.0]
+    @test collect(get_row_iterator(hs, c(2,2), UInt(0b000_000_000))) == [UInt(0b000_100_000) => 1.0]
+    @test collect(get_row_iterator(hs, c(2,2), UInt(0b000_000_001))) == [UInt(0b000_100_001) => 1.0]
+    @test collect(get_row_iterator(hs, c(2,2), UInt(0b000_000_101))) == [UInt(0b000_100_101) => -1.0]
+
+
+    @test isempty(collect(get_column_iterator(hs, cdag(1,3) * c(1,1), UInt(0b000_000_000))))
+    @test collect(get_column_iterator(hs, cdag(1,3) * c(1,1), UInt(0b000_000_001))) == [UInt(0b001_000_000) => 1.0]
+    @test collect(get_column_iterator(hs, cdag(1,3) * c(1,1), UInt(0b000_001_001))) == [UInt(0b001_001_000) => 1.0]
+
+    @test isempty(collect(get_column_iterator(hs, cdag(2,3) * c(2,1), UInt(0b000_000_000))))
+    @test collect(get_column_iterator(hs, cdag(2,3) * c(2,1), UInt(0b000_000_100))) == [UInt(0b100_000_000) => 1.0]
+    @test collect(get_column_iterator(hs, cdag(2,3) * c(2,1), UInt(0b000_001_100))) == [UInt(0b100_001_000) => 1.0]
+    @test collect(get_column_iterator(hs, cdag(2,3) * c(2,1), UInt(0b000_101_100))) == [UInt(0b100_101_000) => -1.0]
 end
