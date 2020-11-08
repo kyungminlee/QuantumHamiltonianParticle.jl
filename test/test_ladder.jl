@@ -139,6 +139,9 @@ using Particle
         @test n11 + 2\n12 == ∑([n11=>1.0, n12=>0.5])
         @test n11 + n12//2 == ∑([n11=>1//1, n12=>1//2])
 
+        @test n11 + c(1,2) == ∑([n11=>1, ∏([c(1,2)])=>1])
+        @test c(1,2) + n11 == ∑([∏([c(1,2)])=>1, n11=>1])
+
         op = n11 + 2*n12
 
         @test one(ParticleLadderSum{PS, Int, Int, Int}) == one(op)
