@@ -140,7 +140,7 @@ function get_element(
         end
     end
 
-    if brow == set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
+    if brow == set_occupancy(hs, op.particle_index, op.orbital, bcol, new_occupancy_at_site)
         if isfermion(particle)
             wj_parity = get_fermion_parity(hs, op, bcol)
             ampl = wj_parity == 0 ? one(S) : -one(S)
