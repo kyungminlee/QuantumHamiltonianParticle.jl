@@ -1,6 +1,11 @@
 export get_fermion_parity
 
 
+"""
+    get_fermion_parity(phs, op, bvec)
+
+Get the fermion parity (0 or 1) for when op is applied to bvec.
+"""
 function get_fermion_parity(
     hs::ParticleHilbertSpace,
     op::ParticleLadderUnit{PS, <:Integer, <:Integer},

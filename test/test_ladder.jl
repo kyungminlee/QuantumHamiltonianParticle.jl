@@ -207,4 +207,29 @@ using Particle
         @test iszero(simplify( c(2,1)*cdag(2,1) + cdag(2,1)*c(2,1) - 1))
         @test iszero(simplify( c(2,1)*c(2,1)*c(2,1) ))
     end
+
+    @testset "with Hilbert" begin
+        # p = ParticleSector(Boson(:m, 2), Fermion(:f))
+
+        site = ParticleSite([
+            ParticleState(p, "__", [0, 0], (0, 0)),
+            ParticleState(p, "b_", [1, 0], (1, 0)),
+            ParticleState(p, "B_", [2, 0], (2, 0)),
+            ParticleState(p, "_f", [0, 1], (0, 1)),
+            ParticleState(p, "bf", [1, 1], (1, 1)),
+            ParticleState(p, "Bf", [2, 1], (2, 1)),
+        ])
+        hs = ParticleHilbertSpace([site, site, site])
+        @test get_fermion_parity(hs, cdag(1, 3), 0b000_000_001) == 0
+        @test get_fermion_parity(hs, cdag(2, 3), 0b000_000_001) == 0
+
+        @test get_fermion_parity(hs, cdag(1, 3), 0b000_000_100) == 0
+        @test get_fermion_parity(hs, cdag(2, 3), 0b000_000_100) == 1
+
+        @test get_fermion_parity(hs, cdag(1, 1), 0b001_000_000) == 0
+        @test get_fermion_parity(hs, cdag(2, 1), 0b001_000_000) == 0
+
+        @test get_fermion_parity(hs, cdag(1, 1), 0b100_000_000) == 0
+        @test get_fermion_parity(hs, cdag(2, 1), 0b100_000_000) == 0
+    end
 end
