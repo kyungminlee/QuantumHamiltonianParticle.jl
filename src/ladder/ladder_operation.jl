@@ -41,14 +41,9 @@ Base.:(//)(lhs::ParticleLadderSum, rhs::Number) = ParticleLadderSum([(t => a // 
 
 # 2b. Complex
 
-function Base.:(*)(lhs::ParticleLadderNull{PS}, rhs::AbstractParticleLadder{PS, S}) where {PS, S}
-    return lhs
-end
-
-function Base.:(*)(lhs::AbstractParticleLadder{PS, S}, rhs::ParticleLadderNull{PS}) where {PS, S}
-    return rhs
-end
-
+Base.:(*)(lhs::ParticleLadderNull{PS}, rhs::ParticleLadderNull{PS}) where {PS} = lhs
+Base.:(*)(lhs::ParticleLadderNull{PS}, rhs::AbstractParticleLadder{PS, S}) where {PS, S} = lhs
+Base.:(*)(lhs::AbstractParticleLadder{PS, S}, rhs::ParticleLadderNull{PS}) where {PS, S} = rhs
 
 function Base.:(*)(lhs::ParticleLadderUnit{PS, P, O}, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
     return ParticleLadderProduct([lhs, rhs])
@@ -103,7 +98,7 @@ Base.:(+)(lhs::Number, rhs::ParticleLadderNull) = lhs
 Base.:(+)(lhs::ParticleLadderNull, rhs::Number) = rhs
 
 Base.:(+)(lhs::AbstractParticleLadder{PS, S}, rhs::ParticleLadderNull{PS}) where {PS, S} = lhs
-Base.:(+)(lhs::ParticleLadderNull{PS}, rhs::AbstractParticleLadder{PS, S}) where {PS, S}= rhs
+Base.:(+)(lhs::ParticleLadderNull{PS}, rhs::AbstractParticleLadder{PS, S}) where {PS, S} = rhs
 
 function Base.:(+)(lhs::S, rhs::ParticleLadderUnit{PS, P, O}) where {PS, P, O, S<:Number}
     return ParticleLadderSum([
