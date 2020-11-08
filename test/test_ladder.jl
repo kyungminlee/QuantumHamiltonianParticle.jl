@@ -95,6 +95,16 @@ using Particle
 
         nop = ParticleLadderNull(p)
 
+        @test nop * 2 == nop
+        @test 2 * nop == nop
+        @test nop / 2.0 == nop
+        @test 2.0 \ nop == nop
+        @test nop // 2.0 == nop
+        @test nop * nop == nop
+
+        @test nop + 2 == 2
+        @test 2.0 + nop == 2.0
+
         @test ∑(c(1,1)) == ∑([∏([c(1,1)]) => 1])
         n11 = cdag(1,1) * c(1,1)
         n12 = cdag(1,2) * c(1,2)
@@ -201,7 +211,6 @@ using Particle
         @test +hop == hop
         @test -hop == ∑([cdag(1,2)*c(1,1)=>-1, cdag(1,1)*c(1,2)=>-1])
     end
-
 
     @testset "simplify" begin
         @test simplify( c(2,1) ) == c(2,1)
