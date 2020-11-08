@@ -61,6 +61,103 @@ using Random
 
     hsr = represent(hs)
 
+
+    @testset "lattice unit" begin
+        rng = MersenneTwister(0)
+        for iptl1 in 1:2, isite1 in 1:3, cop1 in [c, cdag]
+            op1 = cop1(iptl1, isite1)
+            mr = Dict{Tuple{UInt, UInt}, Float64}()
+            mc = Dict{Tuple{UInt, UInt}, Float64}()
+            me = Dict{Tuple{UInt, UInt}, Float64}()
+            for brow in hsr.basis_list
+                for (bcol, ampl) in get_row_iterator(hs, op1, brow)
+                    mr[(brow, bcol)] = get(mr, (brow, bcol), zero(Float64)) + ampl
+                end
+            end
+            for bcol in hsr.basis_list
+                for (brow, ampl) in get_column_iterator(hs, op1, bcol)
+                    mc[(brow, bcol)] = get(mc, (brow, bcol), zero(Float64)) + ampl
+                end
+            end
+
+            for brow in hsr.basis_list, bcol in hsr.basis_list
+                ampl = get_element(hs, op1, brow, bcol)
+                if !iszero(ampl)
+                    me[(brow, bcol)] = ampl
+                end
+            end
+
+            choptol!(mr, 1E-8)
+            choptol!(mc, 1E-8)
+            choptol!(me, 1E-8)
+            @test mr == mc
+            @test me == mc
+        end
+    end
+
+    @testset "lattice product" begin
+        rng = MersenneTwister(0)
+        for iptl1 in 1:2, iptl2 in 1:2, isite1 in 1:3, isite2 in 1:3, cop1 in [c, cdag], cop2 in [c, cdag]
+            op1 = cop1(iptl1, isite1) * cop2(iptl2, isite2)
+            mr = Dict{Tuple{UInt, UInt}, Float64}()
+            mc = Dict{Tuple{UInt, UInt}, Float64}()
+            me = Dict{Tuple{UInt, UInt}, Float64}()
+            for brow in hsr.basis_list
+                for (bcol, ampl) in get_row_iterator(hs, op1, brow)
+                    mr[(brow, bcol)] = get(mr, (brow, bcol), zero(Float64)) + ampl
+                end
+            end
+            for bcol in hsr.basis_list
+                for (brow, ampl) in get_column_iterator(hs, op1, bcol)
+                    mc[(brow, bcol)] = get(mc, (brow, bcol), zero(Float64)) + ampl
+                end
+            end
+            for brow in hsr.basis_list, bcol in hsr.basis_list
+                ampl = get_element(hs, op1, brow, bcol)
+                if !iszero(ampl)
+                    me[(brow, bcol)] = ampl
+                end
+            end
+            choptol!(mr, 1E-8)
+            choptol!(mc, 1E-8)
+            choptol!(me, 1E-8)
+            @test mr == mc
+            @test me == mc
+        end
+    end
+
+    @testset "lattice sum" begin
+        rng = MersenneTwister(0)
+        for iptl1 in 1:2, iptl2 in 1:2, isite1 in 1:3, isite2 in 1:3, cop1 in [c, cdag], cop2 in [c, cdag]
+            op1 = cop1(iptl1, isite1) * cop2(iptl2, isite2) * 0.5 - c(1, 1) * 2
+            mr = Dict{Tuple{UInt, UInt}, Float64}()
+            mc = Dict{Tuple{UInt, UInt}, Float64}()
+            me = Dict{Tuple{UInt, UInt}, Float64}()
+            for brow in hsr.basis_list
+                for (bcol, ampl) in get_row_iterator(hs, op1, brow)
+                    mr[(brow, bcol)] = get(mr, (brow, bcol), zero(Float64)) + ampl
+                end
+            end
+            for bcol in hsr.basis_list
+                for (brow, ampl) in get_column_iterator(hs, op1, bcol)
+                    mc[(brow, bcol)] = get(mc, (brow, bcol), zero(Float64)) + ampl
+                end
+            end
+            for brow in hsr.basis_list, bcol in hsr.basis_list
+                ampl = get_element(hs, op1, brow, bcol)
+                if !iszero(ampl)
+                    me[(brow, bcol)] = ampl
+                end
+            end
+            choptol!(mr, 1E-8)
+            choptol!(mc, 1E-8)
+            choptol!(me, 1E-8)
+            @test mr == mc
+            @test me == mc
+        end
+    end
+
+
     function test_product_iterators()
         rng = MersenneTwister(0)
         for bvec in rand(rng, hsr.basis_list, 5)
@@ -78,13 +175,6 @@ using Random
                     choptol!(out1, 1E-8)
                     choptol!(out2, 1E-8)
                     out1 != out2 && return false
-
-                    for brow in hsr.basis_list
-                        val = get_element(hs, op1 * op2, brow, bvec)
-                        if get(out1, brow, zero(Float64)) != val
-                            return false
-                        end
-                    end
                 end
             end
         end
@@ -108,12 +198,12 @@ using Random
                     choptol!(out2, 1E-8)
                     out1 != out2 && return false
 
-                    for brow in hsr.basis_list
-                        val = get_element(hs, op1 + op2, brow, bvec)
-                        if get(out1, brow, zero(Float64)) != val
-                            return false
-                        end
-                    end
+                    # for brow in hsr.basis_list
+                    #     val = get_element(hs, op1 + op2, brow, bvec)
+                    #     if get(out1, brow, zero(Float64)) != val
+                    #         return false
+                    #     end
+                    # end
                 end
             end
         end
