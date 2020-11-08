@@ -111,9 +111,6 @@ using Random
                     for brow in hsr.basis_list
                         val = get_element(hs, op1 + op2, brow, bvec)
                         if get(out1, brow, zero(Float64)) != val
-                            @show get(out2, brow, zero(Float64))
-                            @show val
-                            @show brow
                             return false
                         end
                     end
