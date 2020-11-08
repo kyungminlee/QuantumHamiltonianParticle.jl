@@ -56,11 +56,8 @@ isfermion(::Type{<:Fermion}) = true
 isboson(::Type{<:AbstractParticle}) = false
 isboson(::Type{<:HardcoreBoson}) = true
 isboson(::Type{<:Boson}) = true
-isboson(::Type{<:Spin}) = false
 
 isspin(::Type{<:AbstractParticle}) = false
-isspin(::Type{<:HardcoreBoson}) = false
-isspin(::Type{<:Boson}) = false
 isspin(::Type{<:Spin}) = true
 
 maxoccupancy(::Type{<:Spin{S, M}}) where {S, M} = M
