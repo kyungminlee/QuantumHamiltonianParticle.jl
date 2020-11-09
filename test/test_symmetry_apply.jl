@@ -4,7 +4,7 @@ using ExactDiagonalization
 using Particle
 using LinearAlgebra
 
-@testset begin
+@testset "Symmetry" begin
     f = Fermion("f")
     particle_sector = ParticleSector(f)
     site = ParticleSite([

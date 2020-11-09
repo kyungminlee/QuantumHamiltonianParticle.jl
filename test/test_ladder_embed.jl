@@ -20,6 +20,7 @@ using Particle
         ParticleState(p, "Bf", [2, 1], (2, 1)),
     ])
     hs1 = ParticleHilbertSpace([site1, site1, site1])
+    hss1 = HilbertSpaceSector(hs1, (2,1))
 
     @testset "Constructor & Comparison" begin
         site2 = ParticleSite([
@@ -36,6 +37,10 @@ using Particle
 
         @test embed(hs1, cdag(1,1) + cdag(1,2)) != embed(hs1, cdag(1,2) + cdag(1,1))
         @test isequiv(embed(hs1, cdag(1,1) + cdag(1,2)), embed(hs1, cdag(1,2) + cdag(1,1)))
+
+        @test embed(hss1, cdag(1,1)) == embed(hss1, cdag(1,1))
+        @test embed(hss1, cdag(1,1)) != embed(hss1, cdag(1,2))
+        @test isequiv(embed(hss1, cdag(1,1) + cdag(1,2)), embed(hss1, cdag(1,2) + cdag(1,1)))
 
         # TODO(2020-11-09): implement isapprox
         # @test embed(hs1, cdag(1,1) + (1+1E-12) * cdag(1,2)) != embed(hs1, cdag(1,1) + cdag(1,2))
