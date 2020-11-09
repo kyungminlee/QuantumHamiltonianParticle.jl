@@ -58,8 +58,6 @@ using Random
     @test collect(get_column_iterator(hs, cdag(2,3) * c(2,1), UInt(0b000_000_100))) == [UInt(0b100_000_000) => 1.0]
     @test collect(get_column_iterator(hs, cdag(2,3) * c(2,1), UInt(0b000_001_100))) == [UInt(0b100_001_000) => 1.0]
     @test collect(get_column_iterator(hs, cdag(2,3) * c(2,1), UInt(0b000_101_100))) == [UInt(0b100_101_000) => -1.0]
-
-
 end
 
 @testset "Iterator Comparison" begin
