@@ -2,7 +2,7 @@ using Test
 using ExactDiagonalization
 using LatticeTools
 using Particle
-
+using Random
 
 @testset "ParticleLadderEmbedding" begin
     @testset "Constructor & Comparison" begin
@@ -30,10 +30,15 @@ using Particle
         @test isempty(collect(get_column_iterator(hs, nop, UInt(0b000_000_000))))
         @test isempty(collect(get_row_iterator(hs, nop, UInt(0b000_000_000))))
 
-        for op in [cdag(1,2), cdag(2,2), c(1,2), c(2,2), cdag(1,3)*c(1,1), cdag(2,3) * c(2,1)]
-            for bvec in UInt[0b000_000_000, 0b000_000_001, 0b000_000_101, 0b000_001_000, 0b000_001_001, 0b000_100_000, 0b000_100_001, 0b000_100_101]
+        hsr = represent(hs)
+        rng = MersenneTwister(0)
+        for op in [cdag(1,2), cdag(2,2), c(1,2), c(2,2), cdag(1,3)*c(1,1), cdag(2,3) * c(2,1), cdag(2,3)*c(2,1)*2 + c(1,1)*0.5]
+            for bvec in rand(rng, hsr.basis_list, 8)
                 @test collect(get_column_iterator(hs, op, bvec)) == collect(get_column_iterator(embed(hs, op), bvec))
                 @test collect(get_row_iterator(hs, op, bvec)) == collect(get_row_iterator(embed(hs, op), bvec))
+            end
+            for brow in rand(rng, hsr.basis_list, 3), bcol in rand(rng, hsr.basis_list, 3)
+                @test get_element(hs, op, brow, bcol) == get_element(embed(hs, op), brow, bcol)
             end
         end
     end

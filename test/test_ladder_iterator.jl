@@ -48,7 +48,6 @@ using Random
     @test collect(get_row_iterator(hs, c(2,2), UInt(0b000_000_001))) == [UInt(0b000_100_001) => 1.0]
     @test collect(get_row_iterator(hs, c(2,2), UInt(0b000_000_101))) == [UInt(0b000_100_101) => -1.0]
 
-
     # ParticleLadderProduct
     @test isempty(collect(get_column_iterator(hs, cdag(1,3) * c(1,1), UInt(0b000_000_000))))
     @test collect(get_column_iterator(hs, cdag(1,3) * c(1,1), UInt(0b000_000_001))) == [UInt(0b001_000_000) => 1.0]
