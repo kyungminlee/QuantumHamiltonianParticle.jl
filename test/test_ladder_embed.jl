@@ -70,6 +70,12 @@ using Particle
             for bvec in rand(rng, hsr.basis_list, 8)
                 @test collect(get_column_iterator(hs, op, bvec)) == collect(get_column_iterator(embed(hs, op), bvec))
                 @test collect(get_row_iterator(hs, op, bvec)) == collect(get_row_iterator(embed(hs, op), bvec))
+                outvec1 = SparseState{Float64, UInt}()
+                outvec2 = SparseState{Float64, UInt}()
+                invec = SparseState(bvec=>1)
+                apply!(outvec1, hs1, op, invec)
+                apply!(outvec2, embed(hs1, op), invec)
+                @test outvec1 == outvec2
             end
             for brow in rand(rng, hsr.basis_list, 3), bcol in rand(rng, hsr.basis_list, 3)
                 @test get_element(hs, op, brow, bcol) == get_element(embed(hs, op), brow, bcol)
@@ -113,9 +119,6 @@ using Particle
         @test op1 / 2.0 == embed(hs1, cdag(1,2) / 2.0)
         @test op1 // 2 == embed(hs1, cdag(1,2) // 2)
         @test 2.0 \ op1 == embed(hs1, 2.0 \ cdag(1,2))
-    end
-
-    @testset "apply!" begin
     end
 
     @testset "simplify" begin

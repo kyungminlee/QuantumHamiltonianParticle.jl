@@ -124,6 +124,7 @@ end
             op1 = cop1(iptl1, 1) * cop2(iptl2, 2)
             mr = Dict{Tuple{UInt, UInt}, Float64}()
             mc = Dict{Tuple{UInt, UInt}, Float64}()
+            mc2 = Dict{Tuple{UInt, UInt}, Float64}()
             me = Dict{Tuple{UInt, UInt}, Float64}()
             for brow in hsr.basis_list
                 for (bcol, ampl) in get_row_iterator(hs, op1, brow)
@@ -134,6 +135,15 @@ end
                 for (brow, ampl) in get_column_iterator(hs, op1, bcol)
                     mc[(brow, bcol)] = get(mc, (brow, bcol), zero(Float64)) + ampl
                 end
+
+                s = SparseState(bcol=>1.0)
+                out = SparseState{Float64, UInt}()
+                apply!(out, hs, op1, s)
+                for (brow, ampl) in out
+                    if !iszero(ampl)
+                        mc2[(brow, bcol)] = ampl
+                    end
+                end
             end
             for brow in hsr.basis_list, bcol in hsr.basis_list
                 ampl = get_element(hs, op1, brow, bcol)
@@ -142,10 +152,12 @@ end
                 end
             end
             choptol!(mr, 1E-8)
+            choptol!(mc2, 1E-8)
             choptol!(mc, 1E-8)
             choptol!(me, 1E-8)
-            @test mr == mc
-            @test me == mc
+            @test mc2 == mr
+            @test mc == mr
+            @test me == mr
         end
     end
 
