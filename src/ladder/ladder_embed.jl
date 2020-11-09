@@ -102,7 +102,7 @@ end
 
 Base.iszero(arg::ParticleLadderOperatorEmbedding) = Base.iszero(get_ladder(arg))
 Base.:(+)(arg::ParticleLadderOperatorEmbedding) = arg
-Base.:(-)(arg::ParticleLadderOperatorEmbedding) = ParticleLadderOperatorEmbedding(arg.hilbert_space, -arg.ladder_oerator)
+Base.:(-)(arg::ParticleLadderOperatorEmbedding) = ParticleLadderOperatorEmbedding(arg.hilbert_space, -arg.ladder)
 Base.adjoint(arg::ParticleLadderOperatorEmbedding) = ParticleLadderOperatorEmbedding(arg.hilbert_space, Base.adjoint(arg.ladder))
 LinearAlgebra.ishermitian(arg::ParticleLadderOperatorEmbedding) = LinearAlgebra.ishermitian(arg.ladder)
 
