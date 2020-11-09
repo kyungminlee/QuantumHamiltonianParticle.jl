@@ -58,7 +58,7 @@ function get_row_iterator(
         elseif isspin(particle)
             ampl = one(S)
         else
-            throw(ArgumentError("unsupported particle type $particle"))
+            throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
         end
         newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
     end
@@ -104,7 +104,7 @@ function get_column_iterator(
         elseif isspin(particle)
             ampl = one(S)
         else
-            throw(ArgumentError("unsupported particle type $particle"))
+            throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
         end
         newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
     end
@@ -149,7 +149,7 @@ function get_element(
         elseif isspin(particle)
             ampl = one(S)
         else
-            throw(ArgumentError("unsupported particle type $particle"))
+            throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
         end
         return ampl
     else
