@@ -38,6 +38,19 @@ Base.zero(::OP) where {OP<:ParticleLadderSum} = Base.zero(OP)
 
 Base.iszero(arg::ParticleLadderSum) = Base.isempty(arg.terms)
 
+function Base.promote_rule(::Type{ParticleLadderSum{PS, P, O, S}}, ::Type{ParticleLadderUnit{PS, P, O}}) where {PS, P, O, S}
+    return ParticleLadderSum{PS, P, O, S}
+end
+
+function Base.promote_rule(::Type{ParticleLadderSum{PS, P, O, S}}, ::Type{ParticleLadderProduct{PS, P, O}}) where {PS, P, O, S}
+    return ParticleLadderSum{PS, P, O, S}
+end
+
+function Base.promote_rule(::Type{ParticleLadderSum{PS, P, O, S1}}, ::Type{ParticleLadderSum{PS, P, O, S2}}) where {PS, P, O, S1, S2}
+    S = promote_type(S1, S2)
+    return ParticleLadderSum{PS, P, O, S}
+end
+
 function Base.convert(::Type{ParticleLadderSum{PS, P, O, S}}, obj::ParticleLadderUnit{PS, P, O}) where {PS, P, O, S}
     return ParticleLadderSum([ParticleLadderProduct([obj])=>one(S)])
 end

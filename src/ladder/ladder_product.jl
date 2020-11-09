@@ -17,7 +17,15 @@ function Base.:(==)(lhs::ParticleLadderProduct{PS, P, O}, rhs::ParticleLadderPro
     return lhs.factors == rhs.factors
 end
 
-function Base.convert(::Type{ParticleLadderProduct{PS, P, O}}, obj::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
+function Base.promote_rule(::Type{ParticleLadderProduct{PS, P, O}}, ::Type{ParticleLadderUnit{PS, P, O}}) where {PS, P, O}
+    return ParticleLadderProduct{PS, P, O}
+end
+
+function Base.promote_rule(::Type{ParticleLadderUnit{PS, P, O}}, ::Type{ParticleLadderProduct{PS, P, O}}) where {PS, P, O}
+    return ParticleLadderProduct{PS, P, O}
+end
+
+function Base.convert(::Type{ParticleLadderProduct{PS, P, O}}, obj::ParticleLadderUnit{PS, P, O})::ParticleLadderProduct{PS, P, O} where {PS, P, O}
     return ParticleLadderProduct([obj])
 end
 
@@ -29,8 +37,8 @@ function Base.one(::Type{ParticleLadderProduct{PS, PI, OI}}) where {PS, PI, OI}
 end
 Base.one(::OP) where {OP<:ParticleLadderProduct} = Base.one(OP)
 
-# Orderings
 
+# Orderings
 
 function Base.isless(lhs::ParticleLadderProduct{PS, P, O}, rhs::ParticleLadderProduct{PS, P, O}) where {PS, P, O}
     ll = length(lhs.factors)
