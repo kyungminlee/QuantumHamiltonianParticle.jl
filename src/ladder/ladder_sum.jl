@@ -6,6 +6,10 @@ import ExactDiagonalization.isequiv
 struct ParticleLadderSum{PS<:ParticleSector, P, O, S<:Number}<:AbstractParticleLadder{PS, S}
     terms::Vector{Pair{ParticleLadderProduct{PS, P, O}, S}}
 
+    function ParticleLadderSum{PS, P, O, S}() where {PS, P, O, S}
+        return new{PS, P, O, S}([])
+    end
+
     function ParticleLadderSum(op::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
         return new{PS, P, O, Int}([ParticleLadderProduct([op])=>1,])
     end
@@ -37,31 +41,6 @@ Base.one(::OP) where {OP<:ParticleLadderSum} = Base.one(OP)
 Base.zero(::OP) where {OP<:ParticleLadderSum} = Base.zero(OP)
 
 Base.iszero(arg::ParticleLadderSum) = Base.isempty(arg.terms)
-
-function Base.promote_rule(::Type{ParticleLadderSum{PS, P, O, S}}, ::Type{ParticleLadderUnit{PS, P, O}}) where {PS, P, O, S}
-    return ParticleLadderSum{PS, P, O, S}
-end
-
-function Base.promote_rule(::Type{ParticleLadderSum{PS, P, O, S}}, ::Type{ParticleLadderProduct{PS, P, O}}) where {PS, P, O, S}
-    return ParticleLadderSum{PS, P, O, S}
-end
-
-function Base.promote_rule(::Type{ParticleLadderSum{PS, P, O, S1}}, ::Type{ParticleLadderSum{PS, P, O, S2}}) where {PS, P, O, S1, S2}
-    S = promote_type(S1, S2)
-    return ParticleLadderSum{PS, P, O, S}
-end
-
-function Base.convert(::Type{ParticleLadderSum{PS, P, O, S}}, obj::ParticleLadderUnit{PS, P, O}) where {PS, P, O, S}
-    return ParticleLadderSum([ParticleLadderProduct([obj])=>one(S)])
-end
-
-function Base.convert(::Type{ParticleLadderSum{PS, P, O, S}}, obj::ParticleLadderProduct{PS, P, O}) where {PS, P, O, S}
-    return ParticleLadderSum([obj=>one(S)])
-end
-
-function Base.convert(::Type{ParticleLadderSum{PS, P, O, S}}, obj::ParticleLadderSum{PS, P, O, S2}) where {PS, P, O, S, S2}
-    return ParticleLadderSum([t=>convert(S, a) for (t, a) in obj.terms])
-end
 
 
 function isequiv(lhs::ParticleLadderSum{PS, P, O, S1}, rhs::ParticleLadderSum{PS, P, O, S2}) where {PS, P, O, S1, S2}

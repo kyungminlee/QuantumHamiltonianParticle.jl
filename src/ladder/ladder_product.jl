@@ -17,18 +17,6 @@ function Base.:(==)(lhs::ParticleLadderProduct{PS, P, O}, rhs::ParticleLadderPro
     return lhs.factors == rhs.factors
 end
 
-function Base.promote_rule(::Type{ParticleLadderProduct{PS, P, O}}, ::Type{ParticleLadderUnit{PS, P, O}}) where {PS, P, O}
-    return ParticleLadderProduct{PS, P, O}
-end
-
-function Base.promote_rule(::Type{ParticleLadderUnit{PS, P, O}}, ::Type{ParticleLadderProduct{PS, P, O}}) where {PS, P, O}
-    return ParticleLadderProduct{PS, P, O}
-end
-
-function Base.convert(::Type{ParticleLadderProduct{PS, P, O}}, obj::ParticleLadderUnit{PS, P, O})::ParticleLadderProduct{PS, P, O} where {PS, P, O}
-    return ParticleLadderProduct([obj])
-end
-
 Base.iszero(arg::ParticleLadderProduct) = false
 Base.isone(arg::ParticleLadderProduct) = isempty(arg.factors)
 
