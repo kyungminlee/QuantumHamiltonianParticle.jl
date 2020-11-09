@@ -13,6 +13,15 @@ import ExactDiagonalization.simplify
 #     isless_localnormalorder(a, b)
 # end
 
+# struct NormalOrdering{BaseOrdering<:Ordering} <: Ordering end
+
+# function Base.lt(
+#     ::NormalOrdering{BaseOrdering},
+#     a::ParticleLadderUnit{PS, PI, OI},
+#     b::ParticleLadderUnit{PS, PI, OI},
+# ) where {BaseOrdering, PS, PI, OI}
+#     return isless_normalordering(a,b)
+# end
 
 function normal_order(arg::ParticleLadderSum{PS, P, O, S})::ParticleLadderSum{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg
@@ -23,11 +32,14 @@ function normal_order(arg::ParticleLadderSum{PS, P, O, S})::ParticleLadderSum{PS
     arg
 end
 
+
 function simplify(arg::ParticleLadderProduct{PS, P, O})::ParticleLadderSum{PS, P, O, Int} where {PS, P, O}
     return simplify(ParticleLadderSum([arg=>1]))
 end
 
+
 simplify(arg::ParticleLadderUnit) = arg
+
 
 function simplify(arg::ParticleLadderSum{PS, P, O, S})::ParticleLadderSum{PS, P, O, S} where {PS, P, O, S}
     isempty(arg.terms) && return arg
@@ -42,18 +54,16 @@ function simplify(arg::ParticleLadderSum{PS, P, O, S})::ParticleLadderSum{PS, P,
         if t2 == t
             a += a2
         else
-            if a != 0
-                push!(new_terms, t => a)
-            end
+            !iszero(a) && push!(new_terms, t => a)
             t, a = t2, a2
         end
     end
-    if a != 0
-        push!(new_terms, t => a)
-    end
+    !iszero(a) && push!(new_terms, t => a)
     return ParticleLadderSum(new_terms)
 end
 
+
+# _normal_order
 
 function _normal_order(arg::ParticleLadderProduct{PS, P, O}) where {PS, P, O}
     if length(arg.factors) <= 1
