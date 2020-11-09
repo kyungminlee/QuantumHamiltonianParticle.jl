@@ -87,16 +87,6 @@ function ExactDiagonalization.isequiv(
     return (get_space(lhs) == get_space(rhs)) && isequiv(lhs.ladder, rhs.ladder)
 end
 
-function Base.isapprox(
-    lhs::ParticleLadderOperatorEmbedding{H, L, P, S1},
-    rhs::ParticleLadderOperatorEmbedding{H, L, P, S2};
-    atol::Real=0,
-    rtol::Real=Base.rtoldefault(S1,S2,atol)
-) where {H, L, P, S1, S2}
-    return (lhs.hilbert_space == rhs.hilbert_space) &&
-        Base.isapprox(lhs.ladder, rhs.ladder; atol=atol, rtol=rtol)
-end
-
 
 # Unary Operations
 
