@@ -176,12 +176,7 @@ function get_row_iterator(
         end
         @assert length(newout) == 1
         (newbvec, newampl) = first(newout)
-        if iszero(newampl)
-            bvec = zero(BR)
-            ampl = zero(S)
-            match = false
-            break
-        end
+        @assert !iszero(newampl)
         bvec = newbvec
         ampl *= newampl
     end
@@ -208,12 +203,7 @@ function get_column_iterator(
         end
         @assert length(newout) == 1
         (newbvec, newampl) = first(newout)
-        if iszero(newampl)
-            bvec = zero(BR)
-            ampl = zero(S)
-            match = false
-            break
-        end
+        @assert !iszero(newampl)
         bvec = newbvec
         ampl *= newampl
     end
@@ -235,7 +225,7 @@ function get_element(
         isempty(newout) && return zero(S)
         @assert length(newout) == 1
         (newbvec, newampl) = first(newout)
-        iszero(newampl) && return zero(S)
+        @assert !iszero(newampl)
         bvec = newbvec
         ampl *= newampl
     end
