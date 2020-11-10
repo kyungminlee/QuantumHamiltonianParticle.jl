@@ -6,6 +6,14 @@ function Base.promote_rule(
     return ParticleProjectorUnitOperator{B, S}
 end
 
+function Base.promote_rule(
+    ::Type{ParticleProjectorUnitOperator{B, S}},
+    ::Type{<:NullOperator}
+) where {B, S}
+    return ParticleProjectorUnitOperator{B, S}
+end
+
+
 
 function Base.promote_rule(
     ::Type{ParticleProjectorUnitOperator{BL, SL}},
@@ -44,6 +52,15 @@ function Base.convert(
     S = promote_type(SL, SR)
     z = zero(B)
     return ParticleProjectorUnitOperator(z, z, z, z, S(arg))
+end
+
+
+function Base.convert(
+    ::Type{ParticleProjectorUnitOperator{BR, S}},
+    ::NullOperator
+) where {BR, S}
+    z = zero(BR)
+    return ParticleProjectorUnitOperator(z, z, z, z, zero(S))
 end
 
 
