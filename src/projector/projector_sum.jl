@@ -1,3 +1,5 @@
+export ParticleProjectorSumOperator
+
 struct ParticleProjectorSumOperator{BR<:Unsigned, S<:Number}<:AbstractParticleProjectorOperator{BR, S}
     terms::Vector{ParticleProjectorUnitOperator{BR, S}}
     function ParticleProjectorSumOperator(terms::AbstractVector{ParticleProjectorUnitOperator{BR, S}}) where {BR, S}
