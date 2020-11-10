@@ -167,9 +167,70 @@ using Particle
         end
     end
 
+    @testset "spin-1/2" begin
+        p = ParticleSector(Spin(:s, 1))
+        site = ParticleSite([
+            ParticleState(p, "Sᶻ = 1/2", [0]),
+            ParticleState(p, "Sᶻ =-1/2", [1]),
+        ])
+        hs = ParticleHilbertSpace([site])
+        hsr = represent(hs)
+        dim = length(hsr.basis_list)
+
+        for (c, cdag) in [
+            (embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
+             embed(hs, ParticleLadderUnit(p, 1, 1, CREATION))),
+            (make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION))),
+             make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, CREATION)))),
+        ]
+            mat_c = zeros(Float64, (dim, dim))
+            mat_cdag = zeros(Float64, (dim, dim))
+            for (ivec, bvec) in enumerate(hsr.basis_list)
+                for (bcol, ampl) in get_row_iterator(c, bvec)
+                    icol = get(hsr.basis_lookup, bcol, -1)
+                    (icol > 0) && (mat_c[ivec, icol] = ampl)
+                end
+                for (bcol, ampl) in get_row_iterator(cdag, bvec)
+                    icol = get(hsr.basis_lookup, bcol, -1)
+                    (icol > 0) && (mat_cdag[ivec, icol] = ampl)
+                end
+            end
+            # https://easyspin.org/easyspin/documentation/spinoperators.html
+            @test mat_c ≈ sqrt.([
+                0 1 ;
+                0 0
+            ])  # c is S+
+            @test mat_cdag ≈ sqrt.([
+                0 0;
+                1 0
+            ])  # cdag is S-
+
+            mat_c = zeros(Float64, (dim, dim))
+            mat_cdag = zeros(Float64, (dim, dim))
+            for (ivec, bvec) in enumerate(hsr.basis_list)
+                for (brow, ampl) in get_column_iterator(c, bvec)
+                    irow = get(hsr.basis_lookup, brow, -1)
+                    (irow > 0) && (mat_c[irow, ivec] = ampl)
+                end
+                for (brow, ampl) in get_column_iterator(cdag, bvec)
+                    irow = get(hsr.basis_lookup, brow, -1)
+                    (irow > 0) && (mat_cdag[irow, ivec] = ampl)
+                end
+            end
+            @test mat_c ≈ sqrt.([
+                0 1 ;
+                0 0
+            ])  # c is S+
+            @test mat_cdag ≈ sqrt.([
+                0 0;
+                1 0
+            ])  # cdag is S-
+
+        end
+    end
 
 
-    @testset "spin" begin
+    @testset "spin-3/2" begin
         p = ParticleSector(Spin(:s, 3))
         site = ParticleSite([
             ParticleState(p, "Sᶻ = 3/2", [0]),
