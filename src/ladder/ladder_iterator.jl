@@ -30,7 +30,6 @@ function get_row_iterator(
     particle = getspecies(PS, op.particle_index)
     occupancy_at_site = get_occupancy(hs, op.particle_index, op.orbital, bvec)
     new_occupancy_at_site = zero(occupancy_at_site)
-    ref_occupancy_at_site = zero(occupancy_at_site)
 
     newbvec::BR = zero(BR)
     match::Bool = false
@@ -38,29 +37,44 @@ function get_row_iterator(
 
     if op.ladder == ANNIHILATION
         if 0 <= occupancy_at_site < maxoccupancy(particle)
-            new_occupancy_at_site = occupancy_at_site + 1
-            ref_occupancy_at_site = occupancy_at_site + 1  # for amplitude sqrt(n) or sqrt(n+1)
             match = true
+            new_occupancy_at_site = occupancy_at_site + 1
+            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
+            if isfermion(particle)
+                ampl = get_fermion_parity(hs, op, bvec) == 0 ? one(S) : -one(S)
+            elseif isboson(particle)
+                ampl = sqrt(S(new_occupancy_at_site))
+            elseif isspin(particle)
+                ampl = let
+                    M = maxoccupancy(particle)
+                    n1 = occupancy_at_site
+                    n2 = new_occupancy_at_site
+                    0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
+                end
+            else
+                throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
+            end
         end
     else # op.ladder == CREATION
         if 0 < occupancy_at_site <= maxoccupancy(particle)
-            new_occupancy_at_site = occupancy_at_site - 1
-            ref_occupancy_at_site = occupancy_at_site      # for amplitude sqrt(n) or sqrt(n+1)
             match = true
+            new_occupancy_at_site = occupancy_at_site - 1
+            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
+            if isfermion(particle)
+                ampl = get_fermion_parity(hs, op, bvec) == 0 ? one(S) : -one(S)
+            elseif isboson(particle)
+                ampl = sqrt(S(occupancy_at_site))
+            elseif isspin(particle)
+                ampl = let
+                    M = maxoccupancy(particle)
+                    n1 = occupancy_at_site
+                    n2 = new_occupancy_at_site
+                    0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
+                end
+            else
+                throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
+            end
         end
-    end
-    if match
-        if isfermion(particle)
-            wj_parity = get_fermion_parity(hs, op, bvec)
-            ampl = wj_parity == 0 ? one(S) : -one(S)
-        elseif isboson(particle)
-            ampl = Base.sqrt(S(ref_occupancy_at_site))
-        elseif isspin(particle)
-            ampl = one(S)
-        else
-            throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
-        end
-        newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
     end
     element::Pair{BR, S} = newbvec => ampl
     return (element for i in 1:(match ? 1 : 0))
@@ -84,29 +98,44 @@ function get_column_iterator(
 
     if op.ladder == CREATION
         if 0 <= occupancy_at_site < maxoccupancy(particle)
-            new_occupancy_at_site = occupancy_at_site + 1
-            ref_occupancy_at_site = occupancy_at_site + 1   # for amplitude sqrt(n) or sqrt(n+1)
             match = true
+            new_occupancy_at_site = occupancy_at_site + 1
+            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
+            if isfermion(particle)
+                ampl = get_fermion_parity(hs, op, bvec) == 0 ? one(S) : -one(S)
+            elseif isboson(particle)
+                ampl = sqrt(S(new_occupancy_at_site))
+            elseif isspin(particle)
+                ampl = let
+                    M = maxoccupancy(particle)
+                    n1 = occupancy_at_site
+                    n2 = new_occupancy_at_site
+                    0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
+                end
+            else
+                throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
+            end
         end
     else # op.ladder == ANNIHILATION
         if 0 < occupancy_at_site <= maxoccupancy(particle)
-            new_occupancy_at_site = occupancy_at_site - 1
-            ref_occupancy_at_site = occupancy_at_site       # for amplitude sqrt(n) or sqrt(n+1)
             match = true
+            new_occupancy_at_site = occupancy_at_site - 1
+            newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
+            if isfermion(particle)
+                ampl = get_fermion_parity(hs, op, bvec) == 0 ? one(S) : -one(S)
+            elseif isboson(particle)
+                ampl = sqrt(S(occupancy_at_site))
+            elseif isspin(particle)
+                ampl = let
+                    M = maxoccupancy(particle)
+                    n1 = occupancy_at_site
+                    n2 = new_occupancy_at_site
+                    0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
+                end
+            else
+                throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
+            end
         end
-    end
-    if match
-        if isfermion(particle)
-            wj_parity = get_fermion_parity(hs, op, bvec)
-            ampl = wj_parity == 0 ? one(S) : -one(S)
-        elseif isboson(particle)
-            ampl = Base.sqrt(S(ref_occupancy_at_site))
-        elseif isspin(particle)
-            ampl = one(S)
-        else
-            throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
-        end
-        newbvec = set_occupancy(hs, op.particle_index, op.orbital, bvec, new_occupancy_at_site)
     end
     element::Pair{BR, S} = newbvec => ampl
     return (element for i in 1:(match ? 1 : 0))
@@ -142,12 +171,16 @@ function get_element(
 
     if brow == set_occupancy(hs, op.particle_index, op.orbital, bcol, new_occupancy_at_site)
         if isfermion(particle)
-            wj_parity = get_fermion_parity(hs, op, bcol)
-            ampl = wj_parity == 0 ? one(S) : -one(S)
+            ampl = get_fermion_parity(hs, op, bcol) == 0 ? one(S) : -one(S)
         elseif isboson(particle)
             ampl = Base.sqrt(S(ref_occupancy_at_site))
         elseif isspin(particle)
-            ampl = one(S)
+            ampl = let
+                M = maxoccupancy(particle)
+                n1 = occupancy_at_site
+                n2 = new_occupancy_at_site
+                0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
+            end
         else
             throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
         end
