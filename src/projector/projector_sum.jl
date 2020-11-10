@@ -35,11 +35,11 @@ end
 
 # Unary
 
-function Base.real(x::ParticleProjectorUnitOperator)
+function Base.real(x::ParticleProjectorSumOperator)
     return ParticleProjectorSumOperator(real.(x.terms))
 end
 
-function Base.imag(x::ParticleProjectorUnitOperator)
+function Base.imag(x::ParticleProjectorSumOperator)
     return ParticleProjectorSumOperator(imag.(x.terms))
 end
 
@@ -47,11 +47,11 @@ function Base.adjoint(x::ParticleProjectorSumOperator)
     return ParticleProjectorSumOperator(adjoint.(x.terms))
 end
 
-function Base.conj(x::ParticleProjectorUnitOperator)
+function Base.conj(x::ParticleProjectorSumOperator)
     return ParticleProjectorSumOperator(conj.(x.terms))
 end
 
-function Base.transpose(x::ParticleProjectorUnitOperator)
+function Base.transpose(x::ParticleProjectorSumOperator)
     return ParticleProjectorSumOperator(transpose.(x.terms))
 end
 

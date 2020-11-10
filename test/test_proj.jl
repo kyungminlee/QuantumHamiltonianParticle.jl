@@ -166,5 +166,30 @@ end
             @test out3a == out3b == out3c
         end
     end
+end
+
+
+@testset "simplify" begin
+    p1 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1)
+    p2 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0000, 10)
+    p3 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 100.0)
+    p4 = ParticleProjectorUnitOperator(0b0000, 0b0000, 0b0000, 0b0000, 1000)
+
+    q1 = ParticleProjectorSumOperator([p1, p2, p3, p4])
+    q2 = simplify(q1)
+
+    @test q1 != ParticleProjectorSumOperator([
+        ParticleProjectorUnitOperator(0b0000, 0b0000, 0b0000, 0b0000, 1000.0),
+        ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0000, 10.0),
+        ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 101.0),
+    ])
+    @test q2 == ParticleProjectorSumOperator([
+        ParticleProjectorUnitOperator(0b0000, 0b0000, 0b0000, 0b0000, 1000.0),
+        ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0000, 10.0),
+        ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 101.0),
+    ])
+    q3 = simplify(ParticleProjectorSumOperator([p1, -p1]))
+    @test iszero(q3)
+    @test q3 == NullOperator()
 
 end
