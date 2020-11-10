@@ -21,6 +21,11 @@ struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number}<:AbstractParticleP
         end
         return new{BR, S}(bitmask, bitrow, bitcol, parity_bitmask, amplitude)
     end
+
+    function ParticleProjectorUnitOperator{BR, S}(amplitude::Number) where {BR<:Unsigned, S<:Number}
+        z = zero(BR)
+        return new{BR, S}(z, z, z, z, amplitude)
+    end
 end
 
 function Base.:(==)(x::ParticleProjectorUnitOperator, y::ParticleProjectorUnitOperator)
@@ -89,6 +94,26 @@ end
 
 
 # Unary
+
+function Base.real(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorUnitOperator(x.bitmask, x.bitrow, x.bitcol, x.parity_bitmask, real(x.amplitude))
+end
+
+function Base.imag(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorUnitOperator(x.bitmask, x.bitrow, x.bitcol, x.parity_bitmask, imag(x.amplitude))
+end
+
+function Base.conj(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorUnitOperator(x.bitmask, x.bitrow, x.bitcol, x.parity_bitmask, conj(x.amplitude))
+end
+
+function Base.adjoint(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorUnitOperator(x.bitmask, x.bitcol, x.bitrow, x.parity_bitmask, conj(x.amplitude))
+end
+
+function Base.transpose(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorUnitOperator(x.bitmask, x.bitcol, x.bitrow, x.parity_bitmask, x.amplitude)
+end
 
 function Base.:(-)(x::ParticleProjectorUnitOperator)
     return ParticleProjectorUnitOperator(x.bitmask, x.bitrow, x.bitcol, x.parity_bitmask, -x.amplitude)

@@ -18,20 +18,54 @@ end
 
 Base.iszero(arg::ParticleProjectorSumOperator) = isempty(arg.terms)
 
+
+# Unary
+
+function Base.real(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorSumOperator(real.(x.terms))
+end
+
+function Base.imag(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorSumOperator(imag.(x.terms))
+end
+
+function Base.adjoint(x::ParticleProjectorSumOperator)
+    return ParticleProjectorSumOperator(adjoint.(x.terms))
+end
+
+function Base.conj(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorSumOperator(conj.(x.terms))
+end
+
+function Base.transpose(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorSumOperator(transpose.(x.terms))
+end
+
+Base.:(+)(arg::ParticleProjectorSumOperator) = arg
+Base.:(-)(arg::ParticleProjectorSumOperator) = ParticleProjectorSumOperator(-arg.terms)
+
+
+# Binary (scale)
+
 Base.:(*)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator(x.terms .* y)
 Base.:(/)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator(x.terms ./ y)
 Base.:(//)(x::ParticleProjectorSumOperator, y::Number) = ParticleProjectorSumOperator(x.terms .// y)
 Base.:(*)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator(y .* x.terms)
 Base.:(\)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator(y .\ x.terms)
 
-function Base.:(÷)(x::ParticleProjectorSumOperator{BR, S1}, y::S2) where {BR, S1, S2}
+function Base.:(+)(x::ParticleProjectorSumOperator{BR, S1}, y::S2) where {BR, S1, S2}
     S = promote_type(S1, S2)
-    return ParticleProjectorSumOperator([x.terms..., one(ParticleProjectorUnitOperator{BR, S})])
+    return ParticleProjectorSumOperator(
+        ParticleProjectorUnitOperator{BR, S}[x.terms..., ParticleProjectorUnitOperator{BR, S}(y)]
+    )
 end
 
-
-Base.:(+)(arg::ParticleProjectorSumOperator) = arg
-Base.:(-)(arg::ParticleProjectorSumOperator) = ParticleProjectorSumOperator(-arg.terms)
+function Base.:(+)(y::S2, x::ParticleProjectorSumOperator{BR, S1}) where {BR, S1, S2}
+    S = promote_type(S1, S2)
+    return ParticleProjectorSumOperator(
+        ParticleProjectorUnitOperator{BR, S}[ParticleProjectorUnitOperator{BR, S}(y), x.terms...]
+    )
+end
 
 Base.:(+)(lhs::ParticleProjectorUnitOperator, rhs::ParticleProjectorUnitOperator) = ParticleProjectorSumOperator([lhs, rhs])
 Base.:(+)(lhs::ParticleProjectorUnitOperator, rhs::ParticleProjectorSumOperator) = ParticleProjectorSumOperator([lhs, rhs.terms...])
