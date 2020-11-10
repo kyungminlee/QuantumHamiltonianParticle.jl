@@ -7,19 +7,14 @@ end
 
 
 function Base.zero(::Type{ParticleProjectorSumOperator{BR, S}}) where {BR, S}
-    terms = Tuple{ParticleProjectorUnitOperator{BR}, S}[]
-    return ParticleProjectorSumOperator(terms)
+    return ParticleProjectorSumOperator(ParticleProjectorUnitOperator{BR, S}[])
 end
-
 
 function Base.one(::Type{ParticleProjectorSumOperator{BR, S}}) where {BR, S}
-    terms = [one(ParticleProjectorUnitOperator{BR, S})]
-    return ParticleProjectorSumOperator(terms)
+    return ParticleProjectorSumOperator([one(ParticleProjectorUnitOperator{BR, S})])
 end
 
-
 Base.iszero(arg::ParticleProjectorSumOperator) = isempty(arg.terms)
-
 
 Base.:(*)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator([t*y for t in x.terms])
 Base.:(/)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator([t/y for t in x.terms])
@@ -28,26 +23,20 @@ Base.:(÷)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOp
 Base.:(*)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator([y*t for t in x.terms])
 Base.:(\)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator([y\t for t in x.terms])
 
-
 Base.:(+)(arg::ParticleProjectorSumOperator) = arg
-Base.:(-)(arg::ParticleProjectorSumOperator) = ParticleProjectorSumOperator([-t for (t, a) in arg.terms])
-
-
+Base.:(-)(arg::ParticleProjectorSumOperator) = ParticleProjectorSumOperator(-arg.terms)
 
 Base.:(+)(lhs::ParticleProjectorUnitOperator, rhs::ParticleProjectorUnitOperator) = ParticleProjectorSumOperator([lhs, rhs])
 Base.:(+)(lhs::ParticleProjectorUnitOperator, rhs::ParticleProjectorSumOperator) = ParticleProjectorSumOperator([lhs, rhs.terms...])
 Base.:(+)(lhs::ParticleProjectorSumOperator, rhs::ParticleProjectorUnitOperator) = ParticleProjectorSumOperator([lhs.terms..., rhs])
 Base.:(+)(lhs::ParticleProjectorSumOperator, rhs::ParticleProjectorSumOperator) = ParticleProjectorSumOperator(vcat(lhs.terms, rhs.terms))
 
-
 function Base.:(*)(x::ParticleProjectorSumOperator{BR, S1}, y::ParticleProjectorSumOperator{BR, S2}) where {BR, S1, S2}
     S3 = promote_type(S1, S2)
     terms = ParticleProjectorUnitOperator{BR, S3}[]
     for t1 in x.terms, t2 in y.terms
         t3 = t1 * t2
-        if !iszero(t3)
-            push!(terms, t3)
-        end
+        !iszero(t3) && push!(terms, t3)
     end
     return ParticleProjectorSumOperator(terms)
 end
