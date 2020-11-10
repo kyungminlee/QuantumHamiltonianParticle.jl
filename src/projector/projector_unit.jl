@@ -22,6 +22,22 @@ struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number}<:AbstractParticleP
         return new{BR, S}(bitmask, bitrow, bitcol, parity_bitmask, amplitude)
     end
 
+    function ParticleProjectorUnitOperator{BR, S}(
+        bitmask::Unsigned, bitrow::Unsigned, bitcol::Unsigned,
+        parity_bitmask::Unsigned,
+        amplitude::Number,
+    ) where {BR<:Unsigned, S<:Number}
+        if !iszero((~bitmask) & bitrow)
+            throw(ArgumentError("bitrow $(string(bitrow, base=2)) has nonzero bit outside bitmask $(string(bitmask, base=2))"))
+        elseif !iszero((~bitmask) & bitcol)
+            throw(ArgumentError("bitcol $(string(bitcol, base=2)) has nonzero bit outside bitmask $(string(bitmask, base=2))"))
+        elseif !iszero(bitmask & parity_bitmask)
+            throw(ArgumentError("bitmask and parity_bitmask should have no overlap"))
+        end
+        return new{BR, S}(bitmask, bitrow, bitcol, parity_bitmask, amplitude)
+    end
+
+
     function ParticleProjectorUnitOperator{BR, S}(amplitude::Number) where {BR<:Unsigned, S<:Number}
         z = zero(BR)
         return new{BR, S}(z, z, z, z, amplitude)
@@ -122,6 +138,7 @@ end
 function Base.:(+)(x::ParticleProjectorUnitOperator)
     return x
 end
+
 
 # Binary (Scale)
 
