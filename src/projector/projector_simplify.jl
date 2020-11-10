@@ -50,11 +50,11 @@ function ExactDiagonalization.simplify(
 
     t1 = terms[1]
 
-    bm::BR = t1.bitmask
-    br::BR = t1.bitrow
-    bc::BR = t1.bitcol
-    pbm::BR= t1.parity_bitmask
-    am::S  = t1.amplitude
+    bm::BR  = t1.bitmask
+    br::BR  = t1.bitrow
+    bc::BR  = t1.bitcol
+    pbm::BR = t1.parity_bitmask
+    am::S   = t1.amplitude
 
     for t in terms[2:end]
         if (bm == t.bitmask) && (br == t.bitrow) && (bc == t.bitcol) && (pbm == t.parity_bitmask)
@@ -66,12 +66,13 @@ function ExactDiagonalization.simplify(
             bm = t.bitmask
             br = t.bitrow
             bc = t.bitcol
+            pbm = t.parity_bitmask
             am = t.amplitude
         end
     end
 
     if !isapprox(am, zero(S); atol=tol)
-        push!(new_terms, ParticleProjectorUnitOperator(bm, br, bc, am))
+        push!(new_terms, ParticleProjectorUnitOperator(bm, br, bc, pbm, am))
     end
 
     if isempty(new_terms)
