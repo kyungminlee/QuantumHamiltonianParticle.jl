@@ -19,6 +19,20 @@ end
 Base.iszero(arg::ParticleProjectorSumOperator) = isempty(arg.terms)
 
 
+# Equality
+
+function Base.:(==)(x::ParticleProjectorSumOperator, y::ParticleProjectorSumOperator)
+    return x.terms == y.terms
+end
+
+function Base.isapprox(
+    x::ParticleProjectorSumOperator, y::ParticleProjectorSumOperator;
+    atol::Real=0, rtol::Real=Base.rtoldefault(x.amplitude,y.amplitude,atol), nans::Bool=false,
+)
+    return isapprox(x.terms, y.terms; atol=atol, rtol=rtol, nans=nans)
+end
+
+
 # Unary
 
 function Base.real(x::ParticleProjectorUnitOperator)
