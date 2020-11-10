@@ -22,7 +22,7 @@ function make_projector_operator(
         end
     elseif isboson(particle)
         if maxoccupancy(particle) <= 0
-            return NullOperator()
+            throw(ArgumentError("maximum occupancy cannot be nonpositive")) # COV_EXCL_LINE
         elseif maxoccupancy(particle) == 1
             if op.ladder == CREATION
                 br = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
@@ -61,7 +61,7 @@ function make_projector_operator(
     elseif isspin(particle)
         M = maxoccupancy(particle)
         if M <= 0
-            return NullOperator()
+            throw(ArgumentError("maximum occupancy cannot be nonpositive")) # COV_EXCL_LINE
         elseif M == 1
             if op.ladder == CREATION
                 br = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
@@ -96,7 +96,7 @@ function make_projector_operator(
             end
         end
     else
-        throw(ArgumentError("unsupported particle $particle"))
+        throw(ArgumentError("unsupported particle $particle")) # COV_EXCL_LINE
     end
 end
 
