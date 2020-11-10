@@ -18,16 +18,6 @@ end
 
 
 function Base.promote_rule(
-    ::Type{ParticleProjectorSumOperator{BL, SL}},
-    ::Type{ParticleProjectorUnitOperator{BR, SR}}
-) where {BL, BR, SL, SR}
-    B = promote_type(BL, BR)
-    S = promote_type(SL, SR)
-    return ParticleProjectorSumOperator{B, S}
-end
-
-
-function Base.promote_rule(
     ::Type{ParticleProjectorUnitOperator{BL, SL}},
     ::Type{ParticleProjectorSumOperator{BR, SR}},
 ) where {BL, BR, SL, SR}
@@ -42,7 +32,7 @@ function Base.promote_rule(
     ::Type{ParticleProjectorSumOperator{BR, SR}},
 ) where {BL, BR, SL, SR}
     B = promote_type(BL, BR)
-    S = promote_Type(SL, SR)
+    S = promote_type(SL, SR)
     return ParticleProjectorSumOperator{B, S}
 end
 
