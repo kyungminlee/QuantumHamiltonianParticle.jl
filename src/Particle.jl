@@ -37,6 +37,8 @@ include("projector/projector_make.jl")
 include("projector/projector_iterator.jl")
 include("projector/projector_apply.jl")
 
+include("projector/projector_simplify.jl")
+
 include("io/prettyprint.jl")
 
 include("symmetry/symmetry_apply_operator.jl")
