@@ -4,7 +4,20 @@ using ExactDiagonalization
 using Particle
 using Random
 
-@testset "ParticleProjectorUnitOperator" begin
+
+@testset "Particle Projector Operators" begin
+    @testset "ParticleProjectorUnitOperator" begin
+        p = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0000, 0b0010, 1.0) # should work fine
+        @test_throws ArgumentError ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0000, 0b0011, 1.0) # parity bit overlap
+        @test_throws ArgumentError ParticleProjectorUnitOperator(0b0101, 0b0110, 0b0000, 0b0000, 1.0) # row
+        @test_throws ArgumentError ParticleProjectorUnitOperator(0b0101, 0b0100, 0b1000, 0b0000, 1.0) # row
+
+        zero(p)
+    end
+end
+
+
+@testset "make_projector_operator" begin
     p = ParticleSector(Fermion(:f), HardcoreBoson(:b), Spin(:s, 2))
     c(i, j) = ParticleLadderUnit(p, i, j, ANNIHILATION)
     cdag(i, j) = ParticleLadderUnit(p, i, j, CREATION)

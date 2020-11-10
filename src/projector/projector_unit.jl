@@ -12,7 +12,11 @@ struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number}<:AbstractParticleP
     amplitude::S
 
     function ParticleProjectorUnitOperator(bitmask::BR, bitrow::BR, bitcol::BR, parity_bitmask::BR, amplitude::S) where {BR<:Unsigned, S<:Number}
-        if bitmask & parity_bitmask != 0
+        if !iszero((~bitmask) & bitrow)
+            throw(ArgumentError("bitrow $(string(bitrow, base=2)) has nonzero bit outside bitmask $(string(bitmask, base=2))"))
+        elseif !iszero((~bitmask) & bitcol)
+            throw(ArgumentError("bitcol $(string(bitcol, base=2)) has nonzero bit outside bitmask $(string(bitmask, base=2))"))
+        elseif !iszero(bitmask & parity_bitmask)
             throw(ArgumentError("bitmask and parity_bitmask should have no overlap"))
         end
         return new{BR, S}(bitmask, bitrow, bitcol, parity_bitmask, amplitude)
