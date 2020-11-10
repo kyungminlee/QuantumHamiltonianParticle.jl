@@ -16,4 +16,12 @@ using Particle
 
     l2 = [p1, p3]
     @test typeof(l2) == Vector{ParticleProjectorUnitOperator{UInt, Float64}}
+
+    p4 = p1 + p1
+    l3 = [p1, p4]
+    @test typeof(l3) == Vector{ParticleProjectorSumOperator{UInt8, Int}}
+
+    p4 = p1 + p1
+    l4 = [p3, p4]
+    @test typeof(l4) == Vector{ParticleProjectorSumOperator{UInt, Float64}}
 end
