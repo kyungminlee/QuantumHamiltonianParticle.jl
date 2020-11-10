@@ -19,7 +19,7 @@ function make_projector_operator(
             bc = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
             return ParticleProjectorUnitOperator(bm, br, bc, pbm, 1.0)
         end
-    elseif isboson(particle)
+    elseif isboson(particle) || isspin(particle)
         if maxoccupancy(particle) <= 0
             return NullOperator()
         elseif maxoccupancy(particle) == 1
@@ -38,7 +38,7 @@ function make_projector_operator(
             # TODO: Implement ParticleProjectorSumOperator
         end
     else
-        @error "unsupported particle $particle"
+        throw(ArgumentError("unsupported particle $particle"))
     end
 end
 

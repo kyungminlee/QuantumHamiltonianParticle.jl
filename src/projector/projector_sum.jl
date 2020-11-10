@@ -6,7 +6,6 @@ struct ParticleProjectorSumOperator{BR<:Unsigned, S<:Number}<:AbstractParticlePr
 end
 
 
-
 function Base.zero(::Type{ParticleProjectorSumOperator{BR, S}}) where {BR, S}
     terms = Tuple{ParticleProjectorUnitOperator{BR}, S}[]
     return ParticleProjectorSumOperator(terms)
@@ -17,6 +16,7 @@ function Base.one(::Type{ParticleProjectorSumOperator{BR, S}}) where {BR, S}
     terms = [one(ParticleProjectorUnitOperator{BR, S})]
     return ParticleProjectorSumOperator(terms)
 end
+
 
 Base.iszero(arg::ParticleProjectorSumOperator) = isempty(arg.terms)
 
