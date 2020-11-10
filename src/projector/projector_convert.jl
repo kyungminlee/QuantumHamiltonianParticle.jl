@@ -48,10 +48,12 @@ end
 
 
 function Base.convert(
-    ::Type{ParticleProjectorUnitOperator{B, S}},
-    arg::Number,
-) where {B, S}
-    return one(ParticleProjectorUnitOperator{B, S}) * arg
+    ::Type{ParticleProjectorUnitOperator{B, SL}},
+    arg::SR,
+) where {B, SL, SR}
+    S = promote_type(SL, SR)
+    z = zero(B)
+    return ParticleProjectorUnitOperator(z, z, z, z, S(arg))
 end
 
 
@@ -75,4 +77,15 @@ function Base.convert(
         B(arg.parity_bitmask), S(arg.amplitude)
     )
     return ParticleProjectorSumOperator([projop])
+end
+
+
+
+function Base.convert(
+    ::Type{ParticleProjectorSumOperator{B, S}},
+    arg::ParticleProjectorSumOperator,
+) where {B, S}
+    terms = ParticleProjectorUnitOperator{B, S}[]
+    append!(terms, arg.terms)
+    return ParticleProjectorSumOperator(terms)
 end
