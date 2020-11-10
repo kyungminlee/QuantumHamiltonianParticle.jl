@@ -110,6 +110,7 @@ using Random
         n = 6
         @test p2^n == p2 * p2 * p2 * p2 * p2 * p2
         @test !iszero(p2^6)
+        @test (p2^6).amplitude == 3^6
     end
 end
 
