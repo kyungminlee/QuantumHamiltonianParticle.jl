@@ -5,19 +5,20 @@ using Particle
 using Random
 
 @testset "ParticleProjectorUnitOperator" begin
-    p = ParticleSector(Fermion(:f), HardcoreBoson(:b), Spin(:s, 1))
+    p = ParticleSector(Fermion(:f), HardcoreBoson(:b), Spin(:s, 2))
     c(i, j) = ParticleLadderUnit(p, i, j, ANNIHILATION)
     cdag(i, j) = ParticleLadderUnit(p, i, j, CREATION)
     site = ParticleSite([
         ParticleState(p, "__↑", [0,0,0], ( 0,  1)),
         ParticleState(p, "f_↑", [1,0,0], ( 1,  1)),
-        ParticleState(p, "__↓", [0,0,1], ( 0, -1)),
-        ParticleState(p, "fb↓", [1,1,1], ( 1, -1)),
+        ParticleState(p, "f_.", [1,0,1], ( 1,  0)),
+        ParticleState(p, "__↓", [0,0,2], ( 0, -1)),
+        ParticleState(p, "fb↓", [1,1,2], ( 1, -1)),
     ])
     hilbert_space = ParticleHilbertSpace([site, site, site])
     hsr = represent(hilbert_space)
     rng = MersenneTwister(0)
-    for lad in [c(1,2), cdag(1,2), c(2,2), cdag(2,2), c(3,2), cdag(3,2), cdag(1,2)*c(2,1)]
+    for lad in [c(1,2), cdag(1,2), c(2,2), cdag(2,2), c(3,2), cdag(3,2), cdag(1,2)*c(2,1), cdag(1,2)*c(2,1) + cdag(2,2)*0.3]
         opa = embed(hilbert_space, lad)
         opb = make_projector_operator(hilbert_space, lad)
         opc = make_projector_operator(opa)
