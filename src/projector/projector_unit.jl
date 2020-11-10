@@ -23,6 +23,31 @@ struct ParticleProjectorUnitOperator{BR<:Unsigned, S<:Number}<:AbstractParticleP
     end
 end
 
+function Base.:(==)(x::ParticleProjectorUnitOperator, y::ParticleProjectorUnitOperator)
+    return (
+        (x.bitmask == y.bitmask) &&
+        (x.bitrow == y.bitrow) &&
+        (x.bitcol == y.bitcol) &&
+        (x.parity_bitmask == y.parity_bitmask) &&
+        (x.amplitude == y.amplitude)
+    )
+end
+
+
+function Base.isapprox(
+    x::ParticleProjectorUnitOperator, y::ParticleProjectorUnitOperator;
+    atol::Real=0, rtol::Real=Base.rtoldefault(x.amplitude,y.amplitude,atol), nans::Bool=false,
+)
+    return (
+        (x.bitmask == y.bitmask) &&
+        (x.bitrow == y.bitrow) &&
+        (x.bitcol == y.bitcol) &&
+        (x.parity_bitmask == y.parity_bitmask) &&
+        isapprox(x.amplitude, y.amplitude; atol=atol, rtol=rtol, nans=nans)
+    )
+end
+
+
 function Base.zero(::Type{ParticleProjectorUnitOperator{BR, S}}) where {BR, S}
     z = zero(BR)
     return ParticleProjectorUnitOperator(z, z, z, z, zero(S))
@@ -62,10 +87,49 @@ function Base.:(*)(lhs::ParticleProjectorUnitOperator{BR, S1}, rhs::ParticleProj
     return ParticleProjectorUnitOperator(new_bitmask, new_bitrow, new_bitcol, new_parity_bitmask, new_amplitude)
 end
 
+
+# Unary
+
+function Base.:(-)(x::ParticleProjectorUnitOperator)
+    return ParticleProjectorUnitOperator(x.bitmask, x.bitrow, x.bitcol, x.parity_bitmask, -x.amplitude)
+end
+
+function Base.:(+)(x::ParticleProjectorUnitOperator)
+    return x
+end
+
+# Binary (Scale)
+
 function Base.:(*)(lhs::Number, rhs::ParticleProjectorUnitOperator)
     return ParticleProjectorUnitOperator(rhs.bitmask, rhs.bitrow, rhs.bitcol, rhs.parity_bitmask, lhs * rhs.amplitude)
 end
 
 function Base.:(*)(lhs::ParticleProjectorUnitOperator, rhs::Number)
     return ParticleProjectorUnitOperator(lhs.bitmask, lhs.bitrow, lhs.bitcol, lhs.parity_bitmask, lhs.amplitude * rhs)
+end
+
+function Base.:(/)(lhs::ParticleProjectorUnitOperator, rhs::Number)
+    return ParticleProjectorUnitOperator(lhs.bitmask, lhs.bitrow, lhs.bitcol, lhs.parity_bitmask, lhs.amplitude / rhs)
+end
+
+function Base.:(//)(lhs::ParticleProjectorUnitOperator, rhs::Number)
+    return ParticleProjectorUnitOperator(lhs.bitmask, lhs.bitrow, lhs.bitcol, lhs.parity_bitmask, lhs.amplitude // rhs)
+end
+
+function Base.:(\)(lhs::Number, rhs::ParticleProjectorUnitOperator)
+    return ParticleProjectorUnitOperator(rhs.bitmask, rhs.bitrow, rhs.bitcol, rhs.parity_bitmask, lhs \ rhs.amplitude)
+end
+
+
+function Base.:(^)(x::ParticleProjectorUnitOperator, y::Integer)
+    y < 0 && throw(ArgumentError("power cannot be negative"))
+    out = one(x)
+    z = x
+    while y > 0
+        (y & 1 != 0) && (out *= x)
+        iszero(out) && return zero(out)
+        y >>= 1
+        x = x * x
+    end
+    return out
 end
