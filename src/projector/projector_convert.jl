@@ -1,4 +1,13 @@
 function Base.promote_rule(
+    ::Type{ParticleProjectorUnitOperator{B, SL}},
+    ::Type{SR}
+) where {B, SL, SR<:Number}
+    S = promote_type(SL, SR)
+    return ParticleProjectorUnitOperator{B, S}
+end
+
+
+function Base.promote_rule(
     ::Type{ParticleProjectorUnitOperator{BL, SL}},
     ::Type{ParticleProjectorUnitOperator{BR, SR}}
 ) where {BL, BR, SL, SR}
@@ -40,6 +49,14 @@ end
 
 function Base.convert(
     ::Type{ParticleProjectorUnitOperator{B, S}},
+    arg::Number,
+) where {B, S}
+    return one(ParticleProjectorUnitOperator{B, S}) * arg
+end
+
+
+function Base.convert(
+    ::Type{ParticleProjectorUnitOperator{B, S}},
     arg::ParticleProjectorUnitOperator,
 ) where {B, S}
     return ParticleProjectorUnitOperator(
@@ -51,7 +68,8 @@ end
 
 function Base.convert(
     ::Type{ParticleProjectorSumOperator{B, S}},
-    arg::ParticleProjectorUnitOperator) where {B, S}
+    arg::ParticleProjectorUnitOperator,
+) where {B, S}
     projop = ParticleProjectorUnitOperator(
         B(arg.bitmask), B(arg.bitrow), B(arg.bitcol),
         B(arg.parity_bitmask), S(arg.amplitude)
