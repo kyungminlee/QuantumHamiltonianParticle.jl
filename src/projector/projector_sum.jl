@@ -16,12 +16,17 @@ end
 
 Base.iszero(arg::ParticleProjectorSumOperator) = isempty(arg.terms)
 
-Base.:(*)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator([t*y for t in x.terms])
-Base.:(/)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator([t/y for t in x.terms])
-Base.:(//)(x::ParticleProjectorSumOperator, y::Number) = ParticleProjectorSumOperator([t//y for t in x.terms])
-Base.:(÷)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator([t÷y for t in x.terms])
-Base.:(*)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator([y*t for t in x.terms])
-Base.:(\)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator([y\t for t in x.terms])
+Base.:(*)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator(x.terms .* y)
+Base.:(/)(x::ParticleProjectorSumOperator, y::Number)  = ParticleProjectorSumOperator(x.terms ./ y)
+Base.:(//)(x::ParticleProjectorSumOperator, y::Number) = ParticleProjectorSumOperator(x.terms .// y)
+Base.:(*)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator(y .* x.terms)
+Base.:(\)(y::Number, x::ParticleProjectorSumOperator)  = ParticleProjectorSumOperator(y .\ x.terms)
+
+function Base.:(÷)(x::ParticleProjectorSumOperator{BR, S1}, y::S2) where {BR, S1, S2}
+    S = promote_type(S1, S2)
+    return ParticleProjectorSumOperator([x.terms..., one(ParticleProjectorUnitOperator{BR, S})])
+end
+
 
 Base.:(+)(arg::ParticleProjectorSumOperator) = arg
 Base.:(-)(arg::ParticleProjectorSumOperator) = ParticleProjectorSumOperator(-arg.terms)
