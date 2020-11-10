@@ -10,6 +10,7 @@ include("test_ladder_embed.jl")
 include("test_ladder_matrixelement.jl")
 
 include("test_proj.jl")
+include("test_proj_promotion.jl")
 
 include("test_symmetry_apply.jl")
 include("test_hubbard.jl")
