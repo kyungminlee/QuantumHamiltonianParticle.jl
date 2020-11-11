@@ -10,12 +10,27 @@ using Particle
 @testset "Particle Projector Operators" begin
     @testset "ParticleProjectorUnitOperator" begin
         @testset "constructor" begin
+            p0 = ParticleProjectorUnitOperator{UInt, Float64}(10)
+            @test isa(p0, ParticleProjectorUnitOperator{UInt, Float64})
+            @test p0.bitmask == 0x0
+            @test p0.bitrow == 0x0
+            @test p0.bitcol == 0x0
+            @test p0.parity_bitmask == 0x0
+            @test p0.amplitude == 10.0
+
             pi = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1) # should work fine
             pd = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1.0) # should work fine
             pz = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1.0 + 0.0im) # should work fine
             @test_throws ArgumentError ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0000, 0b0011, 1.0) # parity bit overlap
             @test_throws ArgumentError ParticleProjectorUnitOperator(0b0101, 0b0110, 0b0000, 0b0000, 1.0) # row
             @test_throws ArgumentError ParticleProjectorUnitOperator(0b0101, 0b0100, 0b1000, 0b0000, 1.0) # row
+
+            ParticleProjectorUnitOperator{UInt, Float64}(0b0101, 0b0100, 0b0001, 0b0010, 1) # should work fine
+            ParticleProjectorUnitOperator{UInt, Float64}(0b0101, 0b0100, 0b0001, 0b0010, 1.0) # should work fine
+            ParticleProjectorUnitOperator{UInt, ComplexF64}(0b0101, 0b0100, 0b0001, 0b0010, 1.0 + 0.0im) # should work fine
+            @test_throws ArgumentError ParticleProjectorUnitOperator{UInt, Float64}(0b0101, 0b0100, 0b0000, 0b0011, 1.0) # parity bit overlap
+            @test_throws ArgumentError ParticleProjectorUnitOperator{UInt, Float64}(0b0101, 0b0110, 0b0000, 0b0000, 1.0) # row
+            @test_throws ArgumentError ParticleProjectorUnitOperator{UInt, Float64}(0b0101, 0b0100, 0b1000, 0b0000, 1.0) # row
 
             @test pi == ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1)
             @test pi != ParticleProjectorUnitOperator(0b1101, 0b0100, 0b0001, 0b0010, 1)
