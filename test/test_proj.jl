@@ -317,4 +317,14 @@ end
     @test q7 == ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1.0)
     @test typeof(q7) == ParticleProjectorUnitOperator{UInt8, Float64}
 
+    p8 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1 + im)
+    p9 = ParticleProjectorUnitOperator(0b0001, 0b0001, 0b0001, 0b0000, 3.0)
+    q8 = p8 + p9 + conj(p8)
+    q9 = simplify(q8)
+    @test typeof(q8) == ParticleProjectorSumOperator{UInt8, ComplexF64}
+    @test typeof(q9) == ParticleProjectorSumOperator{UInt8, Float64}
+    @test q9 == ParticleProjectorSumOperator([
+        ParticleProjectorUnitOperator(0b0001, 0b0001, 0b0001, 0b0000, 3.0),
+        ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 2.0),
+    ])
 end
