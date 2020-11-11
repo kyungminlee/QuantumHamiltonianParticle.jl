@@ -156,6 +156,7 @@ using Particle
             z = zero(P∑{UInt, Float64})
             @test isa(z, P∑{UInt, Float64})
             @test z == P∑(PU{UInt, Float64}[])
+            @test iszero(z)
             o = one(P∑{UInt, Float64})
             @test isa(o, P∑{UInt, Float64})
             @test o == P∑([one(PU{UInt, Float64})])
