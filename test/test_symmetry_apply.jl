@@ -41,6 +41,9 @@ using ExactDiagonalization
     @test symmetry_apply(perm, ecdag(2,3)) == ecdag(2,1)
 
 
+    @test symmetry_apply(particle_hilbert_space, perm, cdag(1,2)*c(2,3)) == cdag(1,3)*c(2,1)
+    @test symmetry_apply(particle_hilbert_space, perm, cdag(1,2)*c(2,3)+c(2,1)) == cdag(1,3)*c(2,1)+c(2,2)
+
     @test symmetry_apply(perm, cdag(1,2)*c(2,3)) == cdag(1,3)*c(2,1)
     @test symmetry_apply(perm, cdag(1,2)*c(2,3)+c(2,1)) == cdag(1,3)*c(2,1)+c(2,2)
 
