@@ -70,3 +70,10 @@ function isinvariant(
 )
     return iszero(simplify(symmetry_apply(permutation, op) - op))
 end
+
+function isinvariant(
+    permutation::SitePermutation,
+    op::AbstractParticleLadder,
+)
+    return iszero(simplify(symmetry_apply(permutation, op) - op))
+end
