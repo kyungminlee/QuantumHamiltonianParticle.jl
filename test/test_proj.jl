@@ -151,25 +151,83 @@ using Particle
     @testset "ParticleProjectorSumOperator" begin
         P∑ = ParticleProjectorSumOperator
         PU = ParticleProjectorUnitOperator
-        p1 = PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0+im)
-        p2 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+im) # no conjugation
-        p3 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0-im) # conjugation
-        s1 = P∑([p1, p2])
-        @test !ishermitian(s1)
-        s2 = P∑([p1, p3])
-        @test ishermitian(s2)
 
-        @test isa(real(s2), P∑{UInt8, Float64})
-        @test isa(imag(s2), P∑{UInt8, Float64})
-        @test isa(conj(s2), P∑{UInt8, ComplexF64})
-        @test isa(transpose(s2), P∑{UInt8, ComplexF64})
-        @test isa(adjoint(s2), P∑{UInt8, ComplexF64})
+        @testset "zero and one" begin
+            z = zero(P∑{UInt, Float64})
+            @test isa(z, P∑{UInt, Float64})
+            @test z == P∑(PU{UInt, Float64}[])
+            o = one(P∑{UInt, Float64})
+            @test isa(o, P∑{UInt, Float64})
+            @test o == P∑([one(PU{UInt, Float64})])
+        end
 
-        @test real(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0), PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0)])
-        @test imag(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 1.0), PU(0b0101, 0b0001, 0b0100, 0b0010,-1.0)])
-        @test conj(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0-1.0im), PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+1.0im)])
-        @test adjoint(s2) == P∑([PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0-1.0im), PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0+1.0im)])
-        @test transpose(s2) == P∑([PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+1.0im), PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0-1.0im)])
+        @testset "equality" begin
+            p1 = PU(0b0101, 0b0100, 0b0001, 0b0010, 2)
+            p2 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+0.0im)
+            p3 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0-0.0im)
+            @test P∑([p1, p2]) == P∑([p1, p3])
+            @test P∑([p1, p2]) != P∑([p2, p1])  # Not necessary though.
+        end
+
+        @testset "unary functions" begin
+            p1 = PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0+im)
+            p2 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+im) # no conjugation
+            p3 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0-im) # conjugation
+            s1 = P∑([p1, p2])
+            @test !ishermitian(s1)
+            s2 = P∑([p1, p3])
+            @test ishermitian(s2)
+
+            @test +s1 == s1
+            @test -s1 == P∑([-p1, -p2])
+
+            @test isa(real(s2), P∑{UInt8, Float64})
+            @test isa(imag(s2), P∑{UInt8, Float64})
+            @test isa(conj(s2), P∑{UInt8, ComplexF64})
+            @test isa(transpose(s2), P∑{UInt8, ComplexF64})
+            @test isa(adjoint(s2), P∑{UInt8, ComplexF64})
+
+            @test real(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0), PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0)])
+            @test imag(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 1.0), PU(0b0101, 0b0001, 0b0100, 0b0010,-1.0)])
+            @test conj(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0-1.0im), PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+1.0im)])
+            @test adjoint(s2) == P∑([PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0-1.0im), PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0+1.0im)])
+            @test transpose(s2) == P∑([PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+1.0im), PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0-1.0im)])
+        end
+
+        @testset "binary functions" begin
+            p0 = PU(0b0000, 0b0000, 0b0000, 0b0000, 1)
+            p1 = PU(0b0101, 0b0100, 0b0100, 0b0010, 2)
+            p2 = PU(0b0101, 0b0001, 0b0100, 0b0010, 3 + 4im)
+            p3 = PU(0b0101, 0b0100, 0b0001, 0b0010, 5.0)
+
+            s1 = P∑([p1, p2])
+            s2 = P∑([p1, p3])
+
+            @test s1 * 2 == P∑([p1*2, p2*2])
+            @test 2 * s1 == P∑([2*p1, 2*p2])
+            @test s1 * (2.5+0.5im) == P∑([p1*(2.5+0.5im), p2*(2.5+0.5im)])
+            @test (2.5+0.5im) * s1 == P∑([(2.5+0.5im)*p1, (2.5+0.5im)*p2])
+
+            @test s1 / 2 == P∑([p1 / 2, p2 / 2])
+            @test s1 // 2 == P∑([p1 // 2, p2 // 2])
+            @test 2 \ s1 == P∑([2\p1, 2\p2])
+            @test s1 / (2.5+0.5im) == P∑([p1 / (2.5+0.5im), p2 / (2.5+0.5im)])
+            @test (2.5+0.5im) \ s1 == P∑([(2.5+0.5im) \ p1, (2.5+0.5im) \ p2])
+
+            @test 10 + s1 == P∑([p0*10, p1, p2])
+            @test s1 + 10.0 == P∑([p1, p2, p0*10.0])
+
+            @test p1 + s1 == P∑([p1, p1, p2])
+            @test p1 - s1 == P∑([p1, -p1, -p2])
+
+            @test s1 + p1 == P∑([p1, p2, p1])
+            @test s1 - p1 == P∑([p1, p2, -p1])
+
+            @test s1 + s2 == P∑([p1, p2, p1, p3])
+            @test s1 - s2 == P∑([p1, p2, -p1, -p3])
+
+            @test s1 * s2 == P∑([p1*p1, p1*p3, p2*p1, p2*p3]) # Not necessarily true
+        end
     end
 end
 
