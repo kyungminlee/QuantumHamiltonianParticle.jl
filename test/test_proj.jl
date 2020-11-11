@@ -170,11 +170,14 @@ end
 
 
 @testset "simplify" begin
+    p0 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 0)
     p1 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1)
     p2 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0000, 10)
     p3 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 100.0)
     p4 = ParticleProjectorUnitOperator(0b0000, 0b0000, 0b0000, 0b0000, 1000.0)
 
+    q0 = simplify(p0)
+    @test isa(q0, NullOperator)
     q1 = ParticleProjectorSumOperator([p1, p2, p3, p4])
     q2 = simplify(q1)
 
@@ -204,5 +207,10 @@ end
     q6 = simplify(p6)
     @test q6 == ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1.0)
     @test typeof(q6) == ParticleProjectorUnitOperator{UInt8, Float64}
+
+    p7 = ParticleProjectorSumOperator([p6])
+    q7 = simplify(p7)
+    @test q7 == ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1.0)
+    @test typeof(q7) == ParticleProjectorUnitOperator{UInt8, Float64}
 
 end
