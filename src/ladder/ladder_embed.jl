@@ -30,15 +30,6 @@ struct ParticleLadderOperatorEmbedding{
         OP = typeof(ladder)
         return new{ParticleHilbertSpace{PS, BR, QN}, OP, PS, S}(hilbert_space, ladder)
     end
-
-    function ParticleLadderOperatorEmbedding(
-        hilbert_space::HilbertSpaceSector{ParticleHilbertSpace{PS, BR, QN}, QN},
-        ladder::AbstractParticleLadder{PS, S},
-    ) where {PS, BR, QN, S}
-        OP = typeof(ladder)
-        #return new{HilbertSpaceSector{ParticleHilbertSpace{PS, BR, QN}, QN}, OP, PS, S}(hilbert_space, ladder)
-        return new{ParticleHilbertSpace{PS, BR, QN}, OP, PS, S}(basespace(hilbert_space), ladder)
-    end
 end
 
 
