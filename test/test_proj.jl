@@ -173,7 +173,7 @@ end
     p1 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1)
     p2 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0000, 10)
     p3 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 100.0)
-    p4 = ParticleProjectorUnitOperator(0b0000, 0b0000, 0b0000, 0b0000, 1000)
+    p4 = ParticleProjectorUnitOperator(0b0000, 0b0000, 0b0000, 0b0000, 1000.0)
 
     q1 = ParticleProjectorSumOperator([p1, p2, p3, p4])
     q2 = simplify(q1)
@@ -191,5 +191,18 @@ end
     q3 = simplify(ParticleProjectorSumOperator([p1, -p1]))
     @test iszero(q3)
     @test q3 == NullOperator()
+
+    q4 = simplify(ParticleProjectorSumOperator([p1, p1, -p1]))
+    @test typeof(q4) == ParticleProjectorUnitOperator{UInt8, Int}
+    @test q4 == p1
+
+    q5 = simplify(ParticleProjectorSumOperator([p1, p1, p4, -p1]))
+    @test typeof(q5) == ParticleProjectorSumOperator{UInt8, Float64}
+    @test q5 == ParticleProjectorSumOperator([p4, p1])
+
+    p6 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1.0 + 1E-12im)
+    q6 = simplify(p6)
+    @test q6 == ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 1.0)
+    @test typeof(q6) == ParticleProjectorUnitOperator{UInt8, Float64}
 
 end
