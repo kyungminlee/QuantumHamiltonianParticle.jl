@@ -93,6 +93,29 @@ using Particle
             @test typeof(x.amplitude) == ComplexF64
         end
 
+        @testset "scale and unary" begin
+            p1 = ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3)
+            @test p1 * 4 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 12)
+            @test 4 * p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 12)
+            @test p1 / 4 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 0.75)
+            @test p1 // 4 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3//4)
+            @test 4 \ p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 0.75)
+            @test -p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, -3)
+            @test +p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3)
+
+            p2 = ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3.0 + 4.0im)
+            @test isa(real(p2), ParticleProjectorUnitOperator{UInt8, Float64})
+            @test real(p2) == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3.0)
+            @test isa(imag(p2), ParticleProjectorUnitOperator{UInt8, Float64})
+            @test imag(p2) == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 4.0)
+            @test isa(conj(p2), ParticleProjectorUnitOperator{UInt8, ComplexF64})
+            @test conj(p2) == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3.0-4.0im)
+            @test isa(adjoint(p2), ParticleProjectorUnitOperator{UInt8, ComplexF64})
+            @test adjoint(p2) == ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0000, 0b0010, 3.0-4.0im)
+            @test isa(transpose(p2), ParticleProjectorUnitOperator{UInt8, ComplexF64})
+            @test transpose(p2) == ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0000, 0b0010, 3.0+4.0im)
+        end
+
         @testset "multiplication" begin
             @testset "mismatch" begin
                 p1 = ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 2)
@@ -111,15 +134,8 @@ using Particle
             end
         end
 
-        @testset "scale" begin
+        @testset "power" begin
             p1 = ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3)
-            @test p1 * 4 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 12)
-            @test 4 * p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 12)
-            @test p1 / 4 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 0.75)
-            @test p1 // 4 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3//4)
-            @test 4 \ p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 0.75)
-            @test -p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, -3)
-            @test +p1 == ParticleProjectorUnitOperator(0b0101, 0b0000, 0b0100, 0b0010, 3)
             n = 2
             @test p1^n == p1 * p1
             @test iszero(p1^n)
@@ -133,12 +149,27 @@ using Particle
     end
 
     @testset "ParticleProjectorSumOperator" begin
-        p1 = ParticleProjectorSumOperator([
-            ParticleProjectorUnitOperator(0b0101, 0b0100, 0b0001, 0b0010, 2.0),
-            ParticleProjectorUnitOperator(0b0101, 0b0001, 0b0100, 0b0010, 2.0),
-        ])
-        @test ishermitian(p1)
+        P∑ = ParticleProjectorSumOperator
+        PU = ParticleProjectorUnitOperator
+        p1 = PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0+im)
+        p2 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+im) # no conjugation
+        p3 = PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0-im) # conjugation
+        s1 = P∑([p1, p2])
+        @test !ishermitian(s1)
+        s2 = P∑([p1, p3])
+        @test ishermitian(s2)
 
+        @test isa(real(s2), P∑{UInt8, Float64})
+        @test isa(imag(s2), P∑{UInt8, Float64})
+        @test isa(conj(s2), P∑{UInt8, ComplexF64})
+        @test isa(transpose(s2), P∑{UInt8, ComplexF64})
+        @test isa(adjoint(s2), P∑{UInt8, ComplexF64})
+
+        @test real(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0), PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0)])
+        @test imag(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 1.0), PU(0b0101, 0b0001, 0b0100, 0b0010,-1.0)])
+        @test conj(s2) == P∑([PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0-1.0im), PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+1.0im)])
+        @test adjoint(s2) == P∑([PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0-1.0im), PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0+1.0im)])
+        @test transpose(s2) == P∑([PU(0b0101, 0b0001, 0b0100, 0b0010, 2.0+1.0im), PU(0b0101, 0b0100, 0b0001, 0b0010, 2.0-1.0im)])
     end
 end
 
