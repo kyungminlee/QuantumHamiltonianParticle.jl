@@ -13,6 +13,7 @@ include("test_proj.jl")
 include("test_proj_promotion.jl")
 
 include("test_symmetry_apply.jl")
+
 include("test_hubbard.jl")
 
 # include("test_spinless_fermion.jl")
