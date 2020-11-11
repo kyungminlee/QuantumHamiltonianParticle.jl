@@ -54,7 +54,6 @@ using Particle
         end
     end
 
-
     @test bitwidth(hilbert) == 9
 
     @test bitoffset(hilbert, 1, 1) == 0
@@ -103,6 +102,12 @@ using Particle
 
     @test set_occupancy(hilbert, 1, 3, 0b001_110_100, 0) == 0b000_110_100
     @test_throws ArgumentError set_occupancy(hilbert, 1, 3, 0b001_110_100, 3)
+
+    # three sites
+    @test compress(hilbert, CartesianIndex(2, 1, 6)) == UInt(0b110_000_001)
+    @test extract(hilbert, 0b110_000_001) == CartesianIndex(2, 1, 6)
+    @test hilbert[CartesianIndex(2, 1, 6)] == UInt(0b110_000_001)
+    @test hilbert[2, 1, 6] == UInt(0b110_000_001)
 
     @test Set(quantum_number_sectors(hilbert)) == Set([(sz, c) for sz in -3:3, c in 0:3])
     @test get_quantum_number(hilbert, 0b001_110_100) == (0-1+1, 1+1)

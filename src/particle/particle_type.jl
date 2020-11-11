@@ -3,7 +3,7 @@ abstract type AbstractParticle end
 export Fermion, HardcoreBoson, Boson, Spin
 export species
 export exchangesign
-export isfermion, isboson
+export isfermion, isboson, isspin
 export maxoccupancy
 
 import ExactDiagonalization.bitwidth
@@ -56,11 +56,8 @@ isfermion(::Type{<:Fermion}) = true
 isboson(::Type{<:AbstractParticle}) = false
 isboson(::Type{<:HardcoreBoson}) = true
 isboson(::Type{<:Boson}) = true
-isboson(::Type{<:Spin}) = false
 
 isspin(::Type{<:AbstractParticle}) = false
-isspin(::Type{<:HardcoreBoson}) = false
-isspin(::Type{<:Boson}) = false
 isspin(::Type{<:Spin}) = true
 
 maxoccupancy(::Type{<:Spin{S, M}}) where {S, M} = M
@@ -71,7 +68,7 @@ maxoccupancy(::Type{<:Fermion}) = 1
 # TODO: Edge case: when maxoccupancy is 0.
 bitwidth(::Type{P}) where {P<:AbstractParticle} = Int(ceil(log2(maxoccupancy(P)+1)))
 
-for fname in [:exchangesign, :isfermion, :isboson, :maxoccupancy, :bitwidth, :bitoffset]
+for fname in [:exchangesign, :isfermion, :isboson, :isspin, :maxoccupancy, :bitwidth, :bitoffset]
     @eval begin
         ($fname)(::T, args...) where {T<:AbstractParticle} = ($fname)(T, args...)
     end

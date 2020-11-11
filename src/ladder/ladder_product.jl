@@ -17,10 +17,6 @@ function Base.:(==)(lhs::ParticleLadderProduct{PS, P, O}, rhs::ParticleLadderPro
     return lhs.factors == rhs.factors
 end
 
-function Base.convert(::Type{ParticleLadderProduct{PS, P, O}}, obj::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
-    return ParticleLadderProduct([obj])
-end
-
 Base.iszero(arg::ParticleLadderProduct) = false
 Base.isone(arg::ParticleLadderProduct) = isempty(arg.factors)
 
@@ -29,8 +25,8 @@ function Base.one(::Type{ParticleLadderProduct{PS, PI, OI}}) where {PS, PI, OI}
 end
 Base.one(::OP) where {OP<:ParticleLadderProduct} = Base.one(OP)
 
-# Orderings
 
+# Orderings
 
 function Base.isless(lhs::ParticleLadderProduct{PS, P, O}, rhs::ParticleLadderProduct{PS, P, O}) where {PS, P, O}
     ll = length(lhs.factors)

@@ -89,10 +89,7 @@ end
 LinearAlgebra.ishermitian(arg::ParticleLadderUnit) = false
 
 
-
-
 #=
-
 import ExactDiagonalization.apply
 import ExactDiagonalization.apply!
 

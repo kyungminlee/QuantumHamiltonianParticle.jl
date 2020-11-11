@@ -1,74 +1,70 @@
 using Test
+using Particle
 using LatticeTools
 using ExactDiagonalization
-using Particle
-using LinearAlgebra
 
-@testset begin
-    f = Fermion("f")
-    particle_sector = ParticleSector(f)
-    site = ParticleSite([
-        ParticleState(particle_sector, "_", [0], ( 0)),
-        ParticleState(particle_sector, "f", [1], ( 1)),
+@testset "symmetry" begin
+    permutation = SitePermutation([2,3,1])  # 1->2, 2->3, 3->1
+    particle_sector = ParticleSector(Fermion("f"), Boson("S=1", 2))
+    particle_site = ParticleSite([
+        ParticleState(particle_sector, "_↑", [0,0]),
+        ParticleState(particle_sector, "f↑", [1,0]),
+        ParticleState(particle_sector, "_⋅", [0,1]),
+        ParticleState(particle_sector, "f⋅", [1,1]),
+        ParticleState(particle_sector, "_↓", [0,2]),
+        ParticleState(particle_sector, "f↓", [1,2]),
     ])
+    particle_hilbert_space = ParticleHilbertSpace([particle_site, particle_site, particle_site])
 
-    nsites = 4
-    unitcell = makeunitcell(1.0; SiteType=String)
-    addsite!(unitcell, "fermion orbital", FractCoord([0], [0.0]))
-    lattice = makelattice(unitcell, nsites)
+    c(i,j) = ParticleLadderUnit(particle_sector, i, j, ANNIHILATION)
+    cdag(i,j) = ParticleLadderUnit(particle_sector, i, j, CREATION)
 
-    tsym = TranslationSymmetry(lattice)
-    psym = project(PointSymmetryDatabase.get3d(2), [1 0 0;])
+    ec(i,j) = embed(particle_hilbert_space, ParticleLadderUnit(particle_sector, i, j, ANNIHILATION))
+    ecdag(i,j) = embed(particle_hilbert_space, ParticleLadderUnit(particle_sector, i, j, CREATION))
 
-    ssym = tsym ⋊ psym
-    ssymbed = embed(lattice, ssym)
+    @testset "ladder operator" begin
+        @test symmetry_apply(permutation, c(1,1)) == c(1,2)
+        @test symmetry_apply(permutation, c(1,3)) == c(1,1)
+        @test symmetry_apply(permutation, c(2,3)) == c(2,1)
+        @test symmetry_apply(permutation, cdag(1,2)) == cdag(1,3)
+        @test symmetry_apply(permutation, cdag(2,3)) == cdag(2,1)
 
-    hilbert_space = ParticleHilbertSpace([site for i in 1:nsites])
-    f_dag(i::Integer) = ParticleLadderUnit(particle_sector, 1, i, CREATION)
-    f(i::Integer) = ParticleLadderUnit(particle_sector, 1, i, ANNIHILATION)
+        @test symmetry_apply(particle_hilbert_space, permutation, c(1,1)) == c(1,2)
+        @test symmetry_apply(particle_hilbert_space, permutation, c(1,3)) == c(1,1)
+        @test symmetry_apply(particle_hilbert_space, permutation, c(2,3)) == c(2,1)
+        @test symmetry_apply(particle_hilbert_space, permutation, cdag(1,2)) == cdag(1,3)
+        @test symmetry_apply(particle_hilbert_space, permutation, cdag(2,3)) == cdag(2,1)
 
-    hopping_hamiltonian = embed(hilbert_space,
-        simplify(sum(
-            let j = mod(i, nsites) + 1
-                f_dag(i) * f(j) + f_dag(j) * f(i)
-            end for i in 1:nsites
-        ))
-    )
+        @test symmetry_apply(permutation, ec(1,1)) == ec(1,2)
+        @test symmetry_apply(permutation, ec(1,3)) == ec(1,1)
+        @test symmetry_apply(permutation, ec(2,3)) == ec(2,1)
+        @test symmetry_apply(permutation, ecdag(1,2)) == ecdag(1,3)
+        @test symmetry_apply(permutation, ecdag(2,3)) == ecdag(2,1)
 
-    interaction_hamiltonian = embed(hilbert_space,
-        simplify(sum(
-            let j = mod(i, nsites) + 1
-                f_dag(i) * f(i) * f_dag(j) * f(j) * 10
-            end for i in 1:nsites
-        ))
-    )
 
-    hamiltonian = make_projector_operator(hopping_hamiltonian + interaction_hamiltonian)
-    hsr = represent(hilbert_space)
-    rhsr = symmetry_reduce(hsr, first(get_irrep_components(ssymbed)))
-    @testset "reduced hilbert space" begin
-        @test rhsr.basis_list == UInt[0b0000, 0b0001]
-        # 0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111
-        @test rhsr.basis_mapping_index == [
-            1,    2,   2,  -1,   2,  -1,  -1,  -1,   2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-        ]
-        @test rhsr.basis_mapping_amplitude[1] ≈ 1.0
-        @test rhsr.basis_mapping_amplitude[2] ≈ 0.5
-        @test rhsr.basis_mapping_amplitude[3] ≈ 0.5
-        @test rhsr.basis_mapping_amplitude[5] ≈ 0.5
-        @test rhsr.basis_mapping_amplitude[9] ≈ 0.5
+        @test symmetry_apply(particle_hilbert_space, permutation, cdag(1,2)*c(2,3)) == cdag(1,3)*c(2,1)
+        @test symmetry_apply(particle_hilbert_space, permutation, cdag(1,2)*c(2,3)+c(2,1)) == cdag(1,3)*c(2,1)+c(2,2)
+
+        @test symmetry_apply(permutation, cdag(1,2)*c(2,3)) == cdag(1,3)*c(2,1)
+        @test symmetry_apply(permutation, cdag(1,2)*c(2,3)+c(2,1)) == cdag(1,3)*c(2,1)+c(2,2)
+
+        @test !isinvariant(permutation, c(1,1) + c(1,2))
+        @test isinvariant(permutation, c(1,1) + c(1,2) + c(1,3))
     end
 
-    @testset "eigenvalues" begin
-        v1 = eigvals(Hermitian(Matrix(represent(hsr, hamiltonian))))
-        v2 = Float64[]
-        for sic in get_irrep_components(ssymbed)
-            rhsr = symmetry_reduce(hsr, sic)
-            h = represent(rhsr, hamiltonian)
-            w = eigvals(Hermitian(Matrix(h)))
-            append!(v2, w)
-        end
-        sort!(v2)
-        @test maximum(abs2.(v1 - v2)) < 1E-8
+    @testset "state" begin
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_000) == (0b000_000_000, 1)
+
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_001) == (0b000_001_000, 1)
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b000_001_000) == (0b001_000_000, 1)
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b001_000_000) == (0b000_000_001, 1)
+
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_011) == (0b000_011_000, 1)
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b000_011_000) == (0b011_000_000, 1)
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b011_000_000) == (0b000_000_011, 1)
+
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b010_001_011) == (0b001_011_010, 1)
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b001_011_010) == (0b011_010_001, -1)
+        @test symmetry_apply(particle_hilbert_space, permutation, 0b011_010_001) == (0b010_001_011, -1)
     end
 end

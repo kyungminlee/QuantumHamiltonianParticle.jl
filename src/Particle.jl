@@ -13,11 +13,12 @@ include("hilbert/particle_repconv.jl")
 
 include("ladder/abstractparticleoperator.jl")
 
-#include("ladder/ladder_algebra.jl")
+include("ladder/ladder_null.jl")
 include("ladder/ladder_unit.jl")
 include("ladder/ladder_product.jl")
 include("ladder/ladder_sum.jl")
 include("ladder/ladder_operation.jl")
+include("ladder/ladder_promotion.jl")
 
 include("ladder/ladder_parity.jl")
 include("ladder/ladder_iterator.jl")
@@ -34,6 +35,9 @@ include("projector/projector_sum.jl")
 include("projector/projector_convert.jl")
 include("projector/projector_make.jl")
 include("projector/projector_iterator.jl")
+include("projector/projector_apply.jl")
+
+include("projector/projector_simplify.jl")
 
 include("io/prettyprint.jl")
 

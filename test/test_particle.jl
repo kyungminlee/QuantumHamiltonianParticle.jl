@@ -6,42 +6,59 @@ using ExactDiagonalization
     b = Boson(:b, 3)
     f = Fermion(:f)
     m = HardcoreBoson(:m)
+    s = Spin("S=1", 3)
 
     @testset "constructor" begin
         b1 = Boson("b", 3)
         f1 = Fermion("f")
         m1 = HardcoreBoson("m")
+        s1 = Spin("S=1", 3)
+        s1p = Spin(Symbol("S=1"), 3)
         @test b == b1
         @test f == f1
         @test m == m1
+        @test s == s1
+        @test s == s1p
 
         b2 = Boson{:b, 3}()
         f2 = Fermion{:f}()
         m2 = HardcoreBoson{:m}()
+        s2 = Spin{Symbol("S=1"), 3}()
         @test b == b2
         @test f == f2
         @test m == m2
+        @test s == s2
     end
 
     @test exchangesign(b) == 1
     @test exchangesign(f) == -1
     @test exchangesign(m) == 1
+    @test exchangesign(s) == 1
 
     @test isboson(b)
     @test !isboson(f)
     @test isboson(m)
+    @test !isboson(s)
 
     @test !isfermion(b)
     @test isfermion(f)
     @test !isfermion(m)
+    @test !isfermion(s)
+
+    @test !isspin(b)
+    @test !isspin(f)
+    @test !isspin(m)
+    @test isspin(s)
 
     @test maxoccupancy(b) == 3
     @test maxoccupancy(f) == 1
     @test maxoccupancy(m) == 1
+    @test maxoccupancy(s) == 3
 
     @test bitwidth(b) == 2
     @test bitwidth(f) == 1
     @test bitwidth(m) == 1
+    @test bitwidth(s) == 2
 end
 
 
@@ -49,6 +66,7 @@ end
     b = Boson(:b, 5)
     f = Fermion(:f)
     m = HardcoreBoson(:m)
+    s = Spin("S=3/2", 4)
 
     p = ParticleSector(b, f)
 
@@ -57,7 +75,6 @@ end
         @test p == p1
         p2 = ParticleSector(typeof((b, f)))
         @test p == p2
-
     end
 
     @test numspecies(p) == 2
