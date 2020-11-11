@@ -120,7 +120,7 @@ end
 
     @testset "ParticleLatticeProduct" begin
         rng = MersenneTwister(0)
-        for iptl1 in 1:3, iptl2 in 1:3, cop1 in [c, cdag], cop2 in [c, cdag]
+        for iptl1 in 1:3, iptl2 in [1,2], cop1 in [c, cdag], cop2 in [c, cdag]
             op1 = cop1(iptl1, 1) * cop2(iptl2, 2)
             mr = Dict{Tuple{UInt, UInt}, Float64}()
             mc = Dict{Tuple{UInt, UInt}, Float64}()
@@ -216,18 +216,20 @@ end
 
     function test_sum_iterators()
         rng = MersenneTwister(0)
-        for bvec in rand(rng, hsr.basis_list, 5)
-            for iptl1 in 1:3, iptl2 in 1:3, iptl3 in 1:3, cop1 in [c, cdag], cop2 in [c, cdag], cop3 in [c, cdag]
-                op1 = cop1(iptl1, 1) * cop2(iptl2, 2)
-                op2 = cop3(iptl2, 2)
-                out1 = Dict{UInt, Float64}(collect(get_column_iterator(hs, op1 + op2, bvec))...)
-                out2 = Dict{UInt, Float64}(collect(get_column_iterator(hs, op1, bvec))...)
-                for (brow, ampl) in get_column_iterator(hs, op2, bvec)
-                    out2[brow] = get(out2, brow, 0) + ampl
+        for bvec in rand(rng, hsr.basis_list, 3)
+            for iptl1 in rand(rng, 1:3, 2), iptl2 in rand(rng, 1:3, 2), iptl3 in rand(rng, 1:3, 2)
+                for cop1 in [c, cdag], cop2 in [c, cdag], cop3 in [c, cdag]
+                    op1 = cop1(iptl1, 1) * cop2(iptl2, 2)
+                    op2 = cop3(iptl3, 2)
+                    out1 = Dict{UInt, Float64}(collect(get_column_iterator(hs, op1 + op2, bvec))...)
+                    out2 = Dict{UInt, Float64}(collect(get_column_iterator(hs, op1, bvec))...)
+                    for (brow, ampl) in get_column_iterator(hs, op2, bvec)
+                        out2[brow] = get(out2, brow, 0) + ampl
+                    end
+                    choptol!(out1, 1E-8)
+                    choptol!(out2, 1E-8)
+                    out1 != out2 && return false
                 end
-                choptol!(out1, 1E-8)
-                choptol!(out2, 1E-8)
-                out1 != out2 && return false
             end
         end
         return true
