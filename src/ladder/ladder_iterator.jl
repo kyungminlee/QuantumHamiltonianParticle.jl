@@ -45,12 +45,11 @@ function get_row_iterator(
             elseif isboson(particle)
                 ampl = sqrt(S(new_occupancy_at_site))
             elseif isspin(particle)
-                ampl = let
-                    M = maxoccupancy(particle)
-                    n1 = occupancy_at_site
-                    n2 = new_occupancy_at_site
-                    0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
-                end
+                ampl = let M = maxoccupancy(particle),
+                           n1 = occupancy_at_site,
+                           n2 = new_occupancy_at_site
+                           0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
+                       end
             else
                 throw(ArgumentError("unsupported particle type $particle")) # COV_EXCL_LINE
             end
@@ -65,10 +64,7 @@ function get_row_iterator(
             elseif isboson(particle)
                 ampl = sqrt(S(occupancy_at_site))
             elseif isspin(particle)
-                ampl = let
-                    M = maxoccupancy(particle)
-                    n1 = occupancy_at_site
-                    n2 = new_occupancy_at_site
+                ampl = let M = maxoccupancy(particle), n1 = occupancy_at_site, n2 = new_occupancy_at_site
                     0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
                 end
             else
@@ -106,10 +102,7 @@ function get_column_iterator(
             elseif isboson(particle)
                 ampl = sqrt(S(new_occupancy_at_site))
             elseif isspin(particle)
-                ampl = let
-                    M = maxoccupancy(particle)
-                    n1 = occupancy_at_site
-                    n2 = new_occupancy_at_site
+                ampl = let M = maxoccupancy(particle), n1 = occupancy_at_site, n2 = new_occupancy_at_site
                     0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
                 end
             else
@@ -126,10 +119,7 @@ function get_column_iterator(
             elseif isboson(particle)
                 ampl = sqrt(S(occupancy_at_site))
             elseif isspin(particle)
-                ampl = let
-                    M = maxoccupancy(particle)
-                    n1 = occupancy_at_site
-                    n2 = new_occupancy_at_site
+                ampl = let M = maxoccupancy(particle), n1 = occupancy_at_site, n2 = new_occupancy_at_site
                     0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
                 end
             else
@@ -175,10 +165,7 @@ function get_element(
         elseif isboson(particle)
             ampl = Base.sqrt(S(ref_occupancy_at_site))
         elseif isspin(particle)
-            ampl = let
-                M = maxoccupancy(particle)
-                n1 = occupancy_at_site
-                n2 = new_occupancy_at_site
+            ampl = let M = maxoccupancy(particle), n1 = occupancy_at_site, n2 = new_occupancy_at_site
                 0.5 * sqrt(S(2*M*(1+n1+n2) - 4*n1*n2))
             end
         else
