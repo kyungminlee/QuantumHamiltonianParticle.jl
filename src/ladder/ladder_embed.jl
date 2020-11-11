@@ -13,7 +13,8 @@ import ExactDiagonalization.simplify
 
 
 struct ParticleLadderOperatorEmbedding{
-    HilbertSpaceType<:Union{<:ParticleHilbertSpace,<:HilbertSpaceSector{<:ParticleHilbertSpace, <:Any}},
+    #HilbertSpaceType<:Union{<:ParticleHilbertSpace,<:HilbertSpaceSector{<:ParticleHilbertSpace, <:Any}},
+    HilbertSpaceType<:ParticleHilbertSpace,
     LadderType<:AbstractParticleLadder,
     PS<:ParticleSector,
     S<:Number,
@@ -35,7 +36,8 @@ struct ParticleLadderOperatorEmbedding{
         ladder::AbstractParticleLadder{PS, S},
     ) where {PS, BR, QN, S}
         OP = typeof(ladder)
-        return new{HilbertSpaceSector{ParticleHilbertSpace{PS, BR, QN}, QN}, OP, PS, S}(hilbert_space, ladder)
+        #return new{HilbertSpaceSector{ParticleHilbertSpace{PS, BR, QN}, QN}, OP, PS, S}(hilbert_space, ladder)
+        return new{ParticleHilbertSpace{PS, BR, QN}, OP, PS, S}(basespace(hilbert_space), ladder)
     end
 end
 
@@ -52,8 +54,9 @@ function embed(
     hilbert_space::HilbertSpaceSector{ParticleHilbertSpace{PS, BR, QN}, QN},
     ladder::AbstractParticleLadder{PS, S},
 ) where {PS, BR, QN, S}
-    return ParticleLadderOperatorEmbedding(hilbert_space, ladder)
+    return ParticleLadderOperatorEmbedding(basespace(hilbert_space), ladder)
 end
+
 
 get_space(arg::ParticleLadderOperatorEmbedding) = basespace(arg.hilbert_space)
 get_ladder(arg::ParticleLadderOperatorEmbedding) = arg.ladder
