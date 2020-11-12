@@ -1,5 +1,6 @@
 export ParticleSector, ParticleIndex
 
+import ExactDiagonalization
 import ExactDiagonalization.bitwidth
 import ExactDiagonalization.compress
 import ExactDiagonalization.extract

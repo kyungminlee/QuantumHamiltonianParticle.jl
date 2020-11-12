@@ -1,3 +1,5 @@
+include("test_util.jl")
+
 include("test_particle.jl")
 include("test_site.jl")
 include("test_hilbert.jl")
