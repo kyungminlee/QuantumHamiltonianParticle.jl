@@ -16,6 +16,8 @@ include("test_proj_promotion.jl")
 
 include("test_symmetry_apply.jl")
 
+include("test_prettyprint.jl")
+
 include("test_hubbard.jl")
 
 # include("test_spinless_fermion.jl")
