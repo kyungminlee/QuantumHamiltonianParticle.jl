@@ -1,4 +1,4 @@
-export prettyprint, prettyprintln
+export prettyprint
 import ExactDiagonalization.prettyprintln
 
 prettyprintln(xs...) = prettyprintln(stdout::IO, xs...)
@@ -26,7 +26,7 @@ function prettyprint(io::IO, arg::ParticleLadderSum)
         print(io, "0")
     else
         t, a = arg.terms[1]
-        print("(", a, ")")
+        print(io, "(", a, ")")
         if !isempty(t.factors)
             print(io, "⋅")
             prettyprint(io, t)
