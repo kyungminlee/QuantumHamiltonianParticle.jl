@@ -31,6 +31,12 @@ struct Boson{Species, Max}<:AbstractParticle
     Boson{Species, Max}() where {Species, Max} = new{Species, Max}()
 end
 
+
+"""
+    Spin{Species, N}
+
+Spin type. S⁺ is annihilation, and S⁻ is creation.
+"""
 struct Spin{Species, N}<:AbstractParticle
     Spin(species::Symbol, max::Integer) = new{species, max}()
     Spin(species::AbstractString, max::Integer) = new{Symbol(species), max}()
