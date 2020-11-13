@@ -36,12 +36,14 @@ function ExactDiagonalization.simplify(
     end
 end
 
+
 function ExactDiagonalization.simplify(
     x::ParticleProjectorSumOperator{BR, S};
     tol::Real=Base.rtoldefault(real(S))
 ) where {BR, S}
     PPUO = ParticleProjectorUnitOperator{BR, S}
     PPSO = ParticleProjectorSumOperator{BR, S}
+
     terms::Vector{PPUO} = filter(x -> !iszero(x), simplify.(x.terms))
     isempty(terms) && return zero(PPUO)
 
@@ -60,9 +62,7 @@ function ExactDiagonalization.simplify(
         if (bm == t.bitmask) && (br == t.bitrow) && (bc == t.bitcol) && (pbm == t.parity_bitmask)
             am += t.amplitude
         else
-            if !isapprox(am, zero(S); atol=tol)
-                push!(new_terms, PPUO(bm, br, bc, pbm, am))
-            end
+            !isapprox(am, zero(S); atol=tol) && push!(new_terms, PPUO(bm, br, bc, pbm, am))
             bm = t.bitmask
             br = t.bitrow
             bc = t.bitcol
@@ -71,13 +71,9 @@ function ExactDiagonalization.simplify(
         end
     end
 
-    if !isapprox(am, zero(S); atol=tol)
-        push!(new_terms, ParticleProjectorUnitOperator(bm, br, bc, pbm, am))
-    end
+    !isapprox(am, zero(S); atol=tol) && push!(new_terms, PPUO(bm, br, bc, pbm, am))
 
-    if isempty(new_terms)
-        return NullOperator()
-    end
+    isempty(new_terms) && return NullOperator()
 
     R = real(S)
     if S <: Complex && isapprox(maximum(abs(imag(t.amplitude)) for t in new_terms), zero(R); atol=tol)
