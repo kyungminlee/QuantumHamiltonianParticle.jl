@@ -16,13 +16,25 @@ import ExactDiagonalization.compress
 """
     ParticleState{PS, BR, QN}
 
+A state, represented by particle occupation.
 """
 struct ParticleState{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:AbstractQuantumNumber}}}
     name::String
     occupancy_binary::BR
-    # occupancy::Vector{Int}
     quantum_number::QN
 
+    @doc """
+        ParticleState(::Type{PS}, name, occvec, quantum_number, ::Type{BR}=UInt)
+
+    Create a particle state
+
+    # Arguments
+    - `PS`: particle sector
+    - `name`: name of the state
+    - `occvec::AbstractVector{<:Integer}`: occupation Vector
+    - `quantum_number`: quantum number (tuple or integer)
+    - `BR`: binary type
+    """
     function ParticleState(
         ::Type{PS},
         name::AbstractString,
@@ -38,6 +50,17 @@ struct ParticleState{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstra
         new{PS, BR, QN}(name, occbin, quantum_number)
     end
 
+    @doc """
+        ParticleState(::Type{PS}, name, occvec, ::Type{BR}=UInt)
+
+    Create a particle state with no quantum number.
+
+    # Arguments
+    - `PS`: particle sector
+    - `name`: name of the state
+    - `occvec::AbstractVector{<:Integer}`: occupation Vector
+    - `BR`: binary type
+    """
     function ParticleState(
         ::Type{PS},
         name::AbstractString,
@@ -70,6 +93,16 @@ qntype(::Type{ParticleState{PS, BR, QN}}) where {PS, BR, QN} = QN
 
 
 # decorated with particle
+"""
+    ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:AbstractQuantumNumber}}}
+
+Particle site.
+
+# Example
+```
+ParticleSite([state1, state2, state3, state4])
+```
+"""
 struct ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:AbstractQuantumNumber}}}
     states::Vector{ParticleState{PS, BR, QN}}
     state_lookup::Dict{BR, Int}
