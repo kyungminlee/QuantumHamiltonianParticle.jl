@@ -49,24 +49,10 @@ hamiltonian = embed(hs, -t * hopping_nn - tp * hopping_2nn + U * interaction)
 hsr = represent(hs)
 hamrep = represent(hsr, hamiltonian)
 
+hamiltonian_proj = make_projector_operator(hamiltonian)
+hamrep_proj = represent(hsr, hamiltonian_proj)
 
-#hamiltonian_proj = make_projector_operator(hs, hamiltonian)
+matrix = Matrix(hamrep)
+matrix_proj = Matrix(hamrep_proj)
 
-# matrix = zeros(Float64, (2^(nsites*2), 2^(nsites*2)))
-# for bcol in UInt(0):UInt(1<<(2*nsites)-1)
-#     iter = get_column_iterator(hamiltonian_proj, bcol)
-#     for (brow, ampl) in iter
-#         matrix[brow+1, bcol+1] += ampl
-#     end
-# end
-
-# println("Fermion")
-# @show minimum(eigvals(Hermitian(matrix)));
-
-# hss = HilbertSpaceSector(hs, [(4, 0)])
-# hssr = represent(hss)
-
-# h_rep = represent(hssr, hamiltonian_proj) # DOES IT TAKE FERMION SIGN INTO ACCOUNT?
-# h_sp = Matrix(h_rep)
-
-# @show minimum(eigvals(Hermitian(h_sp)));
+@show maximum(abs2.(matrix - matrix_proj))
