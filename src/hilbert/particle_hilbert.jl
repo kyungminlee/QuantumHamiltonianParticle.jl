@@ -23,6 +23,16 @@ import ExactDiagonalization.hs_get_basis_list
 
 
 # Add a decoration to the existing Hilbert space
+"""
+    ParticleHilbertSpace{PS, BR, QN} <: AbstractHilbertSpace{QN}
+
+Particle Hilbert space.
+
+# Example
+```
+ParticleHilbertSpace([site1, site2, site3, site4])
+```
+"""
 struct ParticleHilbertSpace{
         PS<:ParticleSector,
         BR<:Unsigned,

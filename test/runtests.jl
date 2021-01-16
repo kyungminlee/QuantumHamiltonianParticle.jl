@@ -1,3 +1,5 @@
+include("test_util.jl")
+
 include("test_particle.jl")
 include("test_site.jl")
 include("test_hilbert.jl")
@@ -13,6 +15,8 @@ include("test_proj.jl")
 include("test_proj_promotion.jl")
 
 include("test_symmetry_apply.jl")
+
+include("test_prettyprint.jl")
 
 include("test_hubbard.jl")
 

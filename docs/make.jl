@@ -16,4 +16,7 @@ makedocs(
     ]
 )
 
-deploydocs(repo="github.com/kyungminlee/Particle.jl.git", devbranch = "dev")
+deploydocs(;
+    repo="github.com/kyungminlee/Particle.jl.git",
+    devbranch="dev"
+)

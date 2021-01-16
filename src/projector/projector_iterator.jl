@@ -32,21 +32,6 @@ function get_column_iterator(
 end
 
 
-function get_column_iterator(sumop::ParticleProjectorSumOperator{BR, S}, bcol::BR2) where {S, BR<:Unsigned, BR2<:Unsigned}
-    let bcol::BR = BR(bcol),
-        terms::Vector{ParticleProjectorUnitOperator{BR, S}} = sumop.terms
-        match(pureop::ParticleProjectorUnitOperator{BR, S})::Bool = (bcol & pureop.bitmask) == pureop.bitcol
-        function element(pureop::ParticleProjectorUnitOperator{BR, S})::Pair{BR, S}
-            isparityeven = mod(count_ones(bcol & pureop.parity_bitmask), 2) == 0
-            brow = (bcol & ~pureop.bitmask) | pureop.bitrow
-            ampl = isparityeven ? pureop.amplitude : -pureop.amplitude
-            return brow => ampl
-        end
-        return (element(t) for t in terms if match(t))
-    end
-end
-
-
 function get_row_iterator(sumop::ParticleProjectorSumOperator{BR, S}, brow::BR2) where {S, BR<:Unsigned, BR2<:Unsigned}
     let brow::BR = BR(brow),
         terms::Vector{ParticleProjectorUnitOperator{BR, S}} = sumop.terms
@@ -56,6 +41,21 @@ function get_row_iterator(sumop::ParticleProjectorSumOperator{BR, S}, brow::BR2)
             bcol = (brow & ~pureop.bitmask) | pureop.bitcol
             ampl = isparityeven ? pureop.amplitude : -pureop.amplitude
             return bcol => ampl
+        end
+        return (element(t) for t in terms if match(t))
+    end
+end
+
+
+function get_column_iterator(sumop::ParticleProjectorSumOperator{BR, S}, bcol::BR2) where {S, BR<:Unsigned, BR2<:Unsigned}
+    let bcol::BR = BR(bcol),
+        terms::Vector{ParticleProjectorUnitOperator{BR, S}} = sumop.terms
+        match(pureop::ParticleProjectorUnitOperator{BR, S})::Bool = (bcol & pureop.bitmask) == pureop.bitcol
+        function element(pureop::ParticleProjectorUnitOperator{BR, S})::Pair{BR, S}
+            isparityeven = mod(count_ones(bcol & pureop.parity_bitmask), 2) == 0
+            brow = (bcol & ~pureop.bitmask) | pureop.bitrow
+            ampl = isparityeven ? pureop.amplitude : -pureop.amplitude
+            return brow => ampl
         end
         return (element(t) for t in terms if match(t))
     end
