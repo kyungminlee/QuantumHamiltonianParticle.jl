@@ -2,7 +2,7 @@
 
 | **Documentation** | **Build Status** | **Code Coverage** |
 |:-----------------:|:----------------:|:-----------------:|
-| [![**STABLE**][docs-stable-img]][docs-stable-url] [![**DEV**][docs-dev-img]][docs-dev-url] | [![Build Status][githubaction-img]][githubaction-url] | [![Code Coverage][codecov-img]][codecov-url] [![Code Coverage][coveralls-img]][coveralls-url] |
+| [![**STABLE**][docs-stable-img]][docs-stable-url] [![**DEV**][docs-dev-img]][docs-dev-url] | [![Build][githubaction-img]][githubaction-url] | [![Code Coverage][codecov-img]][codecov-url] |
 
 Particle extension to [`ExactDiagonalization.jl`](https://github.com/kyungminlee/ExactDiagonalization.jl).
 
