@@ -1,7 +1,7 @@
 using Test
 using LatticeTools
-using ExactDiagonalization
-using Particle
+using QuantumHamiltonian
+using QuantumHamiltonianParticle
 
 @testset "hilbert" begin
     p = ParticleSector(Boson(:m, 2), Fermion(:f))
@@ -115,7 +115,7 @@ using Particle
 
     @test keys(hilbert) == CartesianIndices((1:6, 1:6, 1:6))
 
-    basis_list = ExactDiagonalization.hs_get_basis_list(hilbert)
+    basis_list = QuantumHamiltonian.hs_get_basis_list(hilbert)
     @test basis_list == [
         0b000000000, 0b000000001, 0b000000010, 0b000000100, 0b000000101, 0b000000110,
         0b000001000, 0b000001001, 0b000001010, 0b000001100, 0b000001101, 0b000001110,
@@ -155,5 +155,5 @@ using Particle
         0b110110000, 0b110110001, 0b110110010, 0b110110100, 0b110110101, 0b110110110,
     ]
     @test length(basis_list) == 6^3
-    @test_throws ArgumentError ExactDiagonalization.hs_get_basis_list(hilbert, UInt8)
+    @test_throws ArgumentError QuantumHamiltonian.hs_get_basis_list(hilbert, UInt8)
 end

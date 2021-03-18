@@ -6,11 +6,11 @@ export exchangesign
 export isfermion, isboson, isspin
 export maxoccupancy
 
-import ExactDiagonalization.bitwidth
-import ExactDiagonalization.bitoffset
-import ExactDiagonalization.compress
-import ExactDiagonalization.extract
-import ExactDiagonalization.get_bitmask
+import QuantumHamiltonian.bitwidth
+import QuantumHamiltonian.bitoffset
+import QuantumHamiltonian.compress
+import QuantumHamiltonian.extract
+import QuantumHamiltonian.get_bitmask
 
 
 struct Fermion{Species}<:AbstractParticle

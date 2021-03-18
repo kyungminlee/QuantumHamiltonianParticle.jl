@@ -1,7 +1,7 @@
 using LatticeTools
 
-# import ExactDiagonalization.AbstractSymmetryOperation
-import ExactDiagonalization.symmetry_apply
+# import QuantumHamiltonian.AbstractSymmetryOperation
+import QuantumHamiltonian.symmetry_apply
 
 # === With Hilbert Space ===
 function symmetry_apply(
@@ -32,7 +32,7 @@ function symmetry_apply(permutation::SitePermutation, op::ParticleLadderOperator
 end
 
 
-import ExactDiagonalization.isinvariant
+import QuantumHamiltonian.isinvariant
 
 function isinvariant(permutation::SitePermutation, op::AbstractParticleOperator)
     return iszero(simplify(symmetry_apply(permutation, op) - op))

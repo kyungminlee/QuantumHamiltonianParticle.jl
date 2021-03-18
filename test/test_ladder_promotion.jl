@@ -1,5 +1,5 @@
 using Test
-using Particle
+using QuantumHamiltonianParticle
 
 @testset "Promotion" begin
     p = ParticleSector(Fermion(:f), HardcoreBoson(:b))

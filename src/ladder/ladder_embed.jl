@@ -2,14 +2,14 @@ export ParticleLadderOperatorEmbedding
 
 import LatticeTools.embed
 
-import ExactDiagonalization.get_row_iterator
-import ExactDiagonalization.get_column_iterator
-import ExactDiagonalization.get_element
+import QuantumHamiltonian.get_row_iterator
+import QuantumHamiltonian.get_column_iterator
+import QuantumHamiltonian.get_element
 
-import ExactDiagonalization.get_space
+import QuantumHamiltonian.get_space
 export get_ladder
 
-import ExactDiagonalization.simplify
+import QuantumHamiltonian.simplify
 
 
 struct ParticleLadderOperatorEmbedding{
@@ -74,7 +74,7 @@ function Base.:(==)(lhs::O, rhs::O) where {O<:ParticleLadderOperatorEmbedding}
     return (get_space(lhs) == get_space(rhs)) && (lhs.ladder == rhs.ladder)
 end
 
-function ExactDiagonalization.isequiv(
+function QuantumHamiltonian.isequiv(
     lhs::ParticleLadderOperatorEmbedding{H, L, P, S1},
     rhs::ParticleLadderOperatorEmbedding{H, L, P, S2},
 ) where {H, L, P, S1, S2}

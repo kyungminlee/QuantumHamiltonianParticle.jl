@@ -1,7 +1,7 @@
 using Test
-using Particle
+using QuantumHamiltonianParticle
 using LatticeTools
-using ExactDiagonalization
+using QuantumHamiltonian
 
 
 @testset "state-site" begin

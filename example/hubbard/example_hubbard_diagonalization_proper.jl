@@ -1,7 +1,7 @@
 using Test
 using LatticeTools
-using ExactDiagonalization
-using Particle
+using QuantumHamiltonian
+using QuantumHamiltonianParticle
 using LinearAlgebra
 
 @testset begin

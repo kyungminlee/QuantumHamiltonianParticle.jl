@@ -1,4 +1,4 @@
-import ExactDiagonalization.simplify
+import QuantumHamiltonian.simplify
 
 
 function Base.isless(
@@ -21,7 +21,7 @@ function Base.isless(
 end
 
 
-function ExactDiagonalization.simplify(
+function QuantumHamiltonian.simplify(
     x::ParticleProjectorUnitOperator{BR, S},
     tol::Real=Base.rtoldefault(real(S))
 ) where {BR, S}
@@ -37,7 +37,7 @@ function ExactDiagonalization.simplify(
 end
 
 
-function ExactDiagonalization.simplify(
+function QuantumHamiltonian.simplify(
     x::ParticleProjectorSumOperator{BR, S};
     tol::Real=Base.rtoldefault(real(S))
 ) where {BR, S}

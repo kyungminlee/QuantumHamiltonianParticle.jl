@@ -2,9 +2,9 @@ using Test
 using LinearAlgebra
 using Random
 
-using ExactDiagonalization
+using QuantumHamiltonian
 using LatticeTools
-using Particle
+using QuantumHamiltonianParticle
 
 @testset "ParticleLadderEmbedding" begin
     p = ParticleSector(Boson(:m, 2), Fermion(:f))

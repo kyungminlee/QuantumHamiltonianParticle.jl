@@ -1,10 +1,10 @@
-# Particle Sector
+# QuantumHamiltonianParticle Sector
 
 ## Particle Types
 
 ```@meta
 DocTestSetup = quote
-    using Particle
+    using QuantumHamiltonianParticle
 end
 ```
 
@@ -39,7 +39,7 @@ julia> exchangesign(f), exchangesign(b), exchangesign(h), exchangesign(s)
 julia> maxoccupancy(f), maxoccupancy(b), maxoccupancy(h), maxoccupancy(s)
 (1, 10, 1, 2)
 
-julia> using ExactDiagonalization
+julia> using QuantumHamiltonian
 
 julia> bitwidth(f), bitwidth(b), bitwidth(h), bitwidth(s)
 (1, 4, 1, 2)
@@ -72,7 +72,7 @@ Symbol("e↑")
 julia> exchangesign(particle_sector, 1)
 -1
 
-julia> using ExactDiagonalization
+julia> using QuantumHamiltonian
 
 julia> bitwidth(particle_sector)
 2
@@ -92,8 +92,8 @@ julia> bitoffset(particle_sector)
 
 ```@meta
 DocTestSetup = quote
-    using Particle
-    using ExactDiagonalization
+    using QuantumHamiltonianParticle
+    using QuantumHamiltonian
     electron_up, electron_dn = Fermion("e↑"), Fermion("e↓")
     particle_sector = ParticleSector(electron_up, electron_dn)
 end

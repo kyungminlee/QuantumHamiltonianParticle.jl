@@ -1,5 +1,5 @@
-using ExactDiagonalization
-using Particle
+using QuantumHamiltonian
+using QuantumHamiltonianParticle
 using Test
 using LinearAlgebra
 

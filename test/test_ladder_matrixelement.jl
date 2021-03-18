@@ -1,5 +1,5 @@
 using Test
-using Particle
+using QuantumHamiltonianParticle
 
 @testset "ladder particle" begin
 

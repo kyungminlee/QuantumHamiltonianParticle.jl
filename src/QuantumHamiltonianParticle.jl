@@ -1,6 +1,6 @@
-module Particle
+module QuantumHamiltonianParticle
 
-using ExactDiagonalization
+using QuantumHamiltonian
 
 include("util.jl")
 

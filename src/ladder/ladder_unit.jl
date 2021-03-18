@@ -90,8 +90,8 @@ LinearAlgebra.ishermitian(arg::ParticleLadderUnit) = false
 
 
 #=
-import ExactDiagonalization.apply
-import ExactDiagonalization.apply!
+import QuantumHamiltonian.apply
+import QuantumHamiltonian.apply!
 
 function apply!(
     out::SparseState{S1, BR},

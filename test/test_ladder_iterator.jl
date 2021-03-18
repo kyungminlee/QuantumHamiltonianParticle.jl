@@ -1,7 +1,7 @@
 using Test
 using LinearAlgebra
-using ExactDiagonalization
-using Particle
+using QuantumHamiltonian
+using QuantumHamiltonianParticle
 using Random
 
 @testset "Ladder Iterator" begin

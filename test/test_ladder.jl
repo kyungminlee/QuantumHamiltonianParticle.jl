@@ -1,6 +1,6 @@
 using Test
 using LinearAlgebra
-using Particle
+using QuantumHamiltonianParticle
 
 @testset "ladder" begin
     p = ParticleSector(Boson(:m, 2), Fermion(:f))

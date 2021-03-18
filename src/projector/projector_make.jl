@@ -1,6 +1,6 @@
 export make_projector_operator
 
-import ExactDiagonalization.get_space
+import QuantumHamiltonian.get_space
 
 function make_projector_operator(
     hs::ParticleHilbertSpace{PS, BR, QN},

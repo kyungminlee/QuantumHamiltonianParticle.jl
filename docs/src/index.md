@@ -1,5 +1,5 @@
-# Particle
+# QuantumHamiltonianParticle
 
 ## Overview
 
-`Particle.jl` is an extension to [`ExactDiagonalization.jl`](https://github.com/kyungminlee/ExactDiagonalization.jl).
+`QuantumHamiltonianParticle.jl` is an extension to [`QuantumHamiltonian.jl`](https://github.com/kyungminlee/QuantumHamiltonian.jl).

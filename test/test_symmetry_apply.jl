@@ -1,7 +1,7 @@
 using Test
-using Particle
+using QuantumHamiltonianParticle
 using LatticeTools
-using ExactDiagonalization
+using QuantumHamiltonian
 
 @testset "symmetry" begin
     permutation = SitePermutation([2,3,1])  # 1->2, 2->3, 3->1

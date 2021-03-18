@@ -1,7 +1,7 @@
-import ExactDiagonalization.apply
-import ExactDiagonalization.get_row_iterator
-import ExactDiagonalization.get_column_iterator
-import ExactDiagonalization.get_element
+import QuantumHamiltonian.apply
+import QuantumHamiltonian.get_row_iterator
+import QuantumHamiltonian.get_column_iterator
+import QuantumHamiltonian.get_element
 
 function get_row_iterator(
     hs::ParticleHilbertSpace{PS, BR, QN},

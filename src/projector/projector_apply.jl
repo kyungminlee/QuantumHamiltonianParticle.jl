@@ -1,4 +1,4 @@
-import ExactDiagonalization.apply!
+import QuantumHamiltonian.apply!
 
 function apply!(
     out::SparseState{S1, BR},
