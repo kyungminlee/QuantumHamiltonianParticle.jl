@@ -1,8 +1,8 @@
 # Compare two particle representation vs one particle representation
 
 using LatticeTools
-using ExactDiagonalization
-using Particle
+using QuantumHamiltonian
+using QuantumHamiltonianParticle
 
 using LinearAlgebra
 

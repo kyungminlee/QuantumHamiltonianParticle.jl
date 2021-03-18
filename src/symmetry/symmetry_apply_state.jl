@@ -1,5 +1,5 @@
 using LatticeTools
-import ExactDiagonalization.symmetry_apply
+import QuantumHamiltonian.symmetry_apply
 
 function symmetry_apply(
     phs::ParticleHilbertSpace,

@@ -1,12 +1,12 @@
 export ParticleSector, ParticleIndex
 
-import ExactDiagonalization
-import ExactDiagonalization.bitwidth
-import ExactDiagonalization.compress
-import ExactDiagonalization.extract
-import ExactDiagonalization.get_bitmask
+import QuantumHamiltonian
+import QuantumHamiltonian.bitwidth
+import QuantumHamiltonian.compress
+import QuantumHamiltonian.extract
+import QuantumHamiltonian.get_bitmask
 
-import ExactDiagonalization.bitoffset
+import QuantumHamiltonian.bitoffset
 export numspecies, speciescount, getspecies, getspeciesname
 
 

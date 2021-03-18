@@ -1,7 +1,7 @@
 export ParticleLadderProduct
 
 import LinearAlgebra
-import ExactDiagonalization.isequiv
+import QuantumHamiltonian.isequiv
 
 struct ParticleLadderProduct{PS, P, O}<:AbstractParticleLadder{PS, Int}
     factors::Vector{ParticleLadderUnit{PS, P, O}}

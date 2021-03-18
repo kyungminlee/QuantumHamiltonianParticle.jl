@@ -1,10 +1,10 @@
 using Documenter
-using Particle
+using QuantumHamiltonianParticle
 
 makedocs(
-    modules=[Particle],
+    modules=[QuantumHamiltonianParticle],
     doctest=true,
-    sitename="Particle.jl",
+    sitename="QuantumHamiltonianParticle.jl",
     format=Documenter.HTML(prettyurls=!("local" in ARGS)),
     authors="Kyungmin Lee",
     checkdocs=:all,
@@ -17,6 +17,6 @@ makedocs(
 )
 
 deploydocs(;
-    repo="github.com/kyungminlee/Particle.jl.git",
+    repo="github.com/kyungminlee/QuantumHamiltonianParticle.jl.git",
     devbranch="dev"
 )

@@ -1,9 +1,9 @@
-# using ExactDiagonalization
+# using QuantumHamiltonian
 
 # export AbstractParticleOperator
 
 # export ParticleProjectorSumOperator
-# import ExactDiagonalization.represent
+# import QuantumHamiltonian.represent
 
 # import Base.zero, Base.one
 # import Base.*, Base./, Base.\, Base.//, Base.÷

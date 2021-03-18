@@ -1,16 +1,16 @@
 export ParticleState
 export ParticleSite
 
-using ExactDiagonalization
-import ExactDiagonalization.bitwidth
-import ExactDiagonalization.qntype
-import ExactDiagonalization.dimension
-import ExactDiagonalization.bitwidth
-import ExactDiagonalization.get_state
-import ExactDiagonalization.get_state_index
-import ExactDiagonalization.get_quantum_number
-import ExactDiagonalization.quantum_number_sectors
-import ExactDiagonalization.compress
+using QuantumHamiltonian
+import QuantumHamiltonian.bitwidth
+import QuantumHamiltonian.qntype
+import QuantumHamiltonian.dimension
+import QuantumHamiltonian.bitwidth
+import QuantumHamiltonian.get_state
+import QuantumHamiltonian.get_state_index
+import QuantumHamiltonian.get_quantum_number
+import QuantumHamiltonian.quantum_number_sectors
+import QuantumHamiltonian.compress
 
 
 """

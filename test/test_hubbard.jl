@@ -1,6 +1,6 @@
-using ExactDiagonalization
+using QuantumHamiltonian
 using LatticeTools
-using Particle
+using QuantumHamiltonianParticle
 using Test
 using LinearAlgebra
 

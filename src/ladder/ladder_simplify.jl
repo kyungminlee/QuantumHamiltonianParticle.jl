@@ -1,7 +1,7 @@
 export normal_order, simplify
 export unify_type
 
-import ExactDiagonalization.simplify
+import QuantumHamiltonian.simplify
 
 # struct LocalNormalOrdering <: Ordering end
 # struct NormalOrdering <: Ordering end

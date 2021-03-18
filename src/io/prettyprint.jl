@@ -1,5 +1,5 @@
 export prettyprint
-import ExactDiagonalization.prettyprintln
+import QuantumHamiltonian.prettyprintln
 
 prettyprintln(xs...) = prettyprintln(stdout::IO, xs...)
 prettyprint(xs...) = prettyprint(stdout::IO, xs...)

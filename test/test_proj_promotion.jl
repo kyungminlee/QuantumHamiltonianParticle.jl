@@ -1,6 +1,6 @@
 using Test
-using Particle
-using ExactDiagonalization
+using QuantumHamiltonianParticle
+using QuantumHamiltonian
 
 @testset "test projection" begin
     p1 = ParticleProjectorUnitOperator(0b0101, 0b0001, 0b0100, 0b0010, 2)

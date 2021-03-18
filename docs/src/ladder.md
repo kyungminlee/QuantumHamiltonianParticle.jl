@@ -2,7 +2,7 @@
 
 ```@meta
 DocTestSetup = quote
-    using Particle
+    using QuantumHamiltonianParticle
     electron_up, electron_dn = Fermion("e↑"), Fermion("e↓")
     particle_sector = ParticleSector(electron_up, electron_dn)
     cup(i) = ParticleLadderUnit(particle_sector, 1, i, ANNIHILATION)
@@ -14,7 +14,7 @@ end
 
 Set up
 ```
-using Particle
+using QuantumHamiltonianParticle
 electron_up, electron_dn = Fermion("e↑"), Fermion("e↓")
 particle_sector = ParticleSector(electron_up, electron_dn)
 cup(i) = ParticleLadderUnit(particle_sector, 1, i, ANNIHILATION)
@@ -63,7 +63,7 @@ julia> prettyprintln(cup(1))
 
 ```@meta
 DocTestSetup = quote
-    using Particle
+    using QuantumHamiltonianParticle
     electron_up, electron_dn = Fermion("e↑"), Fermion("e↓")
     particle_sector = ParticleSector(electron_up, electron_dn)
     cup(i) = ParticleLadderUnit(particle_sector, 1, i, ANNIHILATION)

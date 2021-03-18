@@ -1,9 +1,9 @@
 using Test
-using Particle
+using QuantumHamiltonianParticle
 
 @testset "util" begin
     @testset "tuple" begin
-        P = Particle
+        P = QuantumHamiltonianParticle
         t1 = (1.0, 2, 3.0 + 4im)
         T1 = typeof(t1)
         @test P.tuplelength(T1)  === 3

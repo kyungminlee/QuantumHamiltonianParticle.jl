@@ -1,7 +1,7 @@
 using Test
 using LatticeTools
-using Particle
-using ExactDiagonalization
+using QuantumHamiltonianParticle
+using QuantumHamiltonian
 
 @testset "repconv" begin
     p = ParticleSector(Boson(:m, 2), Fermion(:f))

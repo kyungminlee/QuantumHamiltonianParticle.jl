@@ -1,6 +1,6 @@
 using Test
-using Particle
-using ExactDiagonalization
+using QuantumHamiltonianParticle
+using QuantumHamiltonian
 
 @testset "prettyprint" begin
 

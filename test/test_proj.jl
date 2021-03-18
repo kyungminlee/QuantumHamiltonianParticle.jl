@@ -3,8 +3,8 @@ using Random
 using LinearAlgebra
 
 using LatticeTools
-using ExactDiagonalization
-using Particle
+using QuantumHamiltonian
+using QuantumHamiltonianParticle
 
 
 @testset "Particle Projector Operators" begin

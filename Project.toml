@@ -1,10 +1,10 @@
-name = "Particle"
-uuid = "76d689ba-cd5d-4c41-ab5a-af133e796eec"
+name = "QuantumHamiltonianParticle"
+uuid = "e0af54e9-8e56-4866-a784-1fe532970838"
 authors = ["Kyungmin Lee <kyungmin.lee.42@gmail.com>"]
 version = "0.1.3"
 
 [deps]
-ExactDiagonalization = "cf149b0a-e8f7-4f00-9ab4-03e4f5ec5cff"
+QuantumHamiltonian = "ca2024c7-d5ca-47dc-aafc-db87cbdab76e"
 LatticeTools = "8a267902-5e0e-44c3-8ef8-9b2b5c352816"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 

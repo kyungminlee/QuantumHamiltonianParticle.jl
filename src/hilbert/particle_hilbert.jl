@@ -1,5 +1,5 @@
-using ExactDiagonalization
-import ExactDiagonalization.get_bitmask
+using QuantumHamiltonian
+import QuantumHamiltonian.get_bitmask
 
 export ParticleHilbertSpace
 
@@ -7,19 +7,19 @@ export get_parity_bitmask
 export get_fermion_parity
 export get_occupancy, set_occupancy
 
-import ExactDiagonalization.AbstractHilbertSpace
+import QuantumHamiltonian.AbstractHilbertSpace
 
-import ExactDiagonalization.scalartype
-import ExactDiagonalization.qntype
-import ExactDiagonalization.basespace
-import ExactDiagonalization.bitwidth
-import ExactDiagonalization.bitoffset
-import ExactDiagonalization.get_bitmask
-import ExactDiagonalization.quantum_number_sectors
-import ExactDiagonalization.get_quantum_number
-import ExactDiagonalization.compress
-import ExactDiagonalization.extract
-import ExactDiagonalization.hs_get_basis_list
+import QuantumHamiltonian.scalartype
+import QuantumHamiltonian.qntype
+import QuantumHamiltonian.basespace
+import QuantumHamiltonian.bitwidth
+import QuantumHamiltonian.bitoffset
+import QuantumHamiltonian.get_bitmask
+import QuantumHamiltonian.quantum_number_sectors
+import QuantumHamiltonian.get_quantum_number
+import QuantumHamiltonian.compress
+import QuantumHamiltonian.extract
+import QuantumHamiltonian.hs_get_basis_list
 
 
 # Add a decoration to the existing Hilbert space

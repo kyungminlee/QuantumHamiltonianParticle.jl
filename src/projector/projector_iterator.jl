@@ -1,5 +1,5 @@
-import ExactDiagonalization.get_column_iterator
-import ExactDiagonalization.get_row_iterator
+import QuantumHamiltonian.get_column_iterator
+import QuantumHamiltonian.get_row_iterator
 
 
 function get_row_iterator(
