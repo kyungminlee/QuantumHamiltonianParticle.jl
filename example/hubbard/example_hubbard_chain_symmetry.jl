@@ -58,7 +58,7 @@ addsite!(unitcell, "A", FractCoord([0], [0.0]))
 
 lattice = makelattice(unitcell, 4)
 
-tsym = TranslationSymmetry(lattice)
+tsym = FiniteTranslationSymmetry(lattice)
 tsymbed = embed(lattice, tsym)
 
 for tic in get_irrep_components(tsymbed)
@@ -67,4 +67,4 @@ for tic in get_irrep_components(tsymbed)
     end
 end
 
-#tsym = TranslationSymmetry(4*ones(Int, (1,1)))
+#tsym = FiniteTranslationSymmetry(4*ones(Int, (1,1)))
