@@ -27,7 +27,7 @@ cdndag(i) = ParticleLadderUnit(particle_sector, 2, i, CREATION)
 
 ```jldoctest
 julia> cup(10)
-ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(1, 10, ANNIHILATION)
+ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(1, 10, ANNIHILATION)
 
 julia> cup(10) == cup(10)
 true
@@ -48,7 +48,7 @@ julia> iszero(cup(1))
 false
 
 julia> adjoint(cup(10))
-ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(1, 10, CREATION)
+ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(1, 10, CREATION)
 
 julia> using LinearAlgebra
 
@@ -75,10 +75,10 @@ end
 
 ```jldoctest
 julia> cupdag(3) * cup(1)
-ParticleLadderProduct{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}[ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(1, 3, CREATION), ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(1, 1, ANNIHILATION)])
+ParticleLadderProduct{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}[ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(1, 3, CREATION), ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(1, 1, ANNIHILATION)])
 
 julia> adjoint(cupdag(3) * cup(1))
-ParticleLadderProduct{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}[ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(1, 1, CREATION), ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}},Int64,Int64}(1, 3, ANNIHILATION)])
+ParticleLadderProduct{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}[ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(1, 1, CREATION), ParticleLadderUnit{ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}, Int64, Int64}(1, 3, ANNIHILATION)])
 
 julia> using LinearAlgebra
 

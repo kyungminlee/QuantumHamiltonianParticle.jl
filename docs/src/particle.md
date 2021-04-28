@@ -13,13 +13,13 @@ julia> f = Fermion("f")
 Fermion{:f}()
 
 julia> b = Boson("m", 10)
-Boson{:m,10}()
+Boson{:m, 10}()
 
 julia> h = HardcoreBoson("h")
 HardcoreBoson{:h}()
 
 julia> s = Spin("s=1/2", 2)
-Spin{Symbol("s=1/2"),2}()
+Spin{Symbol("s=1/2"), 2}()
 
 julia> isboson(f), isfermion(f), isspin(f)
 (false, true, false)
@@ -52,7 +52,7 @@ julia> electron_up, electron_dn = Fermion("e↑"), Fermion("e↓")
 (Fermion{Symbol("e↑")}(), Fermion{Symbol("e↓")}())
 
 julia> particle_sector = ParticleSector(electron_up, electron_dn)
-ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}}()
+ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}()
 
 julia> numspecies(particle_sector)
 2
@@ -84,7 +84,7 @@ julia> bitoffset(particle_sector, 2)
 1
 
 julia> bitoffset(particle_sector)
-3-element Array{Int64,1}:
+3-element Vector{Int64}:
  0
  1
  2
@@ -101,7 +101,7 @@ end
 
 ```jldoctest
 julia> PS = typeof(particle_sector)
-ParticleSector{Tuple{Fermion{Symbol("e↑")},Fermion{Symbol("e↓")}}}
+ParticleSector{Tuple{Fermion{Symbol("e↑")}, Fermion{Symbol("e↓")}}}
 
 julia> get_bitmask(particle_sector, 2)
 0x0000000000000002
@@ -116,7 +116,7 @@ julia> compress(particle_sector, [1,1])
 0x0000000000000003
 
 julia> extract(particle_sector, 0x2)
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  0
  1
 ```
