@@ -39,10 +39,12 @@ include("projector/projector_apply.jl")
 
 include("projector/projector_simplify.jl")
 
-include("io/prettyprint.jl")
-
 include("symmetry/symmetry_apply_operator.jl")
 include("symmetry/symmetry_apply_state.jl")
+
+include("toolkit/toolkit.jl")
+
+include("io/prettyprint.jl")
 
 
 end # module
