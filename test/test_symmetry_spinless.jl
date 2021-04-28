@@ -17,10 +17,10 @@ using LinearAlgebra
     addsite!(unitcell, "fermion orbital", FractCoord([0], [0.0]))
     lattice = makelattice(unitcell, nsites)
 
-    tsym = TranslationSymmetry(lattice)
+    tsym = FiniteTranslationSymmetry(lattice)
     psym = project(PointSymmetryDatabase.get3d(2), [1 0 0;])
 
-    ssym = tsym ⋊ psym
+    ssym = SymmorphicSymmetry(tsym, psym)
     ssymbed = embed(lattice, ssym)
 
     hilbert_space = ParticleHilbertSpace([site for i in 1:nsites])

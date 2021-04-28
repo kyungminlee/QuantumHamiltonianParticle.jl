@@ -19,6 +19,7 @@ import QuantumHamiltonian.quantum_number_sectors
 import QuantumHamiltonian.get_quantum_number
 import QuantumHamiltonian.compress
 import QuantumHamiltonian.extract
+import QuantumHamiltonian.uncompress
 import QuantumHamiltonian.hs_get_basis_list
 
 
@@ -97,6 +98,11 @@ function quantum_number_sectors(phs::ParticleHilbertSpace{PS, BR, QN})::Vector{Q
 end
 
 
+"""
+    get_quantum_number(phs, bitrep)
+
+Get quantum number of the basis state `bitrep`.
+"""
 function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
     return mapreduce(
         identity,
@@ -111,6 +117,11 @@ function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
 end
 
 
+"""
+    get_quantum_number(phs, statevec)
+
+Get quantum number of the basis state `statevec`.
+"""
 function get_quantum_number(hs::ParticleHilbertSpace, statevec::AbstractVector{<:Integer})
     return mapreduce(identity, tupleadd,
         site.states[statevec[isite]].quantum_number
@@ -119,17 +130,39 @@ function get_quantum_number(hs::ParticleHilbertSpace, statevec::AbstractVector{<
 end
 
 
+"""
+    bitwidth(phs)
+
+Return number of bits needed to represent basis states of `phs`.
+"""
 bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
 
+
+"""
+    bitoffset(phs, iptl, isite)
+
+Get the bit offset of the particle `iptl` at site `isite`.
+"""
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
     return phs.bitoffsets[isite] + bitoffset(PS, iptl)
 end
 
+
+"""
+    bitoffset(phs, isite)
+"""
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
     return phs.bitoffsets[isite]
 end
 
 
+"""
+    get_bitmask(phs, [iptl, isite])
+
+Get the bit mask for the particles `iptl` at sites `isite`.
+`iptl` or `isite` can either be integer, a vector of integers, or colon `:`.
+Bitwise or is taken over list of iptl.
+"""
 function get_bitmask(
     phs::ParticleHilbertSpace{PS, BR, QN},
     iptl::Integer,
@@ -211,13 +244,16 @@ function get_bitmask(
     return make_bitmask(bitwidth(phs), BR)
 end
 
-# TODO(kyungminlee): Colon & AbstractVector
-
 function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, QN}
     return make_bitmask(bitwidth(phs), BR)
 end
 
 
+"""
+    get_parity_bitmask(phs, iptl, isite)
+
+Get parity bitmask (i.e. position of the Wigner-Jordan string). Nonzero only for fermions.
+"""
 function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
     if isfermion(getspecies(PS, iptl))
         bm_species = get_bitmask(hs, iptl, :)
@@ -230,6 +266,11 @@ function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer,
 end
 
 
+"""
+    get_occupancy(phs, iptl, isite, bvec::Unsigned)
+
+Get occupancy of particle `iptl` at site `isite` for the given basis state `bvec`.
+"""
 function get_occupancy(
     hs::ParticleHilbertSpace,
     iptl::Integer,
@@ -241,6 +282,11 @@ function get_occupancy(
 end
 
 
+"""
+    set_occupancy(phs, iptl, isite, bvec::Unsigned, count)
+
+Set occupancy of particle `iptl` at site `isite` for the given basis state `bvec` to `count`.
+"""
 function set_occupancy(
     hs::ParticleHilbertSpace{PS, BR, QN},
     iptl::Integer,
@@ -254,6 +300,16 @@ function set_occupancy(
 end
 
 
+"""
+    compress(hs, indexarray, [type])
+
+Return the binary representation of the basis state represented by `indexarray`, optionally in type `type`.
+
+# Arguments
+- `hs::ParticleHilbertSpace{PS, BR, QN}`
+- `indexarray::CartesianIndex`
+- `type::Type{BR2}=BR`
+"""
 function compress(
     hs::ParticleHilbertSpace{PS, BR, QN},
     indexarray::CartesianIndex,
@@ -263,9 +319,33 @@ function compress(
 end
 
 
+"""
+    extract(hs, occbin)
+
+Return the CartesianIndex representation of the basis state represented by `occbin`.
+
+# Arguments
+- `hs::ParticleHilbertSpace`
+- `occbin::Unsigned`
+"""
 function extract(hs::ParticleHilbertSpace, occbin::Unsigned)
     return CartesianIndex(occbin2statevec(hs, occbin)...)
 end
+
+
+"""
+    uncompress(hs, occbin)
+
+Return the CartesianIndex representation of the basis state represented by `occbin`.
+
+# Arguments
+- `hs::ParticleHilbertSpace`
+- `occbin::Unsigned`
+"""
+function uncompress(hs::ParticleHilbertSpace, occbin::Unsigned)
+    return CartesianIndex(occbin2statevec(hs, occbin)...)
+end
+
 
 
 function Base.keys(hs::ParticleHilbertSpace)

@@ -1,7 +1,7 @@
 name = "QuantumHamiltonianParticle"
 uuid = "e0af54e9-8e56-4866-a784-1fe532970838"
 authors = ["Kyungmin Lee <kyungmin.lee.42@gmail.com>"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 QuantumHamiltonian = "ca2024c7-d5ca-47dc-aafc-db87cbdab76e"
