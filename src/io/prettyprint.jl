@@ -1,5 +1,6 @@
-export prettyprint
 import QuantumHamiltonian.prettyprintln
+export prettyprint
+export prettyprintln
 
 prettyprintln(xs...) = prettyprintln(stdout::IO, xs...)
 prettyprint(xs...) = prettyprint(stdout::IO, xs...)
