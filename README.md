@@ -2,7 +2,7 @@
 
 | **Documentation** | **Build Status** | **Code Coverage** |
 |:-----------------:|:----------------:|:-----------------:|
-| [![**STABLE**][docs-stable-img]][docs-stable-url] [![**DEV**][docs-dev-img]][docs-dev-url] | [![Build][githubaction-img]][githubaction-url] | [![Code Coverage][codecov-img]][codecov-url] |
+| [![**STABLE**][docs-stable-img]][docs-stable-url] [![**DEV**][docs-dev-img]][docs-dev-url] | [![Build][githubaction-img]][githubaction-url] | [![Code Coverage][codecov-main-img]][codecov-url] [![Code Coverage][codecov-dev-img]][codecov-url] |
 
 QuantumHamiltonianParticle extension to [`QuantumHamiltonian.jl`](https://github.com/kyungminlee/QuantumHamiltonian.jl).
 
@@ -15,5 +15,6 @@ QuantumHamiltonianParticle extension to [`QuantumHamiltonian.jl`](https://github
 [githubaction-img]: https://github.com/kyungminlee/QuantumHamiltonianParticle.jl/workflows/Build/badge.svg
 [githubaction-url]: https://github.com/kyungminlee/QuantumHamiltonianParticle.jl/actions?query=workflow%3ABuild
 
-[codecov-img]: https://codecov.io/gh/kyungminlee/QuantumHamiltonianParticle.jl/branch/master/graph/badge.svg
+[codecov-main-img]: https://codecov.io/gh/kyungminlee/QuantumHamiltonianParticle.jl/branch/main/graph/badge.svg?token=M2WK8AAN9A
+[codecov-dev-img]: https://codecov.io/gh/kyungminlee/QuantumHamiltonianParticle.jl/branch/dev/graph/badge.svg?token=M2WK8AAN9A
 [codecov-url]: https://codecov.io/gh/kyungminlee/QuantumHamiltonianParticle.jl
