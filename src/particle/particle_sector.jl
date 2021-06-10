@@ -179,10 +179,30 @@ function get_occupancy(
 end
 
 
+"""
+    set_occupancy(phs, iptl, isite, bvec::Unsigned, count)
+
+Set occupancy of particle `iptl` at site `isite` for the given basis state `bvec` to `count`.
+"""
+function set_occupancy(
+    ::Type{PS},
+    iptl::Integer,
+    isite::Integer,
+    bvec::BR,
+    count::Integer,
+) where {PS, BR}
+    @boundscheck !(0 <= count <= maxoccupancy(getspecies(PS, iptl))) && throw(ArgumentError("count out of bounds"))
+    bw = bitwidth(PS)
+    bm = get_bitmask(PS, iptl) << (bw*(isite-1))
+    bop = bitoffset(PS, iptl)
+    return (bvec & ~bm) | (BR(count) << (bw*(isite-1) + bop))
+end
+
+
 function compress(
     ::Type{PS},
     occupancy::AbstractVector{<:Integer},
-    binary_type::Type{BR}=UInt,
+    ::Type{BR}=UInt,
 )::BR where {PS<:ParticleSector, BR<:Unsigned}
     if length(occupancy) != speciescount(PS)
         throw(ArgumentError("length of occupancy vector should match the number of particles"))
@@ -228,9 +248,10 @@ for fname in [
     end
 end
 
+
 for fname in [
     :bitwidth, :bitoffset, :get_bitmask, :get_parity_bitmask,
-    :get_occupancy,
+    :get_occupancy, :set_occupancy,
     :compress, :extract,
 ]
     @eval begin
