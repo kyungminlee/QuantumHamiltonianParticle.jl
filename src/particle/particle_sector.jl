@@ -51,6 +51,17 @@ function bitoffset(::Type{P}, iptl::Integer)::Int where {P<:ParticleSector}
 end
 
 
+function bitoffset(::Type{P}, iptl::Integer, isite::Integer)::Int where {P<:ParticleSector}
+    spec = getspecies(P)
+    offset = 0
+    for i in 1:(iptl-1)
+        offset += bitwidth(spec[i])
+    end
+    bw = bitwidth(P)
+    return offset + (bw * (isite-1))
+end
+
+
 function bitoffset(::Type{P}) where {P<:ParticleSector}
     spec = getspecies(P)
     nptls = length(spec)
@@ -194,8 +205,8 @@ function set_occupancy(
     @boundscheck !(0 <= count <= maxoccupancy(getspecies(PS, iptl))) && throw(ArgumentError("count out of bounds"))
     bw = bitwidth(PS)
     bm = get_bitmask(PS, iptl, BR) << (bw*(isite-1))
-    bop = bitoffset(PS, iptl)
-    return (bvec & ~bm) | (BR(count) << (bw*(isite-1) + bop))
+    bo = bitoffset(PS, iptl, isite)
+    return (bvec & ~bm) | (BR(count) << bo)
 end
 
 
