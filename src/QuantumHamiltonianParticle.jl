@@ -35,6 +35,7 @@ include("projector/projector_unit.jl")
 include("projector/projector_sum.jl")
 include("projector/projector_convert.jl")
 include("projector/projector_make.jl")
+include("projector/projector_make_ps.jl")
 include("projector/projector_iterator.jl")
 include("projector/projector_apply.jl")
 
