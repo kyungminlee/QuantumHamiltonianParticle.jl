@@ -75,17 +75,17 @@ function get_bitmask(
 end
 
 
-function get_bitmask(
-    ::Type{P},
-    iptl::Integer,
-    isite::Integer,
-    ::Type{BR}=UInt,
-)::BR where {P<:ParticleSector, BR<:Unsigned}
-    offset = bitoffset(P, iptl)
-    bm = make_bitmask(offset+bitwidth(P, iptl), offset, BR)
-    bw = bitwidth(P)
-    return bm << (bw*(isite-1))
-end
+# function get_bitmask(
+#     ::Type{P},
+#     iptl::Integer,
+#     isite::Integer,
+#     ::Type{BR}=UInt,
+# )::BR where {P<:ParticleSector, BR<:Unsigned}
+#     offset = bitoffset(P, iptl)
+#     bm = make_bitmask(offset+bitwidth(P, iptl), offset, BR)
+#     bw = bitwidth(P)
+#     return bm << (bw*(isite-1))
+# end
 
 
 """
@@ -156,7 +156,7 @@ function get_parity_bitmask(
 ) where {PS<:ParticleSector, BR<:Unsigned}
     if isfermion(getspecies(PS, iptl))
         bm_mask = zero(BR)
-        bmp = get_bitmask(PS, iptl)
+        bmp = get_bitmask(PS, iptl, BR)
         bw = bitwidth(PS)
         for jsite in 0:(isite-2)
             bm_mask |= bmp << (bw*jsite) 
@@ -172,9 +172,9 @@ function get_occupancy(
     ::Type{PS},
     iptl::Integer,
     isite::Integer,
-    bvec::Unsigned,
-) where {PS<:ParticleSector}
-    bm = get_bitmask(PS, iptl)
+    bvec::BR,
+) where {PS<:ParticleSector, BR<:Unsigned}
+    bm = get_bitmask(PS, iptl, BR)
     return Int( ((bvec >> (bitwidth(PS)*(isite-1))) & bm) >> bitoffset(PS, iptl) )
 end
 
@@ -193,7 +193,7 @@ function set_occupancy(
 ) where {PS, BR}
     @boundscheck !(0 <= count <= maxoccupancy(getspecies(PS, iptl))) && throw(ArgumentError("count out of bounds"))
     bw = bitwidth(PS)
-    bm = get_bitmask(PS, iptl) << (bw*(isite-1))
+    bm = get_bitmask(PS, iptl, BR) << (bw*(isite-1))
     bop = bitoffset(PS, iptl)
     return (bvec & ~bm) | (BR(count) << (bw*(isite-1) + bop))
 end
