@@ -8,6 +8,7 @@ include("test_repconv.jl")
 include("test_ladder.jl")
 include("test_ladder_promotion.jl")
 include("test_ladder_iterator.jl")
+include("test_ladder_iterator_ps.jl")
 include("test_ladder_embed.jl")
 include("test_ladder_matrixelement.jl")
 
