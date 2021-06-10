@@ -232,16 +232,31 @@ using QuantumHamiltonianParticle
             ParticleState(p, "Bf", [2, 1], (2, 1)),
         ])
         hs = ParticleHilbertSpace([site, site, site])
-        @test get_fermion_parity(hs, cdag(1, 3), 0b000_000_001) == 0
-        @test get_fermion_parity(hs, cdag(2, 3), 0b000_000_001) == 0
+        @testset "hs" begin
+            @test get_fermion_parity(hs, cdag(1, 3), 0b000_000_001) == 0
+            @test get_fermion_parity(hs, cdag(2, 3), 0b000_000_001) == 0
 
-        @test get_fermion_parity(hs, cdag(1, 3), 0b000_000_100) == 0
-        @test get_fermion_parity(hs, cdag(2, 3), 0b000_000_100) == 1
+            @test get_fermion_parity(hs, cdag(1, 3), 0b000_000_100) == 0
+            @test get_fermion_parity(hs, cdag(2, 3), 0b000_000_100) == 1
 
-        @test get_fermion_parity(hs, cdag(1, 1), 0b001_000_000) == 0
-        @test get_fermion_parity(hs, cdag(2, 1), 0b001_000_000) == 0
+            @test get_fermion_parity(hs, cdag(1, 1), 0b001_000_000) == 0
+            @test get_fermion_parity(hs, cdag(2, 1), 0b001_000_000) == 0
 
-        @test get_fermion_parity(hs, cdag(1, 1), 0b100_000_000) == 0
-        @test get_fermion_parity(hs, cdag(2, 1), 0b100_000_000) == 0
+            @test get_fermion_parity(hs, cdag(1, 1), 0b100_000_000) == 0
+            @test get_fermion_parity(hs, cdag(2, 1), 0b100_000_000) == 0
+        end
+        @testset "PS" begin
+            @test get_fermion_parity(cdag(1, 3), 0b000_000_001) == 0
+            @test get_fermion_parity(cdag(2, 3), 0b000_000_001) == 0
+
+            @test get_fermion_parity(cdag(1, 3), 0b000_000_100) == 0
+            @test get_fermion_parity(cdag(2, 3), 0b000_000_100) == 1
+
+            @test get_fermion_parity(cdag(1, 1), 0b001_000_000) == 0
+            @test get_fermion_parity(cdag(2, 1), 0b001_000_000) == 0
+
+            @test get_fermion_parity(cdag(1, 1), 0b100_000_000) == 0
+            @test get_fermion_parity(cdag(2, 1), 0b100_000_000) == 0
+        end
     end
 end
