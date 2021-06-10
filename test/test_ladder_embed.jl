@@ -51,9 +51,6 @@ using QuantumHamiltonianParticle
     end
 
     @testset "Ladder Iterator" begin
-        p = ParticleSector(Boson(:m, 2), Fermion(:f))
-        cdag(i, j) = ParticleLadderUnit(p, i, j, CREATION)
-        c(i, j)    = ParticleLadderUnit(p, i, j, ANNIHILATION)
         site = ParticleSite([
             ParticleState(p, "__", [0, 0], (0, 0)),
             ParticleState(p, "b_", [1, 0], (1, 0)),
