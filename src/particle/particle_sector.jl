@@ -68,27 +68,131 @@ end
 function get_bitmask(
     ::Type{P},
     iptl::Integer,
-    binary_type::Type{BR}=UInt,
+    ::Type{BR}=UInt,
 )::BR where {P<:ParticleSector, BR<:Unsigned}
   offset = bitoffset(P, iptl)
   return make_bitmask(offset+bitwidth(P, iptl), offset, BR)
 end
 
 
-function compress(
+function get_bitmask(
     ::Type{P},
+    iptl::Integer,
+    isite::Integer,
+    ::Type{BR}=UInt,
+)::BR where {P<:ParticleSector, BR<:Unsigned}
+    offset = bitoffset(P, iptl)
+    bm = make_bitmask(offset+bitwidth(P, iptl), offset, BR)
+    bw = bitwidth(P)
+    return bm << (bw*(isite-1))
+end
+
+
+"""
+    get_bitmask(phs, [iptl, isite])
+
+Get the bit mask for the particles `iptl` at sites `isite`.
+`iptl` or `isite` can either be integer, a vector of integers, or colon `:`.
+Bitwise or is taken over list of iptl.
+"""
+function get_bitmask(
+    ::Type{PS},
+    iptl::Integer,
+    isite::Integer,
+    ::Type{BR}=UInt,
+)::BR where {PS<:ParticleSector, BR<:Unsigned}
+    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+    bm = get_bitmask(PS, iptl, BR)
+    bw = bitwidth(PS)
+    return bm << (bw * (isite-1))
+end
+
+function get_bitmask(
+    ::Type{PS},
+    iptls::AbstractVector{<:Integer},
+    isites::AbstractVector{<:Integer},
+    ::Type{BR}=UInt,
+)::BR where {PS<:ParticleSector, BR<:Unsigned}
+    @boundscheck for iptl in iptls
+        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+    end
+    bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
+    bw = bitwidth(PS)
+    return mapreduce(isite -> (bm << (bw * (isite-1))), |, isites; init=zero(BR))
+end
+
+function get_bitmask(
+    ::Type{PS},
+    iptl::Integer,
+    isites::AbstractVector{<:Integer},
+    ::Type{BR}=UInt,
+)::BR where {PS<:ParticleSector, BR<:Unsigned}
+    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+    bm = get_bitmask(PS, iptl, BR)
+    bw = bitwidth(PS)
+    return mapreduce(isite -> (bm << (bw * (isite-1))), |, isites; init=zero(BR))
+end
+
+function get_bitmask(
+    ::Type{PS},
+    iptls::AbstractVector{<:Integer},
+    isite::Integer,
+    ::Type{BR}=UInt,
+)::BR where {PS<:ParticleSector, BR<:Unsigned}
+    @boundscheck for iptl in iptls
+        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+    end
+    bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
+    bw = bitwidth(PS)
+    return bm << (bw * (isite-1))
+end
+
+
+function get_parity_bitmask(
+    ::Type{PS},
+    iptl::Integer,
+    isite::Integer,
+    binary_type::Type{BR}=UInt,
+) where {PS<:ParticleSector, BR<:Unsigned}
+    if isfermion(getspecies(PS, iptl))
+        bm_mask = zero(BR)
+        bmp = get_bitmask(PS, iptl)
+        bw = bitwidth(PS)
+        for jsite in 0:(isite-2)
+            bm_mask |= bmp << (bw*jsite) 
+        end
+        return bm_mask
+    else
+        return zero(BR)
+    end
+end
+
+
+function get_occupancy(
+    ::Type{PS},
+    iptl::Integer,
+    isite::Integer,
+    bvec::Unsigned,
+) where {PS<:ParticleSector}
+    bm = get_bitmask(PS, iptl)
+    return Int( ((bvec >> (bitwidth(PS)*(isite-1))) & bm) >> bitoffset(PS, iptl) )
+end
+
+
+function compress(
+    ::Type{PS},
     occupancy::AbstractVector{<:Integer},
     binary_type::Type{BR}=UInt,
-)::BR where {P<:ParticleSector, BR<:Unsigned}
-    if length(occupancy) != speciescount(P)
+)::BR where {PS<:ParticleSector, BR<:Unsigned}
+    if length(occupancy) != speciescount(PS)
         throw(ArgumentError("length of occupancy vector should match the number of particles"))
-    elseif sizeof(BR) * 8 < bitwidth(P)
+    elseif sizeof(BR) * 8 < bitwidth(PS)
         throw(ArgumentError("type $BR is too short to represent the particle sector"))
     end
 
     out = zero(BR)
     offset = 0
-    for (i, (p, n)) in enumerate(zip(getspecies(P), occupancy))
+    for (i, (p, n)) in enumerate(zip(getspecies(PS), occupancy))
         n < 0 && throw(ArgumentError("occupancy should be non-negative"))
         n > maxoccupancy(p) && throw(ArgumentError("occupancy ($n) should be no greater than the maxoccupancy of particle ($p)"))
         out |= BR(n) << offset
@@ -111,10 +215,8 @@ function extract(::Type{P}, occbin::BR)::Vector{Int} where {P<:ParticleSector, B
         occ[i] = n
         occbin >>= bitwidth(p)
     end
-    # @assert(iszero(occbin))
     return occ
 end
-
 
 
 for fname in [
@@ -127,7 +229,8 @@ for fname in [
 end
 
 for fname in [
-    :bitwidth, :bitoffset, :get_bitmask,
+    :bitwidth, :bitoffset, :get_bitmask, :get_parity_bitmask,
+    :get_occupancy,
     :compress, :extract,
 ]
     @eval begin

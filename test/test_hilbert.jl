@@ -56,52 +56,103 @@ using QuantumHamiltonianParticle
 
     @test bitwidth(hilbert) == 9
 
-    @test bitoffset(hilbert, 1, 1) == 0
-    @test bitoffset(hilbert, 2, 1) == 2
-    @test bitoffset(hilbert, 1, 2) == 3
-    @test bitoffset(hilbert, 2, 2) == 5
-    @test bitoffset(hilbert, 1) == 0
-    @test bitoffset(hilbert, 2) == 3
+    @testset "bitoffset" begin
+        @test bitoffset(hilbert, 1, 1) == 0
+        @test bitoffset(hilbert, 2, 1) == 2
+        @test bitoffset(hilbert, 1, 2) == 3
+        @test bitoffset(hilbert, 2, 2) == 5
+        @test bitoffset(hilbert, 1) == 0
+        @test bitoffset(hilbert, 2) == 3
+    end
 
-    @test get_bitmask(hilbert, 1, 1) == 0b000000011
-    @test get_bitmask(hilbert, 2, 1) == 0b000000100
-    @test get_bitmask(hilbert, 1, 2) == 0b000011000
-    @test get_bitmask(hilbert, 2, 2) == 0b000100000
+    @testset "get_bitmask" begin
+        @test get_bitmask(hilbert, 1, 1) == 0b000000011
+        @test get_bitmask(hilbert, 2, 1) == 0b000000100
+        @test get_bitmask(hilbert, 1, 2) == 0b000011000
+        @test get_bitmask(hilbert, 2, 2) == 0b000100000
 
-    @test get_bitmask(hilbert, 1, :) == 0b011011011
-    @test get_bitmask(hilbert, :, :) == 0b111111111
-    @test get_bitmask(hilbert, :, 2) == 0b000111000
-    # @test get_bitmask(hilbert, :, [2,3]) == 0b000111111000
-    # TODO(kyungminlee 20200917) tests for colon and vector
+        @test get_bitmask(hilbert, 1, :) == 0b011011011
+        @test get_bitmask(hilbert, :, :) == 0b111111111
+        @test get_bitmask(hilbert, :, 2) == 0b000111000
+        # @test get_bitmask(hilbert, :, [2,3]) == 0b000111111000
+        # TODO(kyungminlee 20200917) tests for colon and vector
 
-    @test get_bitmask(hilbert, 1, [2,3])    == 0b011011000
-    @test get_bitmask(hilbert, [1], 2)      == 0b000011000
-    @test get_bitmask(hilbert, [1,2], 2)    == 0b000111000
-    @test get_bitmask(hilbert, [1,], [2,3]) == 0b011011000
+        @test get_bitmask(hilbert, 1, [2,3])    == 0b011011000
+        @test get_bitmask(hilbert, [1], 2)      == 0b000011000
+        @test get_bitmask(hilbert, [1,2], 2)    == 0b000111000
+        @test get_bitmask(hilbert, [1,], [2,3]) == 0b011011000
 
-    @test get_bitmask(hilbert) == 0b111111111
+        @test get_bitmask(hilbert) == 0b111111111
 
-    @test_throws BoundsError get_bitmask(hilbert, 3, 1)
-    @test_throws BoundsError get_bitmask(hilbert, 1, 8)
+        @test_throws BoundsError get_bitmask(hilbert, 3, 1)
+        @test_throws BoundsError get_bitmask(hilbert, 1, 8)
 
-    @test_throws BoundsError get_bitmask(hilbert, 3, :)
-    @test_throws BoundsError get_bitmask(hilbert, :, 8)
+        @test_throws BoundsError get_bitmask(hilbert, 3, :)
+        @test_throws BoundsError get_bitmask(hilbert, :, 8)
 
-    @test_throws BoundsError get_bitmask(hilbert, 3, [1,2])
-    @test_throws BoundsError get_bitmask(hilbert, [1,2], 8)
+        @test_throws BoundsError get_bitmask(hilbert, 3, [1,2])
+        @test_throws BoundsError get_bitmask(hilbert, [1,2], 8)
+    
+        @test get_parity_bitmask(hilbert, 2, 3) == 0b000100100  # parity bits for fermions
+        @test get_parity_bitmask(hilbert, 1, 3) == 0b000000000  # nothing for bosons
+    end
 
-    @test get_parity_bitmask(hilbert, 2, 3) == 0b000100100  # parity bits for fermions
-    @test get_parity_bitmask(hilbert, 1, 3) == 0b000000000  # nothing for bosons
+    @testset "get_bitmask" begin
+        @test get_bitmask(p, 1, 1) == 0b000000011
+        @test get_bitmask(p, 2, 1) == 0b000000100
+        @test get_bitmask(p, 1, 2) == 0b000011000
+        @test get_bitmask(p, 2, 2) == 0b000100000
 
-    @test get_occupancy(hilbert, 1, 1, 0b001_110_100) == 0
-    @test get_occupancy(hilbert, 2, 1, 0b001_110_100) == 1
-    @test get_occupancy(hilbert, 1, 2, 0b001_110_100) == 2
-    @test get_occupancy(hilbert, 2, 2, 0b001_110_100) == 1
-    @test get_occupancy(hilbert, 1, 3, 0b001_110_100) == 1
-    @test get_occupancy(hilbert, 2, 3, 0b001_110_100) == 0
+        # @test get_bitmask(p, 1, :) == 0b011011011
+        # @test get_bitmask(p, :, :) == 0b111111111
+        # @test get_bitmask(p, :, 2) == 0b000111000
+        # @test get_bitmask(p, :, [2,3]) == 0b000111111000
+        # TODO(kyungminlee 20200917) tests for colon and vector
 
-    @test set_occupancy(hilbert, 1, 3, 0b001_110_100, 0) == 0b000_110_100
-    @test_throws ArgumentError set_occupancy(hilbert, 1, 3, 0b001_110_100, 3)
+        @test get_bitmask(p, 1, [2,3])    == 0b011011000
+        @test get_bitmask(p, [1], 2)      == 0b000011000
+        @test get_bitmask(p, [1,2], 2)    == 0b000111000
+        @test get_bitmask(p, [1,], [2,3]) == 0b011011000
+
+        # @test get_bitmask(p) == 0b111111111
+
+        @test_throws BoundsError get_bitmask(p, 3, 1)
+        # @test_throws BoundsError get_bitmask(p, 1, 8)
+
+        @test_throws BoundsError get_bitmask(p, 3, [1,2])
+        # @test_throws BoundsError get_bitmask(p, [1,2], 8)
+    
+        @test get_parity_bitmask(p, 2, 3) == 0b000100100  # parity bits for fermions
+        @test get_parity_bitmask(p, 1, 3) == 0b000000000  # nothing for bosons
+    end
+
+    @testset "occupancy" begin
+        @test get_occupancy(hilbert, 1, 1, 0b001_110_100) == 0
+        @test get_occupancy(hilbert, 2, 1, 0b001_110_100) == 1
+        @test get_occupancy(hilbert, 1, 2, 0b001_110_100) == 2
+        @test get_occupancy(hilbert, 2, 2, 0b001_110_100) == 1
+        @test get_occupancy(hilbert, 1, 3, 0b001_110_100) == 1
+        @test get_occupancy(hilbert, 2, 3, 0b001_110_100) == 0
+
+        @test set_occupancy(hilbert, 1, 3, 0b001_110_100, 0) == 0b000_110_100
+        @test_throws ArgumentError set_occupancy(hilbert, 1, 3, 0b001_110_100, 3)
+    end
+
+    @testset "get_occupancy(PS)" begin
+        @test get_occupancy(p, 1, 1, 0b001_110_100) == 0
+        @test get_occupancy(p, 2, 1, 0b001_110_100) == 1
+        @test get_occupancy(p, 1, 2, 0b001_110_100) == 2
+        @test get_occupancy(p, 2, 2, 0b001_110_100) == 1
+        @test get_occupancy(p, 1, 3, 0b001_110_100) == 1
+        @test get_occupancy(p, 2, 3, 0b001_110_100) == 0
+        P = typeof(p)
+        @test get_occupancy(P, 1, 1, 0b001_110_100) == 0
+        @test get_occupancy(P, 2, 1, 0b001_110_100) == 1
+        @test get_occupancy(P, 1, 2, 0b001_110_100) == 2
+        @test get_occupancy(P, 2, 2, 0b001_110_100) == 1
+        @test get_occupancy(P, 1, 3, 0b001_110_100) == 1
+        @test get_occupancy(P, 2, 3, 0b001_110_100) == 0
+    end
 
     # three sites
     @test compress(hilbert, CartesianIndex(2, 1, 6)) == UInt(0b110_000_001)
