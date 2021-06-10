@@ -1,3 +1,5 @@
+# This is now deprecated
+
 export ParticleLadderOperatorEmbedding
 
 import LatticeTools.embed
