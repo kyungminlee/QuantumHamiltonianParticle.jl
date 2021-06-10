@@ -133,18 +133,20 @@ using QuantumHamiltonianParticle
         @test get_occupancy(hilbert, 2, 2, 0b001_110_100) == 1
         @test get_occupancy(hilbert, 1, 3, 0b001_110_100) == 1
         @test get_occupancy(hilbert, 2, 3, 0b001_110_100) == 0
-
         @test set_occupancy(hilbert, 1, 3, 0b001_110_100, 0) == 0b000_110_100
         @test_throws ArgumentError set_occupancy(hilbert, 1, 3, 0b001_110_100, 3)
     end
 
-    @testset "get_occupancy(PS)" begin
+    @testset "occupancy(PS)" begin
         @test get_occupancy(p, 1, 1, 0b001_110_100) == 0
         @test get_occupancy(p, 2, 1, 0b001_110_100) == 1
         @test get_occupancy(p, 1, 2, 0b001_110_100) == 2
         @test get_occupancy(p, 2, 2, 0b001_110_100) == 1
         @test get_occupancy(p, 1, 3, 0b001_110_100) == 1
         @test get_occupancy(p, 2, 3, 0b001_110_100) == 0
+        @test set_occupancy(p, 1, 3, 0b001_110_100, 0) == 0b000_110_100
+        @test_throws ArgumentError set_occupancy(p, 1, 3, 0b001_110_100, 3)
+
         P = typeof(p)
         @test get_occupancy(P, 1, 1, 0b001_110_100) == 0
         @test get_occupancy(P, 2, 1, 0b001_110_100) == 1
@@ -152,6 +154,8 @@ using QuantumHamiltonianParticle
         @test get_occupancy(P, 2, 2, 0b001_110_100) == 1
         @test get_occupancy(P, 1, 3, 0b001_110_100) == 1
         @test get_occupancy(P, 2, 3, 0b001_110_100) == 0
+        @test set_occupancy(P, 1, 3, 0b001_110_100, 0) == 0b000_110_100
+        @test_throws ArgumentError set_occupancy(P, 1, 3, 0b001_110_100, 3)
     end
 
     # three sites
