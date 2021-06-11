@@ -1,4 +1,5 @@
 # This is now deprecated
+#=
 
 export ParticleLadderOperatorEmbedding
 
@@ -148,3 +149,6 @@ end
 function simplify(arg::ParticleLadderOperatorEmbedding)
     return ParticleLadderOperatorEmbedding(arg.hilbert_space, simplify(arg.ladder))
 end
+
+
+=#

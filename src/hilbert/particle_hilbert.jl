@@ -157,10 +157,10 @@ end
 
 
 """
-    get_bitmask(phs, [iptl, isite])
+    get_bitmask(phs, iptl, isite)
 
 Get the bit mask for the particles `iptl` at sites `isite`.
-`iptl` or `isite` can either be integer, a vector of integers, or colon `:`.
+`iptl` or `isite` can either be integer, a vector of integers, or colon (:).
 Bitwise or is taken over list of iptl.
 """
 function get_bitmask(
@@ -264,7 +264,6 @@ function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer,
         return zero(BR)
     end
 end
-
 
 """
     get_occupancy(phs, iptl, isite, bvec::Unsigned)

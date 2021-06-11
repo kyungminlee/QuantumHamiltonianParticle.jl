@@ -121,6 +121,6 @@ function make_projector_operator(
     return make_projector_operator(basespace(hs), op...)
 end
 
-function make_projector_operator(op::ParticleLadderOperatorEmbedding)
-    return make_projector_operator(get_space(op), get_ladder(op))
-end
+# function make_projector_operator(op::ParticleLadderOperatorEmbedding)
+#     return make_projector_operator(get_space(op), get_ladder(op))
+# end
