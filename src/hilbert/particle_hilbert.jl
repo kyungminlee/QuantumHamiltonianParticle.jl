@@ -103,11 +103,12 @@ end
 
 Get quantum number of the basis state `bitrep`.
 """
-function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
+function get_quantum_number(hs::ParticleHilbertSpace{PS, BR, QN}, binrep::Unsigned) where {PS, QN, BR}
+    bw = bitwidth(PS)
     return mapreduce(
         identity,
         tupleadd,
-        let b = (get_bitmask(hs, :, isite) & binrep) >> bitoffset(hs, isite)
+        let b = (get_bitmask(hs, :, isite) & binrep) >> (bw*(isite-1))
             #i = get_state_index(site, binrep)
             #site.states[i].quantum_number
             get_state(site, b).quantum_number
@@ -148,12 +149,12 @@ function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::
 end
 
 
-"""
-    bitoffset(phs, isite)
-"""
-function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
-    return phs.bitoffsets[isite]
-end
+# """
+#     bitoffset(phs, isite)
+# """
+# function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
+#     return phs.bitoffsets[isite]
+# end
 
 
 """

@@ -61,8 +61,8 @@ using QuantumHamiltonianParticle
         @test bitoffset(hilbert, 2, 1) == 2
         @test bitoffset(hilbert, 1, 2) == 3
         @test bitoffset(hilbert, 2, 2) == 5
-        @test bitoffset(hilbert, 1) == 0
-        @test bitoffset(hilbert, 2) == 3
+        # @test bitoffset(hilbert, 1) == 0
+        # @test bitoffset(hilbert, 2) == 3
     end
 
     @testset "get_bitmask" begin
