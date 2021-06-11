@@ -7,7 +7,7 @@ function make_projector_operator(
     ::Type{BR}=UInt
 ) where {PS, BR<:Unsigned, PI<:Integer, OI<:Integer}
     particle = getspecies(PS, op.particle_index)
-    bm  = get_bitmask(op.particle_index, op.orbital, BR)
+    bm  = get_bitmask(PS, op.particle_index, op.orbital, BR)
     pbm = zero(BR)
     if isfermion(particle)
         pbm = get_parity_bitmask(PS, op.particle_index, op.orbital, BR)
