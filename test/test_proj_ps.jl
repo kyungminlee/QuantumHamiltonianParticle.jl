@@ -249,7 +249,6 @@ end
     rng = MersenneTwister(0)
     for lad in [c(1,2), cdag(1,2), c(2,2), cdag(2,2), c(3,2), cdag(3,2),
                 cdag(1,2)*c(2,1), cdag(1,2)*c(2,1) + cdag(2,2)*0.3]
-        # opa = embed(hilbert_space, lad)
         opa = lad
         opb = make_projector_operator(lad)
         for bvec in rand(rng, hsr.basis_list, 5)
