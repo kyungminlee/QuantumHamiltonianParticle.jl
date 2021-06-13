@@ -8,7 +8,7 @@ electronUp = Fermion{Symbol("e↑")}()
 electronDn = Fermion{Symbol("e↓")}()
 magnon = Boson{Symbol("m↓"), 2}()  # spin 1
 
-particle_sector = make_particle_sector(magnon, electronUp, electronDn)
+particle_sector = ParticleSector(magnon, electronUp, electronDn)
 
 # magnon_index = ParticleIndex(particle_sector, 1)
 # electron_up_index = ParticleIndex(particle_sector, 2)
@@ -24,10 +24,10 @@ particle_sector = make_particle_sector(magnon, electronUp, electronDn)
 # c_dn_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(3, orbital, CREATION))
 # c_dn(orbital::OrbitalType) where OrbitalType = ParticleLadderSum(ParticleLadderUnit(3, orbital, ANNIHILATION))
 
-c_up_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(2, orbital, CREATION)
-c_up(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(2, orbital, ANNIHILATION)
-c_dn_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(3, orbital, CREATION)
-c_dn(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(3, orbital, ANNIHILATION)
+c_up_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(particle_sector, 2, orbital, CREATION)
+c_up(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(particle_sector, 2, orbital, ANNIHILATION)
+c_dn_dag(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(particle_sector, 3, orbital, CREATION)
+c_dn(orbital::OrbitalType) where OrbitalType = ParticleLadderUnit(particle_sector, 3, orbital, ANNIHILATION)
 
 # sf_site = ParticleSite([
 #     ParticleState(particle_sector, "↑,e↑", [0,1,0], 2+1),
