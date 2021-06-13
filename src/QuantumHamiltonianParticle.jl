@@ -21,12 +21,8 @@ include("ladder/ladder_operation.jl")
 include("ladder/ladder_promotion.jl")
 
 include("ladder/ladder_parity.jl")
-# include("ladder/ladder_iterator.jl")
-include("ladder/ladder_iterator_ps.jl")
+include("ladder/ladder_iterator.jl")
 include("ladder/ladder_apply.jl")
-
-# include("ladder/ladder_embed.jl")
-
 
 include("ladder/ladder_simplify.jl")
 
@@ -34,8 +30,7 @@ include("ladder/ladder_simplify.jl")
 include("projector/projector_unit.jl")
 include("projector/projector_sum.jl")
 include("projector/projector_convert.jl")
-# include("projector/projector_make.jl")
-include("projector/projector_make_ps.jl")
+include("projector/projector_make.jl")
 include("projector/projector_iterator.jl")
 include("projector/projector_apply.jl")
 
