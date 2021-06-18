@@ -38,6 +38,7 @@ include("projector/projector_simplify.jl")
 
 include("symmetry/symmetry_apply_operator.jl")
 include("symmetry/symmetry_apply_state.jl")
+include("symmetry/orbital_permutation.jl")
 
 include("toolkit/toolkit.jl")
 
