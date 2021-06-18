@@ -30,13 +30,9 @@ function symmetry_apply(
         end
     end
     sv = occbin2statevec(phs, occbin)
-    sv2 = [
-        let # this newline is relevant
-            y, amplitude = op(x, amplitude)
-            y
-        end
-        for (x, op) in zip(sv, perm.operations)        
-    ]
+    # the semicolon is relevant
+    sv2 = [let ; y, amplitude = op(x, amplitude); y end
+           for (x, op) in zip(sv, perm.operations)]
     ob2 = statevec2occbin(phs, sv2)
     return (ob2, amplitude)
 end
