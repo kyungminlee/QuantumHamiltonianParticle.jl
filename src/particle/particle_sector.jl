@@ -8,7 +8,7 @@ import QuantumHamiltonian.get_bitmask
 
 import QuantumHamiltonian.bitoffset
 export numspecies, speciescount, getspecies, getspeciesname
-
+export findspeciesindex
 
 struct ParticleSector{P<:Tuple{Vararg{AbstractParticle}}}
     function ParticleSector(::Type{P}) where {P<:Tuple{Vararg{AbstractParticle}}}
@@ -28,6 +28,14 @@ speciescount(::Type{ParticleSector{P}}) where {P} = tuplelength(P)
 getspecies(::Type{P}) where {P<:ParticleSector} = tuple(P.parameters[1].parameters...)
 getspecies(::Type{ParticleSector{P}}, index::Integer) where {P} = P.parameters[index]
 getspeciesname(::Type{ParticleSector{P}}, index::Integer) where {P} = getspecies(ParticleSector{P}, index).parameters[1]::Symbol
+
+findspeciesindex(::P, args...) where {P<:ParticleSector} = findspeciesindex(P, args...)
+
+# TODO: more efficient implementation
+function findspeciesindex(::Type{ParticleSector{P}}, name::Symbol) where {P}
+    i = findfirst(x -> getspeciesname(x) == name, P.parameters)
+    return isnothing(i) ? -1 : Int(i)
+end
 
 exchangesign(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = exchangesign(getspecies(PS, iptl))
 function exchangesign(::Type{PS}, iptl1::Integer, iptl2::Integer) where {PS<:ParticleSector}
