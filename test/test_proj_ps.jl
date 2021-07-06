@@ -251,7 +251,7 @@ end
                 cdag(1,2)*c(2,1), cdag(1,2)*c(2,1) + cdag(2,2)*0.3]
         opa = lad
         opb = make_projector_operator(lad)
-        for bvec in rand(rng, hsr.basis_list, 5)
+        for bvec in rand(rng, get_basis_list(hsr), 5)
             out1a = Dict(collect(get_column_iterator(opa, bvec)))
             out1b = Dict(collect(get_column_iterator(opb, bvec)))
             @test out1a == out1b
@@ -270,7 +270,7 @@ end
         hilbert_space_sector = HilbertSpaceSector(hilbert_space, (2,0))
         opa = lad
         opb = make_projector_operator(lad)
-        for bvec in rand(rng, hsr.basis_list, 5)
+        for bvec in rand(rng, get_basis_list(hsr), 5)
             out1a = Dict(collect(get_column_iterator(opa, bvec)))
             out1b = Dict(collect(get_column_iterator(opb, bvec)))
             @test out1a == out1b

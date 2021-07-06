@@ -94,17 +94,17 @@ end
             mr = Dict{Tuple{UInt, UInt}, Float64}()
             mc = Dict{Tuple{UInt, UInt}, Float64}()
             me = Dict{Tuple{UInt, UInt}, Float64}()
-            for brow in hsr.basis_list
+            for brow in get_basis_list(hsr)
                 for (bcol, ampl) in get_row_iterator(op1, brow)
                     mr[(brow, bcol)] = get(mr, (brow, bcol), zero(Float64)) + ampl
                 end
             end
-            for bcol in hsr.basis_list
+            for bcol in get_basis_list(hsr)
                 for (brow, ampl) in get_column_iterator(op1, bcol)
                     mc[(brow, bcol)] = get(mc, (brow, bcol), zero(Float64)) + ampl
                 end
             end
-            for brow in hsr.basis_list, bcol in hsr.basis_list
+            for brow in get_basis_list(hsr), bcol in get_basis_list(hsr)
                 ampl = get_element(op1, brow, bcol)
                 if !iszero(ampl)
                     me[(brow, bcol)] = ampl
@@ -126,12 +126,12 @@ end
             mc = Dict{Tuple{UInt, UInt}, Float64}()
             mc2 = Dict{Tuple{UInt, UInt}, Float64}()
             me = Dict{Tuple{UInt, UInt}, Float64}()
-            for brow in hsr.basis_list
+            for brow in get_basis_list(hsr)
                 for (bcol, ampl) in get_row_iterator(op1, brow)
                     mr[(brow, bcol)] = get(mr, (brow, bcol), zero(Float64)) + ampl
                 end
             end
-            for bcol in hsr.basis_list
+            for bcol in get_basis_list(hsr)
                 for (brow, ampl) in get_column_iterator(op1, bcol)
                     mc[(brow, bcol)] = get(mc, (brow, bcol), zero(Float64)) + ampl
                 end
@@ -145,7 +145,7 @@ end
                     end
                 end
             end
-            for brow in hsr.basis_list, bcol in hsr.basis_list
+            for brow in get_basis_list(hsr), bcol in get_basis_list(hsr)
                 ampl = get_element(op1, brow, bcol)
                 if !iszero(ampl)
                     me[(brow, bcol)] = ampl
@@ -168,17 +168,17 @@ end
             mr = Dict{Tuple{UInt, UInt}, Float64}()
             mc = Dict{Tuple{UInt, UInt}, Float64}()
             me = Dict{Tuple{UInt, UInt}, Float64}()
-            for brow in hsr.basis_list
+            for brow in get_basis_list(hsr)
                 for (bcol, ampl) in get_row_iterator(op1, brow)
                     mr[(brow, bcol)] = get(mr, (brow, bcol), zero(Float64)) + ampl
                 end
             end
-            for bcol in hsr.basis_list
+            for bcol in get_basis_list(hsr)
                 for (brow, ampl) in get_column_iterator(op1, bcol)
                     mc[(brow, bcol)] = get(mc, (brow, bcol), zero(Float64)) + ampl
                 end
             end
-            for brow in hsr.basis_list, bcol in hsr.basis_list
+            for brow in get_basis_list(hsr), bcol in get_basis_list(hsr)
                 ampl = get_element(op1, brow, bcol)
                 if !iszero(ampl)
                     me[(brow, bcol)] = ampl
@@ -194,7 +194,7 @@ end
 
     function test_product_iterators()
         rng = MersenneTwister(0)
-        for bvec in rand(rng, hsr.basis_list, 5)
+        for bvec in rand(rng, get_basis_list(hsr), 5)
             for iptl1 in 1:3, iptl2 in 1:3, cop1 in [c, cdag], cop2 in [c, cdag]
                 op1 = cop1(iptl1, 1)
                 op2 = cop2(iptl2, 2)
@@ -216,7 +216,7 @@ end
 
     function test_sum_iterators()
         rng = MersenneTwister(0)
-        for bvec in rand(rng, hsr.basis_list, 3)
+        for bvec in rand(rng, get_basis_list(hsr), 3)
             for iptl1 in rand(rng, 1:3, 2), iptl2 in rand(rng, 1:3, 2), iptl3 in rand(rng, 1:3, 2)
                 for cop1 in [c, cdag], cop2 in [c, cdag], cop3 in [c, cdag]
                     op1 = cop1(iptl1, 1) * cop2(iptl2, 2)

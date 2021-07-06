@@ -47,7 +47,7 @@ using LinearAlgebra
     hsr = represent(hilbert_space)
     rhsr = symmetry_reduce(hsr, first(get_irrep_components(ssymbed)))
     @testset "reduced hilbert space" begin
-        @test rhsr.basis_list == UInt[0b0000, 0b0001]
+        @test get_basis_list(rhsr) == UInt[0b0000, 0b0001]
         # 0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111
         @test rhsr.basis_mapping_index == [
             1,    2,   2,  -1,   2,  -1,  -1,  -1,   2,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
