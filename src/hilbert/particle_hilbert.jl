@@ -103,11 +103,12 @@ end
 
 Get quantum number of the basis state `bitrep`.
 """
-function get_quantum_number(hs::ParticleHilbertSpace, binrep::Unsigned)
+function get_quantum_number(hs::ParticleHilbertSpace{PS, BR, QN}, binrep::Unsigned) where {PS, QN, BR}
+    bw = bitwidth(PS)
     return mapreduce(
         identity,
         tupleadd,
-        let b = (get_bitmask(hs, :, isite) & binrep) >> bitoffset(hs, isite)
+        let b = (get_bitmask(hs, :, isite) & binrep) >> (bw*(isite-1))
             #i = get_state_index(site, binrep)
             #site.states[i].quantum_number
             get_state(site, b).quantum_number
@@ -148,19 +149,19 @@ function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::
 end
 
 
-"""
-    bitoffset(phs, isite)
-"""
-function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
-    return phs.bitoffsets[isite]
-end
+# """
+#     bitoffset(phs, isite)
+# """
+# function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
+#     return phs.bitoffsets[isite]
+# end
 
 
 """
-    get_bitmask(phs, [iptl, isite])
+    get_bitmask(phs, iptl, isite)
 
 Get the bit mask for the particles `iptl` at sites `isite`.
-`iptl` or `isite` can either be integer, a vector of integers, or colon `:`.
+`iptl` or `isite` can either be integer, a vector of integers, or colon (:).
 Bitwise or is taken over list of iptl.
 """
 function get_bitmask(
@@ -264,7 +265,6 @@ function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer,
         return zero(BR)
     end
 end
-
 
 """
     get_occupancy(phs, iptl, isite, bvec::Unsigned)

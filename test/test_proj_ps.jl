@@ -249,51 +249,41 @@ end
     rng = MersenneTwister(0)
     for lad in [c(1,2), cdag(1,2), c(2,2), cdag(2,2), c(3,2), cdag(3,2),
                 cdag(1,2)*c(2,1), cdag(1,2)*c(2,1) + cdag(2,2)*0.3]
-        opa = embed(hilbert_space, lad)
-        opb = make_projector_operator(hilbert_space, lad)
-        opc = make_projector_operator(opa)
+        opa = lad
+        opb = make_projector_operator(lad)
         for bvec in rand(rng, get_basis_list(hsr), 5)
             out1a = Dict(collect(get_column_iterator(opa, bvec)))
             out1b = Dict(collect(get_column_iterator(opb, bvec)))
-            out1c = Dict(collect(get_column_iterator(opc, bvec)))
-            @test out1a == out1b == out1c
+            @test out1a == out1b
             out2a = Dict(collect(get_row_iterator(opa, bvec)))
             out2b = Dict(collect(get_row_iterator(opb, bvec)))
-            out2c = Dict(collect(get_row_iterator(opc, bvec)))
-            @test out2a == out2b == out2c
+            @test out2a == out2b
 
             state = SparseState(bvec=>1)
             out3a = SparseState{Float64, UInt}()
             out3b = SparseState{Float64, UInt}()
-            out3c = SparseState{Float64, UInt}()
             apply!(out3a, opa, state)
             apply!(out3b, opb, state)
-            apply!(out3c, opc, state)
-            @test out3a == out3b == out3c
+            @test out3a == out3b
         end
 
         hilbert_space_sector = HilbertSpaceSector(hilbert_space, (2,0))
-        opa = embed(hilbert_space_sector, lad)
-        opb = make_projector_operator(hilbert_space_sector, lad)
-        opc = make_projector_operator(opa)
+        opa = lad
+        opb = make_projector_operator(lad)
         for bvec in rand(rng, get_basis_list(hsr), 5)
             out1a = Dict(collect(get_column_iterator(opa, bvec)))
             out1b = Dict(collect(get_column_iterator(opb, bvec)))
-            out1c = Dict(collect(get_column_iterator(opc, bvec)))
-            @test out1a == out1b == out1c
+            @test out1a == out1b
             out2a = Dict(collect(get_row_iterator(opa, bvec)))
             out2b = Dict(collect(get_row_iterator(opb, bvec)))
-            out2c = Dict(collect(get_row_iterator(opc, bvec)))
-            @test out2a == out2b == out2c
+            @test out2a == out2b
 
             state = SparseState(bvec=>1)
             out3a = SparseState{Float64, UInt}()
             out3b = SparseState{Float64, UInt}()
-            out3c = SparseState{Float64, UInt}()
             apply!(out3a, opa, state)
             apply!(out3b, opb, state)
-            apply!(out3c, opc, state)
-            @test out3a == out3b == out3c
+            @test out3a == out3b
         end
     end
 end

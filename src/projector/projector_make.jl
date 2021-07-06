@@ -3,21 +3,21 @@ export make_projector_operator
 import QuantumHamiltonian.get_space
 
 function make_projector_operator(
-    hs::ParticleHilbertSpace{PS, BR, QN},
     op::ParticleLadderUnit{PS, PI, OI},
-) where {PS, BR, QN, PI<:Integer, OI<:Integer}
+    ::Type{BR}=UInt
+) where {PS, BR<:Unsigned, PI<:Integer, OI<:Integer}
     particle = getspecies(PS, op.particle_index)
-    bm  = get_bitmask(hs, op.particle_index, op.orbital)
+    bm  = get_bitmask(PS, op.particle_index, op.orbital, BR)
     pbm = zero(BR)
     if isfermion(particle)
-        pbm = get_parity_bitmask(hs, op.particle_index, op.orbital)
+        pbm = get_parity_bitmask(PS, op.particle_index, op.orbital, BR)
         if op.ladder == CREATION
-            br = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
+            br = one(BR) << bitoffset(PS, op.particle_index, op.orbital)
             bc = zero(BR)
             return ParticleProjectorUnitOperator(bm, br, bc, pbm, 1)
         else
             br = zero(BR)
-            bc = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
+            bc = one(BR) << bitoffset(PS, op.particle_index, op.orbital)
             return ParticleProjectorUnitOperator(bm, br, bc, pbm, 1)
         end
     elseif isboson(particle)
@@ -25,12 +25,12 @@ function make_projector_operator(
             throw(ArgumentError("maximum occupancy cannot be nonpositive")) # COV_EXCL_LINE
         elseif maxoccupancy(particle) == 1
             if op.ladder == CREATION
-                br = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
+                br = one(BR) << bitoffset(PS, op.particle_index, op.orbital)
                 bc = zero(BR)
                 return ParticleProjectorUnitOperator(bm, br, bc, pbm, 1)
             else
                 br = zero(BR)
-                bc = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
+                bc = one(BR) << bitoffset(PS, op.particle_index, op.orbital)
                 return ParticleProjectorUnitOperator(bm, br, bc, pbm, 1)
             end
         else
@@ -38,8 +38,8 @@ function make_projector_operator(
                 let compute_amplitude(cr::Integer, cc::Integer) = sqrt(cr)
                     return ParticleProjectorSumOperator([
                         let cc = cr - 1,
-                            br = BR(cr) << bitoffset(hs, op.particle_index, op.orbital),
-                            bc = BR(cc) << bitoffset(hs, op.particle_index, op.orbital),
+                            br = BR(cr) << bitoffset(PS, op.particle_index, op.orbital),
+                            bc = BR(cc) << bitoffset(PS, op.particle_index, op.orbital),
                             ampl = compute_amplitude(cr, cc)
                             ParticleProjectorUnitOperator(bm, br, bc, pbm, ampl)
                         end for cr in 1:maxoccupancy(particle)
@@ -49,8 +49,8 @@ function make_projector_operator(
                 let compute_amplitude(cr::Integer, cc::Integer) = sqrt(cc)
                     return ParticleProjectorSumOperator([
                         let cr = cc - 1,
-                            br = BR(cr) << bitoffset(hs, op.particle_index, op.orbital),
-                            bc = BR(cc) << bitoffset(hs, op.particle_index, op.orbital),
+                            br = BR(cr) << bitoffset(PS, op.particle_index, op.orbital),
+                            bc = BR(cc) << bitoffset(PS, op.particle_index, op.orbital),
                             ampl = compute_amplitude(cr, cc)
                             ParticleProjectorUnitOperator(bm, br, bc, pbm, ampl)
                         end for cc in 1:maxoccupancy(particle)
@@ -64,12 +64,12 @@ function make_projector_operator(
             throw(ArgumentError("maximum occupancy cannot be nonpositive")) # COV_EXCL_LINE
         elseif M == 1
             if op.ladder == CREATION
-                br = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
+                br = one(BR) << bitoffset(PS, op.particle_index, op.orbital)
                 bc = zero(BR)
                 return ParticleProjectorUnitOperator(bm, br, bc, pbm, 1)
             else
                 br = zero(BR)
-                bc = one(BR) << bitoffset(hs, op.particle_index, op.orbital)
+                bc = one(BR) << bitoffset(PS, op.particle_index, op.orbital)
                 return ParticleProjectorUnitOperator(bm, br, bc, pbm, 1)
             end
         else
@@ -77,8 +77,8 @@ function make_projector_operator(
                 if op.ladder == CREATION
                     return ParticleProjectorSumOperator([
                         let cc = cr - 1,
-                            br = BR(cr) << bitoffset(hs, op.particle_index, op.orbital),
-                            bc = BR(cc) << bitoffset(hs, op.particle_index, op.orbital),
+                            br = BR(cr) << bitoffset(PS, op.particle_index, op.orbital),
+                            bc = BR(cc) << bitoffset(PS, op.particle_index, op.orbital),
                             ampl = compute_amplitude(cr, cc)
                             ParticleProjectorUnitOperator(bm, br, bc, pbm, ampl)
                         end for cr in 1:maxoccupancy(particle)
@@ -86,8 +86,8 @@ function make_projector_operator(
                 else # op.ladder == ANNIHILATION
                     return ParticleProjectorSumOperator([
                         let cr = cc - 1,
-                            br = BR(cr) << bitoffset(hs, op.particle_index, op.orbital),
-                            bc = BR(cc) << bitoffset(hs, op.particle_index, op.orbital),
+                            br = BR(cr) << bitoffset(PS, op.particle_index, op.orbital),
+                            bc = BR(cc) << bitoffset(PS, op.particle_index, op.orbital),
                             ampl = compute_amplitude(cr, cc)
                             ParticleProjectorUnitOperator(bm, br, bc, pbm, ampl)
                         end for cc in 1:maxoccupancy(particle)
@@ -101,26 +101,15 @@ function make_projector_operator(
 end
 
 function make_projector_operator(
-    hs::ParticleHilbertSpace{PS, BR, QN},
-    op::ParticleLadderProduct{PS, PI, OI},
-) where {PS, BR, QN, PI<:Integer, OI<:Integer}
-    return prod(make_projector_operator(hs, f) for f in op.factors)
+    op::ParticleLadderProduct,
+    ::Type{BR}=UInt,
+) where {BR<:Unsigned}
+    return prod(make_projector_operator(f, BR) for f in op.factors)
 end
 
 function make_projector_operator(
-    hs::ParticleHilbertSpace{PS, BR, QN},
-    op::ParticleLadderSum{PS, PI, OI, S},
-) where {PS, BR, QN, PI<:Integer, OI<:Integer, S}
-    return sum(a * make_projector_operator(hs, t) for (t, a) in op.terms)
-end
-
-function make_projector_operator(
-    hs::HilbertSpaceSector{<:ParticleHilbertSpace, <:Any},
-    op...
-)
-    return make_projector_operator(basespace(hs), op...)
-end
-
-function make_projector_operator(op::ParticleLadderOperatorEmbedding)
-    return make_projector_operator(get_space(op), get_ladder(op))
+    op::ParticleLadderSum,
+    ::Type{BR}=UInt,
+) where {BR<:Unsigned}
+    return sum(a * make_projector_operator(t, BR) for (t, a) in op.terms)
 end

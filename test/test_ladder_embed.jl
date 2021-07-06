@@ -1,3 +1,5 @@
+#=
+
 using Test
 using LinearAlgebra
 using Random
@@ -51,9 +53,6 @@ using QuantumHamiltonianParticle
     end
 
     @testset "Ladder Iterator" begin
-        p = ParticleSector(Boson(:m, 2), Fermion(:f))
-        cdag(i, j) = ParticleLadderUnit(p, i, j, CREATION)
-        c(i, j)    = ParticleLadderUnit(p, i, j, ANNIHILATION)
         site = ParticleSite([
             ParticleState(p, "__", [0, 0], (0, 0)),
             ParticleState(p, "b_", [1, 0], (1, 0)),
@@ -72,7 +71,7 @@ using QuantumHamiltonianParticle
         hsr = represent(hs)
         rng = MersenneTwister(0)
         for op in [cdag(1,2), cdag(2,2), c(1,2), c(2,2), cdag(1,3)*c(1,1), cdag(2,3) * c(2,1), cdag(2,3)*c(2,1)*2 + c(1,1)*0.5]
-            for bvec in rand(rng, hsr.basis_list, 8)
+            for bvec in rand(rng, get_basis_list(hsr), 8)
                 @test collect(get_column_iterator(hs, op, bvec)) == collect(get_column_iterator(embed(hs, op), bvec))
                 @test collect(get_row_iterator(hs, op, bvec)) == collect(get_row_iterator(embed(hs, op), bvec))
                 outvec1 = SparseState{Float64, UInt}()
@@ -82,7 +81,7 @@ using QuantumHamiltonianParticle
                 apply!(outvec2, embed(hs1, op), invec)
                 @test outvec1 == outvec2
             end
-            for brow in rand(rng, hsr.basis_list, 3), bcol in rand(rng, hsr.basis_list, 3)
+            for brow in rand(rng, get_basis_list(hsr), 3), bcol in rand(rng, get_basis_list(hsr), 3)
                 @test get_element(hs, op, brow, bcol) == get_element(embed(hs, op), brow, bcol)
             end
         end
@@ -129,3 +128,5 @@ using QuantumHamiltonianParticle
     @testset "simplify" begin
     end
 end
+
+=#

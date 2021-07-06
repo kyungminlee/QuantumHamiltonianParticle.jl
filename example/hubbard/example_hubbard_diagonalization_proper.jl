@@ -80,11 +80,11 @@ using LinearAlgebra
         rhsr = symmetry_reduce(hsr, sic)
         println("SIC: $(sic.normal.irrep_index) $(sic.rest.irrep_index)/$(sic.rest.irrep_component)")
         for (j, (i, a)) in enumerate(zip(rhsr.basis_mapping_index, rhsr.basis_mapping_amplitude))
-            print(string(hsr.basis_list[j], base=2, pad=4), "\t")
+            print(string(get_basis_state(hsr, j), base=2, pad=4), "\t")
             if i <= 0
                 println(-1)
             else
-                println(string(rhsr.basis_list[i], base=2, pad=4), "\t", a)
+                println(string(get_basis_state(rhsr, i), base=2, pad=4), "\t", a)
             end
         end
         println()

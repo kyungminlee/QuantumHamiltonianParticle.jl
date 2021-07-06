@@ -4,13 +4,16 @@ using QuantumHamiltonianParticle
 
 using LinearAlgebra
 
+#=
 fermion_up = Fermion{:up}()
 fermion_dn = Fermion{:dn}()
 particle_sector = ParticleSector(fermion_up, fermion_dn)
 
 c_dag(i, sp) = ParticleLadderUnit(particle_sector, sp, i, CREATION)
 c(i, sp) = ParticleLadderUnit(particle_sector, sp, i, ANNIHILATION)
+=#
 
+particle_sector, c, c_dag = QuantumHamiltonianParticle.Toolkit.electron_system()
 site = ParticleSite([
     ParticleState(particle_sector, "em", [0,0], (0, 0)),
     ParticleState(particle_sector, "up", [1,0], (1, 1)),
@@ -18,28 +21,27 @@ site = ParticleSite([
     ParticleState(particle_sector, "ud", [1,1], (2, 0)),
 ])
 
+
 nsites = 4
 hs = ParticleHilbertSpace([site for i in 1:nsites])
-
-
 
 hopping_nn = sum(
     let j = mod(i, nsites)+1
         c_dag(i, sp)*c(j, sp) + c_dag(j, sp)*c(i, sp)
     end
         for i in 1:nsites
-        for sp in 1:2
+        for sp in [:up, :dn]
 )
 hopping_2nn = sum(
     let j = mod(i+1, nsites)+1
         c_dag(i, sp)*c(j, sp) + c_dag(j, sp)*c(i, sp)
     end
         for i in 1:nsites
-        for sp in 1:2
+        for sp in [:up, :dn]
 )
 
 interaction = sum(
-    c_dag(i, 1) * c(i, 1) * c_dag(i, 2) * c(i, 2)
+    c_dag(i, :up) * c(i, :up) * c_dag(i, :dn) * c(i, :dn)
     for i in 1:nsites
 )
 

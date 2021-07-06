@@ -11,7 +11,7 @@ import QuantumHamiltonian.get_state_index
 import QuantumHamiltonian.get_quantum_number
 import QuantumHamiltonian.quantum_number_sectors
 import QuantumHamiltonian.compress
-
+import QuantumHamiltonian.represent
 
 """
     ParticleState{PS, BR, QN}
@@ -139,6 +139,9 @@ function get_quantum_number(site::ParticleSite{PS, BR, QN}, state_index::Integer
     return site.states[state_index].quantum_number
 end
 
+@inline function represent(site::ParticleSite{PS, BR, QN}, istate::Integer, ::Type{BR2}=BR) where {PS, BR, QN, BR2<:Unsigned}
+    BR2(site.states[istate].occupancy_binary)
+end
 
 for fname in [
     :exchangesign,

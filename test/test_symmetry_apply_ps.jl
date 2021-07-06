@@ -19,9 +19,6 @@ using QuantumHamiltonian
     c(i,j) = ParticleLadderUnit(particle_sector, i, j, ANNIHILATION)
     cdag(i,j) = ParticleLadderUnit(particle_sector, i, j, CREATION)
 
-    ec(i,j) = embed(particle_hilbert_space, ParticleLadderUnit(particle_sector, i, j, ANNIHILATION))
-    ecdag(i,j) = embed(particle_hilbert_space, ParticleLadderUnit(particle_sector, i, j, CREATION))
-
     @testset "ladder operator" begin
         @test symmetry_apply(permutation, c(1,1)) == c(1,2)
         @test symmetry_apply(permutation, c(1,3)) == c(1,1)
@@ -34,13 +31,6 @@ using QuantumHamiltonian
         @test symmetry_apply(particle_hilbert_space, permutation, c(2,3)) == c(2,1)
         @test symmetry_apply(particle_hilbert_space, permutation, cdag(1,2)) == cdag(1,3)
         @test symmetry_apply(particle_hilbert_space, permutation, cdag(2,3)) == cdag(2,1)
-
-        @test symmetry_apply(permutation, ec(1,1)) == ec(1,2)
-        @test symmetry_apply(permutation, ec(1,3)) == ec(1,1)
-        @test symmetry_apply(permutation, ec(2,3)) == ec(2,1)
-        @test symmetry_apply(permutation, ecdag(1,2)) == ecdag(1,3)
-        @test symmetry_apply(permutation, ecdag(2,3)) == ecdag(2,1)
-
 
         @test symmetry_apply(particle_hilbert_space, permutation, cdag(1,2)*c(2,3)) == cdag(1,3)*c(2,1)
         @test symmetry_apply(particle_hilbert_space, permutation, cdag(1,2)*c(2,3)+c(2,1)) == cdag(1,3)*c(2,1)+c(2,2)

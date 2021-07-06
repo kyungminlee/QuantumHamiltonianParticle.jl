@@ -1,7 +1,7 @@
 abstract type AbstractParticle end
 
 export Fermion, HardcoreBoson, Boson, Spin
-export species
+export getspeciesname
 export exchangesign
 export isfermion, isboson, isspin
 export maxoccupancy
@@ -31,6 +31,10 @@ struct Boson{Species, Max}<:AbstractParticle
     Boson{Species, Max}() where {Species, Max} = new{Species, Max}()
 end
 
+@inline getspeciesname(::P) where {P<:AbstractParticle} = getspeciesname(P)
+@inline getspeciesname(::Type{Fermion{S}}) where S = S
+@inline getspeciesname(::Type{HardcoreBoson{S}}) where S = S
+@inline getspeciesname(::Type{Boson{S, M}}) where {S, M} = S
 
 """
     Spin{Species, N}

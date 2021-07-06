@@ -8,24 +8,24 @@ using QuantumHamiltonianParticle
         site = ParticleSite([ParticleState(p, "_", [0]), ParticleState(p, "f", [1])])
         hs = ParticleHilbertSpace([site])
         hsr = represent(hs)
-        dim = length(hsr.basis_list)
+        dim = length(get_basis_list(hsr))
 
         for (c, cdag) in [
-            (embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
-             embed(hs, ParticleLadderUnit(p, 1, 1, CREATION))),
-            (make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION))),
-             make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, CREATION)))),
+            (ParticleLadderUnit(p, 1, 1, ANNIHILATION),
+             ParticleLadderUnit(p, 1, 1, CREATION)),
+            (make_projector_operator(ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
+             make_projector_operator(ParticleLadderUnit(p, 1, 1, CREATION))),
         ]
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (bcol, ampl) in get_row_iterator(c, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_c[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_c[ivec, icol] = ampl * ampl2)
                 end
                 for (bcol, ampl) in get_row_iterator(cdag, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_cdag[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_cdag[ivec, icol] = ampl * ampl2)
                 end
             end
             @test mat_c == [0.0 1.0; 0.0 0.0]
@@ -33,14 +33,14 @@ using QuantumHamiltonianParticle
 
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (brow, ampl) in get_column_iterator(c, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_c[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_c[irow, ivec] = ampl * ampl2)
                 end
                 for (brow, ampl) in get_column_iterator(cdag, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_cdag[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_cdag[irow, ivec] = ampl * ampl2)
                 end
             end
             @test mat_c == [0.0 1.0; 0.0 0.0]
@@ -54,24 +54,24 @@ using QuantumHamiltonianParticle
         site = ParticleSite([ParticleState(p, "_", [0]), ParticleState(p, "f", [1])])
         hs = ParticleHilbertSpace([site])
         hsr = represent(hs)
-        dim = length(hsr.basis_list)
+        dim = length(get_basis_list(hsr))
 
         for (c, cdag) in [
-            (embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
-             embed(hs, ParticleLadderUnit(p, 1, 1, CREATION))),
-            (make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION))),
-             make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, CREATION)))),
+            (ParticleLadderUnit(p, 1, 1, ANNIHILATION),
+             ParticleLadderUnit(p, 1, 1, CREATION)),
+            (make_projector_operator(ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
+             make_projector_operator(ParticleLadderUnit(p, 1, 1, CREATION))),
         ]
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (bcol, ampl) in get_row_iterator(c, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_c[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_c[ivec, icol] = ampl * ampl2)
                 end
                 for (bcol, ampl) in get_row_iterator(cdag, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_cdag[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_cdag[ivec, icol] = ampl * ampl2)
                 end
             end
             @test mat_c == [0 1; 0 0]
@@ -79,14 +79,14 @@ using QuantumHamiltonianParticle
 
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (brow, ampl) in get_column_iterator(c, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_c[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_c[irow, ivec] = ampl * ampl2)
                 end
                 for (brow, ampl) in get_column_iterator(cdag, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_cdag[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_cdag[irow, ivec] = ampl * ampl2)
                 end
             end
             @test mat_c == [0 1; 0 0]
@@ -105,25 +105,25 @@ using QuantumHamiltonianParticle
         ])
         hs = ParticleHilbertSpace([site])
         hsr = represent(hs)
-        dim = length(hsr.basis_list)
+        dim = length(get_basis_list(hsr))
 
         for (c, cdag) in [
-            (embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
-             embed(hs, ParticleLadderUnit(p, 1, 1, CREATION))),
-            (make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION))),
-             make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, CREATION)))),
+            (ParticleLadderUnit(p, 1, 1, ANNIHILATION),
+             ParticleLadderUnit(p, 1, 1, CREATION)),
+            (make_projector_operator(ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
+             make_projector_operator(ParticleLadderUnit(p, 1, 1, CREATION))),
         ]
 
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (bcol, ampl) in get_row_iterator(c, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_c[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_c[ivec, icol] = ampl * ampl2)
                 end
                 for (bcol, ampl) in get_row_iterator(cdag, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_cdag[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_cdag[ivec, icol] = ampl * ampl2)
                 end
             end
             # https://en.wikipedia.org/wiki/Creation_and_annihilation_operators#Matrix_representation
@@ -142,14 +142,14 @@ using QuantumHamiltonianParticle
 
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (brow, ampl) in get_column_iterator(c, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_c[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_c[irow, ivec] = ampl * ampl2)
                 end
                 for (brow, ampl) in get_column_iterator(cdag, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_cdag[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_cdag[irow, ivec] = ampl * ampl2)
                 end
             end
             @test mat_c ≈ sqrt.([
@@ -175,24 +175,24 @@ using QuantumHamiltonianParticle
         ])
         hs = ParticleHilbertSpace([site])
         hsr = represent(hs)
-        dim = length(hsr.basis_list)
+        dim = length(get_basis_list(hsr))
 
         for (c, cdag) in [
-            (embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
-             embed(hs, ParticleLadderUnit(p, 1, 1, CREATION))),
-            (make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION))),
-             make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, CREATION)))),
+            (ParticleLadderUnit(p, 1, 1, ANNIHILATION),
+             ParticleLadderUnit(p, 1, 1, CREATION)),
+            (make_projector_operator(ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
+             make_projector_operator(ParticleLadderUnit(p, 1, 1, CREATION))),
         ]
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (bcol, ampl) in get_row_iterator(c, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_c[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_c[ivec, icol] = ampl * ampl2)
                 end
                 for (bcol, ampl) in get_row_iterator(cdag, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_cdag[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_cdag[ivec, icol] = ampl * ampl2)
                 end
             end
             # https://easyspin.org/easyspin/documentation/spinoperators.html
@@ -207,14 +207,14 @@ using QuantumHamiltonianParticle
 
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (brow, ampl) in get_column_iterator(c, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_c[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_c[irow, ivec] = ampl * ampl2)
                 end
                 for (brow, ampl) in get_column_iterator(cdag, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_cdag[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_cdag[irow, ivec] = ampl * ampl2)
                 end
             end
             @test mat_c ≈ sqrt.([
@@ -240,24 +240,24 @@ using QuantumHamiltonianParticle
         ])
         hs = ParticleHilbertSpace([site])
         hsr = represent(hs)
-        dim = length(hsr.basis_list)
+        dim = length(get_basis_list(hsr))
 
         for (c, cdag) in [
-            (embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
-             embed(hs, ParticleLadderUnit(p, 1, 1, CREATION))),
-            (make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, ANNIHILATION))),
-             make_projector_operator(embed(hs, ParticleLadderUnit(p, 1, 1, CREATION)))),
+            (ParticleLadderUnit(p, 1, 1, ANNIHILATION),
+             ParticleLadderUnit(p, 1, 1, CREATION)),
+            (make_projector_operator(ParticleLadderUnit(p, 1, 1, ANNIHILATION)),
+             make_projector_operator(ParticleLadderUnit(p, 1, 1, CREATION))),
         ]
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (bcol, ampl) in get_row_iterator(c, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_c[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_c[ivec, icol] = ampl * ampl2)
                 end
                 for (bcol, ampl) in get_row_iterator(cdag, bvec)
-                    icol = get(hsr.basis_lookup, bcol, -1)
-                    (icol > 0) && (mat_cdag[ivec, icol] = ampl)
+                    icol, ampl2 = get_basis_index_amplitude(hsr, bcol)
+                    (icol > 0) && (mat_cdag[ivec, icol] = ampl * ampl2)
                 end
             end
             # https://easyspin.org/easyspin/documentation/spinoperators.html
@@ -276,14 +276,14 @@ using QuantumHamiltonianParticle
 
             mat_c = zeros(Float64, (dim, dim))
             mat_cdag = zeros(Float64, (dim, dim))
-            for (ivec, bvec) in enumerate(hsr.basis_list)
+            for (ivec, bvec) in enumerate(get_basis_list(hsr))
                 for (brow, ampl) in get_column_iterator(c, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_c[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_c[irow, ivec] = ampl * ampl2)
                 end
                 for (brow, ampl) in get_column_iterator(cdag, bvec)
-                    irow = get(hsr.basis_lookup, brow, -1)
-                    (irow > 0) && (mat_cdag[irow, ivec] = ampl)
+                    irow, ampl2 = get_basis_index_amplitude(hsr, brow)
+                    (irow > 0) && (mat_cdag[irow, ivec] = ampl * ampl2)
                 end
             end
             @test mat_c ≈ sqrt.([

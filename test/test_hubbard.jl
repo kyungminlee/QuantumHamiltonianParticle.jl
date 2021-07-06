@@ -37,9 +37,12 @@ using LinearAlgebra
 
     @testset "symmetry" begin
         t = SitePermutation([2,3,4,1])
-        @test isinvariant(t, embed(hilbert_space, interaction_hamiltonian))
-        @test isinvariant(t, embed(hilbert_space, hopping_hamiltonian))
-        @test !isinvariant(t, embed(hilbert_space, c_up_dag(1)*c_up(1)))
+        # @test isinvariant(t, embed(hilbert_space, interaction_hamiltonian))
+        # @test isinvariant(t, embed(hilbert_space, hopping_hamiltonian))
+        # @test !isinvariant(t, embed(hilbert_space, c_up_dag(1)*c_up(1)))
+        @test isinvariant(t, interaction_hamiltonian)
+        @test isinvariant(t, hopping_hamiltonian)
+        @test !isinvariant(t, c_up_dag(1)*c_up(1))
     end
 
 end

@@ -26,10 +26,10 @@ function symmetry_apply(permutation::SitePermutation, op::ParticleLadderSum{PI, 
     return ParticleLadderSum([symmetry_apply(permutation, t) => a for (t, a) in op.terms])
 end
 
-# === Ladder Embedding ===
-function symmetry_apply(permutation::SitePermutation, op::ParticleLadderOperatorEmbedding)
-    return ParticleLadderOperatorEmbedding(op.hilbert_space, symmetry_apply(permutation, op.ladder))
-end
+# # === Ladder Embedding ===
+# function symmetry_apply(permutation::SitePermutation, op::ParticleLadderOperatorEmbedding)
+#     return ParticleLadderOperatorEmbedding(op.hilbert_space, symmetry_apply(permutation, op.ladder))
+# end
 
 
 import QuantumHamiltonian.isinvariant
