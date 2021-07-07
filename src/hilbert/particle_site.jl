@@ -130,7 +130,7 @@ function get_state(site::ParticleSite, binrep::Unsigned)
 end
 
 function quantum_number_sectors(site::ParticleSite{PS, BR, QN})::Vector{QN} where {PS, BR, QN}
-    return sort(collect(Set([state.quantum_number for state in site.states])))
+    return unique(sort([state.quantum_number for state in site.states]))
 end
 
 function get_quantum_number(site::ParticleSite{PS, BR, QN}, state_index::Integer)::QN where {PS, BR, QN}
