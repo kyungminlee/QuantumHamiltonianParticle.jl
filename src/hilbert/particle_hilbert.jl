@@ -20,7 +20,6 @@ import QuantumHamiltonian.get_quantum_number
 import QuantumHamiltonian.compress
 import QuantumHamiltonian.extract
 import QuantumHamiltonian.uncompress
-import QuantumHamiltonian.hs_get_basis_list
 
 
 # Add a decoration to the existing Hilbert space
@@ -365,19 +364,6 @@ function Base.getindex(
     idx::Integer...
 ) where {PS, BR, QN}
     return compress(hs, CartesianIndex(idx...), BR)
-end
-
-
-function hs_get_basis_list(hs::ParticleHilbertSpace{PS, BR, QN}, ::Type{BR2}=BR)::Vector{BR2} where {PS, BR<:Unsigned, QN, BR2}
-    if sizeof(BR2) * 8 <= bitwidth(hs)
-        throw(ArgumentError("type $(BR2) not enough to represent the hilbert space (need $(bitwidth(hs)) bits)"))
-    end
-    basis_list = BR2[]
-    for indexarray in keys(hs)
-        push!(basis_list, statevec2occbin(hs, collect(indexarray.I) ))
-    end
-    sort!(basis_list)
-    return basis_list
 end
 
 
