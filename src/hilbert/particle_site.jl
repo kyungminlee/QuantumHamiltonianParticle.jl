@@ -108,7 +108,6 @@ struct ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstrac
     state_lookup::Dict{BR, Int}
 
     function ParticleSite(states::AbstractVector{ParticleState{PS, BR, QN}}) where {QN, PS, BR}
-        n_particles, n_states = numspecies(PS), length(states)
         lookup = Dict{BR, Int}()
         for (i, s) in enumerate(states)
             occbin = s.occupancy_binary

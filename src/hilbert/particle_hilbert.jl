@@ -148,14 +148,6 @@ function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::
 end
 
 
-# """
-#     bitoffset(phs, isite)
-# """
-# function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
-#     return phs.bitoffsets[isite]
-# end
-
-
 """
     get_bitmask(phs, iptl, isite)
 
@@ -264,6 +256,7 @@ function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer,
     end
 end
 
+
 """
     get_occupancy(phs, iptl, isite, bvec::Unsigned)
 
@@ -345,7 +338,6 @@ function uncompress(hs::ParticleHilbertSpace, occbin::Unsigned)
 end
 
 
-
 function Base.keys(hs::ParticleHilbertSpace)
     return CartesianIndices(((1:length(site.states) for site in hs.sites)...,))
 end
@@ -365,18 +357,3 @@ function Base.getindex(
 ) where {PS, BR, QN}
     return compress(hs, CartesianIndex(idx...), BR)
 end
-
-
-# function extract(hs::ParticleHilbertSpace{PS, BR, QN}, binrep::Unsigned)::CartesianIndex where {PS, BR, QN}
-#   out = Int[]
-#   for (isite, site) in enumerate(hs.sites)
-#     @inbounds mask = make_bitmask(hs.bitwidths[isite], BR)
-#     index = Int(binrep & mask) + 1
-#     @boundscheck if !(1 <= index <= length(site.states))
-#       throw(BoundsError(1:length(site.states), index))
-#     end
-#     push!(out, index)
-#     binrep = binrep >> hs.bitwidths[isite]
-#   end
-#   return CartesianIndex(out...)
-# end
