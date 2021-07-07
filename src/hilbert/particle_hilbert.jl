@@ -12,6 +12,8 @@ import QuantumHamiltonian.AbstractHilbertSpace
 import QuantumHamiltonian.scalartype
 import QuantumHamiltonian.qntype
 import QuantumHamiltonian.basespace
+import QuantumHamiltonian.numsites
+import QuantumHamiltonian.get_site
 import QuantumHamiltonian.bitwidth
 import QuantumHamiltonian.bitoffset
 import QuantumHamiltonian.get_bitmask
@@ -71,6 +73,10 @@ qntype(::ParticleHilbertSpace{PS, BR, QN}) where {PS, BR, QN} = QN
 
 
 basespace(hs::ParticleHilbertSpace) = hs
+
+numsites(hs::ParticleHilbertSpace) = length(hs.sites)
+
+get_site(hs::ParticleHilbertSpace, i::Integer) = hs.sites[i]
 
 
 for fname in [
@@ -137,6 +143,10 @@ Return number of bits needed to represent basis states of `phs`.
 """
 bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
 
+bitwidth(hs::ParticleHilbertSpace, isite::Integer) = hs.bitwidths[isite]
+
+bitoffset(hs::ParticleHilbertSpace, isite::Integer) = hs.bitoffsets[isite]
+
 
 """
     bitoffset(phs, iptl, isite)
@@ -146,6 +156,9 @@ Get the bit offset of the particle `iptl` at site `isite`.
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
     return phs.bitoffsets[isite] + bitoffset(PS, iptl)
 end
+
+
+
 
 
 """
