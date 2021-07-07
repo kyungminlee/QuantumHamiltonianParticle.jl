@@ -242,7 +242,6 @@ end
 
 
 function extract(::Type{P}, occbin::BR)::Vector{Int} where {P<:ParticleSector, BR<:Unsigned}
-    offset = 0
     n_particles = speciescount(P)
     occ = Vector{Int}(undef, n_particles)
     for (i, p) in enumerate(getspecies(P))

@@ -171,7 +171,6 @@ function get_bitmask(
 )::BR where {PS, BR, QN}
     @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
     @boundscheck !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
-    n_sites = length(phs.sites)
     bm = get_bitmask(PS, iptl, BR)
     return bm << phs.bitoffsets[isite]
 end
@@ -315,7 +314,7 @@ function compress(
     indexarray::CartesianIndex,
     ::Type{BR2}=BR,
 ) where {PS, BR, QN, BR2<:Unsigned}
-    return BR(statevec2occbin(hs, collect(indexarray.I)))
+    return BR2(statevec2occbin(hs, collect(indexarray.I)))
 end
 
 
