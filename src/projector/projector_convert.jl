@@ -13,8 +13,6 @@ function Base.promote_rule(
     return ParticleProjectorUnitOperator{B, S}
 end
 
-
-
 function Base.promote_rule(
     ::Type{ParticleProjectorUnitOperator{BL, SL}},
     ::Type{ParticleProjectorUnitOperator{BR, SR}}
@@ -24,7 +22,6 @@ function Base.promote_rule(
     return ParticleProjectorUnitOperator{B, S}
 end
 
-
 function Base.promote_rule(
     ::Type{ParticleProjectorUnitOperator{BL, SL}},
     ::Type{ParticleProjectorSumOperator{BR, SR}},
@@ -33,7 +30,6 @@ function Base.promote_rule(
     S = promote_type(SL, SR)
     return ParticleProjectorSumOperator{B, S}
 end
-
 
 function Base.promote_rule(
     ::Type{ParticleProjectorSumOperator{BL, SL}},
@@ -54,7 +50,6 @@ function Base.convert(
     return ParticleProjectorUnitOperator(z, z, z, z, S(arg))
 end
 
-
 function Base.convert(
     ::Type{ParticleProjectorUnitOperator{BR, S}},
     ::NullOperator
@@ -62,7 +57,6 @@ function Base.convert(
     z = zero(BR)
     return ParticleProjectorUnitOperator(z, z, z, z, zero(S))
 end
-
 
 function Base.convert(
     ::Type{ParticleProjectorUnitOperator{B, S}},
@@ -74,7 +68,6 @@ function Base.convert(
     )
 end
 
-
 function Base.convert(
     ::Type{ParticleProjectorSumOperator{B, S}},
     arg::ParticleProjectorUnitOperator,
@@ -85,8 +78,6 @@ function Base.convert(
     )
     return ParticleProjectorSumOperator([projop])
 end
-
-
 
 function Base.convert(
     ::Type{ParticleProjectorSumOperator{B, S}},

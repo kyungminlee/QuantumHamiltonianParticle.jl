@@ -11,7 +11,6 @@ import QuantumHamiltonian.get_state_index
 import QuantumHamiltonian.get_quantum_number
 import QuantumHamiltonian.quantum_number_sectors
 import QuantumHamiltonian.compress
-import QuantumHamiltonian.represent
 
 """
     ParticleState{PS, BR, QN}
@@ -108,7 +107,6 @@ struct ParticleSite{PS<:ParticleSector, BR<:Unsigned, QN<:Tuple{Vararg{<:Abstrac
     state_lookup::Dict{BR, Int}
 
     function ParticleSite(states::AbstractVector{ParticleState{PS, BR, QN}}) where {QN, PS, BR}
-        n_particles, n_states = numspecies(PS), length(states)
         lookup = Dict{BR, Int}()
         for (i, s) in enumerate(states)
             occbin = s.occupancy_binary
@@ -132,15 +130,15 @@ function get_state(site::ParticleSite, binrep::Unsigned)
 end
 
 function quantum_number_sectors(site::ParticleSite{PS, BR, QN})::Vector{QN} where {PS, BR, QN}
-    return sort(collect(Set([state.quantum_number for state in site.states])))
+    return unique(sort([state.quantum_number for state in site.states]))
 end
 
 function get_quantum_number(site::ParticleSite{PS, BR, QN}, state_index::Integer)::QN where {PS, BR, QN}
     return site.states[state_index].quantum_number
 end
 
-@inline function represent(site::ParticleSite{PS, BR, QN}, istate::Integer, ::Type{BR2}=BR) where {PS, BR, QN, BR2<:Unsigned}
-    BR2(site.states[istate].occupancy_binary)
+@inline function compress(site::ParticleSite{PS, BR, QN}, istate::Integer, ::Type{BR2}=BR) where {PS, BR, QN, BR2<:Unsigned}
+    return BR2(site.states[istate].occupancy_binary)
 end
 
 for fname in [

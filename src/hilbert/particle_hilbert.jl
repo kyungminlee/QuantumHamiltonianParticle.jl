@@ -12,6 +12,8 @@ import QuantumHamiltonian.AbstractHilbertSpace
 import QuantumHamiltonian.scalartype
 import QuantumHamiltonian.qntype
 import QuantumHamiltonian.basespace
+import QuantumHamiltonian.numsites
+import QuantumHamiltonian.get_site
 import QuantumHamiltonian.bitwidth
 import QuantumHamiltonian.bitoffset
 import QuantumHamiltonian.get_bitmask
@@ -20,7 +22,6 @@ import QuantumHamiltonian.get_quantum_number
 import QuantumHamiltonian.compress
 import QuantumHamiltonian.extract
 import QuantumHamiltonian.uncompress
-import QuantumHamiltonian.hs_get_basis_list
 
 
 # Add a decoration to the existing Hilbert space
@@ -72,6 +73,10 @@ qntype(::ParticleHilbertSpace{PS, BR, QN}) where {PS, BR, QN} = QN
 
 
 basespace(hs::ParticleHilbertSpace) = hs
+
+numsites(hs::ParticleHilbertSpace) = length(hs.sites)
+
+get_site(hs::ParticleHilbertSpace, i::Integer) = hs.sites[i]
 
 
 for fname in [
@@ -138,6 +143,10 @@ Return number of bits needed to represent basis states of `phs`.
 """
 bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
 
+bitwidth(hs::ParticleHilbertSpace, isite::Integer) = hs.bitwidths[isite]
+
+bitoffset(hs::ParticleHilbertSpace, isite::Integer) = hs.bitoffsets[isite]
+
 
 """
     bitoffset(phs, iptl, isite)
@@ -149,12 +158,7 @@ function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::
 end
 
 
-# """
-#     bitoffset(phs, isite)
-# """
-# function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, isite::Integer) where {PS, BR, QN}
-#     return phs.bitoffsets[isite]
-# end
+
 
 
 """
@@ -171,7 +175,6 @@ function get_bitmask(
 )::BR where {PS, BR, QN}
     @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
     @boundscheck !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
-    n_sites = length(phs.sites)
     bm = get_bitmask(PS, iptl, BR)
     return bm << phs.bitoffsets[isite]
 end
@@ -266,6 +269,7 @@ function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer,
     end
 end
 
+
 """
     get_occupancy(phs, iptl, isite, bvec::Unsigned)
 
@@ -315,7 +319,7 @@ function compress(
     indexarray::CartesianIndex,
     ::Type{BR2}=BR,
 ) where {PS, BR, QN, BR2<:Unsigned}
-    return BR(statevec2occbin(hs, collect(indexarray.I)))
+    return BR2(statevec2occbin(hs, collect(indexarray.I)))
 end
 
 
@@ -347,7 +351,6 @@ function uncompress(hs::ParticleHilbertSpace, occbin::Unsigned)
 end
 
 
-
 function Base.keys(hs::ParticleHilbertSpace)
     return CartesianIndices(((1:length(site.states) for site in hs.sites)...,))
 end
@@ -367,31 +370,3 @@ function Base.getindex(
 ) where {PS, BR, QN}
     return compress(hs, CartesianIndex(idx...), BR)
 end
-
-
-function hs_get_basis_list(hs::ParticleHilbertSpace{PS, BR, QN}, ::Type{BR2}=BR)::Vector{BR2} where {PS, BR<:Unsigned, QN, BR2}
-    if sizeof(BR2) * 8 <= bitwidth(hs)
-        throw(ArgumentError("type $(BR2) not enough to represent the hilbert space (need $(bitwidth(hs)) bits)"))
-    end
-    basis_list = BR2[]
-    for indexarray in keys(hs)
-        push!(basis_list, statevec2occbin(hs, collect(indexarray.I) ))
-    end
-    sort!(basis_list)
-    return basis_list
-end
-
-
-# function extract(hs::ParticleHilbertSpace{PS, BR, QN}, binrep::Unsigned)::CartesianIndex where {PS, BR, QN}
-#   out = Int[]
-#   for (isite, site) in enumerate(hs.sites)
-#     @inbounds mask = make_bitmask(hs.bitwidths[isite], BR)
-#     index = Int(binrep & mask) + 1
-#     @boundscheck if !(1 <= index <= length(site.states))
-#       throw(BoundsError(1:length(site.states), index))
-#     end
-#     push!(out, index)
-#     binrep = binrep >> hs.bitwidths[isite]
-#   end
-#   return CartesianIndex(out...)
-# end

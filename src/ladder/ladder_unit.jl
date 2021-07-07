@@ -87,25 +87,3 @@ function Base.adjoint(arg::ParticleLadderUnit{PS, P, O}) where {PS, P, O}
 end
 
 LinearAlgebra.ishermitian(arg::ParticleLadderUnit) = false
-
-
-#=
-import QuantumHamiltonian.apply
-import QuantumHamiltonian.apply!
-
-function apply!(
-    out::SparseState{S1, BR},
-    pureop::ParticleProjectorUnitOperator{BR, S2},
-    psi::SparseState{S3, BR},
-) where {S1, S2, S3, BR}
-    for (b, v) in psi.components
-        if (b & pureop.bitmask) == pureop.bitcol
-            b2 = (b & ~pureop.bitmask) | pureop.bitrow
-            a = pureop.amplitude * v
-            isparityeven = mod(count_ones(pureop.parity_bitmask & bvec), 2) == 0
-            out[b2] += isparityeven ? a : -a
-        end
-    end
-    return out
-end
-=#

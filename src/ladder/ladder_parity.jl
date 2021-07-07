@@ -17,7 +17,6 @@ function get_fermion_parity(
 end
 
 
-
 """
     get_fermion_parity(phs, op, bvec)
 

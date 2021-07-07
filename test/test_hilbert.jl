@@ -211,4 +211,18 @@ using QuantumHamiltonianParticle
     ]
     @test length(basis_list) == 6^3
     @test_throws ArgumentError QuantumHamiltonian.hs_get_basis_list(hilbert, UInt8)
+
+
+    basis_list = QuantumHamiltonian.hs_get_basis_list(hilbert, [(2, 1)])
+    @test basis_list == sort([
+        0b000_000_101,
+        0b000_100_001,
+        0b100_000_001,
+        0b000_001_100,
+        0b000_101_000,
+        0b100_001_000,
+        0b001_000_100,
+        0b001_100_000,
+        0b101_000_000,
+    ])
 end

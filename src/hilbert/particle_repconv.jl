@@ -29,7 +29,7 @@ function occbin2occvec(ps::ParticleSite{PS, BR, QN}, occbin::Unsigned) where {PS
 end
 
 function occvec2occbin(ps::ParticleSite{PS, BR, QN}, occarr::AbstractVector{<:Integer}) where {PS, BR, QN}
-    return compress(PS, occarr)
+    return compress(PS, occarr, BR)
 end
 
 function state2occbin(ps::ParticleSite{PS, BR, QN}, index::Integer)::BR where {PS, BR, QN}
