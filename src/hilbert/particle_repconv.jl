@@ -94,7 +94,7 @@ function statevec2occbin(
     occbin = zero(BR)
     for (isite, (site, istate)) in enumerate(zip(phs.sites, statevec))
         siteoccbin = state2occbin(site, istate)
-        occbin |= siteoccbin << phs.bitoffsets[isite]
+        occbin |= siteoccbin << bitoffset(phs, isite)
     end
     return occbin
 end
@@ -104,12 +104,12 @@ function statevec2occmat(
     ps::ParticleHilbertSpace{PS, BR, QN},
     statevec::AbstractVector{<:Integer},
 )::Matrix{Int} where {PS, BR, QN}
-    n_particles = speciescount(PS)
-    n_sites = length(ps.sites)
-    if length(statevec) != length(ps.sites)
+    nptls = speciescount(PS)
+    nsites = length(ps.sites)
+    if length(statevec) != nsites
         throw(ArgumentError("Length of statevec does not match the number of sites"))
     end
-    occarr = zeros(Int, (n_particles, n_sites))
+    occarr = zeros(Int, (nptls, nsites))
     for (isite, (site, istate)) in enumerate(zip(ps.sites, statevec))
         occarr[:, isite] = extract(PS, state2occbin(site, istate))
     end
@@ -121,11 +121,11 @@ function statevec2locvec(
     phs::ParticleHilbertSpace{PS, BR, QN},
     statevec::AbstractVector{<:Integer},
 ) where {PS, BR, QN}
-    n_sites = length(phs.sites)
-    n_particles = speciescount(PS)
+    nsites = length(phs.sites)
+    nptls = speciescount(PS)
     occmat = statevec2occmat(phs, statevec)
-    out = [Int[] for i in 1:n_particles]
-    for iptl in 1:n_particles, isite in 1:n_sites
+    out = [Int[] for _ in 1:nptls]
+    for iptl in 1:nptls, isite in 1:nsites
         append!(out[iptl], isite for c in 1:occmat[iptl, isite])
     end
     return out
@@ -136,12 +136,12 @@ function occmat2occbin(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occmat::AbstractMatrix{<:Integer},
 ) where {PS, BR, QN}
-    n_particles = speciescount(PS)
-    n_sites = length(phs.sites)
-    size(occmat) != (n_particles, n_sites) && throw(ArgumentError("Wrong occmat size"))
+    nptls = speciescount(PS)
+    nsites = length(phs.sites)
+    size(occmat) != (nptls, nsites) && throw(ArgumentError("Wrong occmat size"))
     occbin = zero(BR)
-    for isite in 1:n_sites
-        occbin |= compress(PS, occmat[:, isite]) << phs.bitoffsets[isite]
+    for isite in 1:nsites
+        occbin |= compress(PS, view(occmat, :, isite), BR) << bitoffset(phs, isite)
     end
     return occbin
 end
@@ -151,9 +151,9 @@ function occmat2statevec(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occmat::AbstractMatrix{<:Integer},
 ) where {PS, BR, QN}
-    n_particles = speciescount(PS)
-    n_sites = length(phs.sites)
-    size(occmat) != (n_particles, n_sites) && throw(ArgumentError("Wrong occmat size"))
+    nptls = speciescount(PS)
+    nsites = length(phs.sites)
+    size(occmat) != (nptls, nsites) && throw(ArgumentError("Wrong occmat size"))
     out = Vector{Int}(undef, length(phs.sites))
     for (isite, site) in enumerate(phs.sites)
         siteoccbin = compress(PS, occmat[:,isite], BR)
@@ -168,11 +168,11 @@ function occmat2locvec(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occmat::AbstractMatrix{<:Integer},
 ) where {PS, BR, QN}
-    n_sites = length(phs.sites)
-    n_particles = speciescount(PS)
-    size(occmat) != (n_particles, n_sites) && throw(ArgumentError("Wrong occmat size"))
-    out = [Int[] for i in 1:n_particles]
-    for iptl in 1:n_particles, isite in 1:n_sites
+    nsites = length(phs.sites)
+    nptls = speciescount(PS)
+    size(occmat) != (nptls, nsites) && throw(ArgumentError("Wrong occmat size"))
+    out = [Int[] for i in 1:nptls]
+    for iptl in 1:nptls, isite in 1:nsites
         append!(out[iptl], isite for c in 1:occmat[iptl, isite])
     end
     return out
@@ -185,7 +185,7 @@ function occbin2statevec(
 )::Vector{Int} where {PS, BR, QN}
     out = Vector{Int}(undef, length(phs.sites))
     for (isite, site) in enumerate(phs.sites)
-        siteoccbin = (occbin & get_bitmask(phs, :, isite)) >> phs.bitoffsets[isite]
+        siteoccbin = (occbin & get_bitmask(phs, :, isite)) >> bitoffset(phs, isite)
         idx = occbin2state(site, siteoccbin)
         out[isite] = idx
     end
@@ -197,18 +197,32 @@ function occbin2occmat(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occbin::Unsigned,
 ) where {PS, BR, QN}
-    n_particles = speciescount(PS)
-    n_sites = length(phs.sites)
-    occmat = Matrix{Int}(undef, (n_particles, n_sites))
-    for isite in 1:n_sites
-        siteoccbin = (occbin & get_bitmask(phs, :, isite)) >> phs.bitoffsets[isite]
-        occmat[:, isite] = extract(PS, siteoccbin)
+    nptls = speciescount(PS)
+    nsites = length(phs.sites)
+    occmat = Matrix{Int}(undef, (nptls, nsites))
+    for isite in 1:nsites
+        siteoccbin = (occbin & get_bitmask(phs, :, isite)) >> bitoffset(phs, isite)
+        extract(PS, siteoccbin, view(occmat, :, isite))
     end
     return occmat
 end
 
 
-function occbin2locvec(
+function occbin2occmat(
+    phs::ParticleHilbertSpace{PS, BR, QN},
+    occbin::Unsigned,
+    occmat::AbstractMatrix{<:Integer},
+) where {PS, BR, QN}
+    nsites = length(phs.sites)
+    for isite in 1:nsites
+        siteoccbin = (occbin & get_bitmask(phs, :, isite)) >> bitoffset(phs, isite)
+        extract(PS, siteoccbin, view(occmat, :, isite))
+    end
+    return occmat
+end
+
+
+function occbin2locvec_naive(
     phs::ParticleHilbertSpace{PS, BR, QN},
     occbin::Unsigned,
 ) where {PS, BR, QN}
@@ -217,21 +231,65 @@ function occbin2locvec(
 end
 
 
+function occbin2locvec(
+    phs::ParticleHilbertSpace{PS, BR, QN},
+    occbin::Unsigned,
+) where {PS, BR, QN}
+    nsites = length(phs.sites)
+    nptls = speciescount(PS)
+    out = [Int[] for _ in 1:nptls]
+    for iptl in 1:nptls
+        sizehint!(out[iptl], nsites)
+    end
+    sbw::Int = bitwidth(PS)
+    for iptl in 1:nptls
+        pbw::Int = bitwidth(PS, iptl)
+        pbm::BR = make_bitmask(pbw, BR)
+        for isite in 1:nsites
+            occ = Int( (occbin >> (sbw * (isite-1))) & pbm )
+            append!(out[iptl], isite for _ in 1:occ)
+        end
+        occbin >>= pbw
+    end
+    return out
+end
+
+
+function occbin2locvec!(
+    out::AbstractVector{<:AbstractVector{<:Integer}},
+    phs::ParticleHilbertSpace{PS, BR, QN},
+    occbin::Unsigned,
+) where {PS, BR, QN}
+    nsites = length(phs.sites)
+    nptls = speciescount(PS)
+    sbw::Int = bitwidth(PS)
+    for iptl in 1:nptls
+        pbw::Int = bitwidth(PS, iptl)
+        pbm::BR = make_bitmask(pbw, BR)
+        for isite in 1:nsites
+            occ = Int( (occbin >> (sbw * (isite-1))) & pbm )
+            append!(out[iptl], isite for _ in 1:occ)
+        end
+        occbin >>= pbw
+    end
+    return out
+end
+
 function locvec2occmat(
     phs::ParticleHilbertSpace{PS, BR, QN},
     particle_locations::AbstractVector{<:AbstractVector{<:Integer}},
 ) where {PS, BR, QN}
-    n_sites = length(phs.sites)
-    n_particles = speciescount(PS)
-    if length(particle_locations) != n_particles
+    nsites = length(phs.sites)
+    nptls = speciescount(PS)
+    if length(particle_locations) != nptls
         throw(ArgumentError("length of particle locations does not match the number of particles"))
     end
     sgn = 1
-    occmat = zeros(Int, (n_particles, n_sites)) # occupation matrix
+    occmat = zeros(Int, (nptls, nsites)) # occupation matrix
     for (iptl, p) in enumerate(particle_locations)
-        if exchangesign(getspecies(PS, iptl)) == 1
+        if exchangesign(PS, iptl) == 1
             # do nothing
-        elseif exchangesign(getspecies(PS, iptl)) == -1
+        elseif exchangesign(PS, iptl) == -1
             sgn = isparityodd(p) ? -sgn : sgn
         else
             throw(ArgumentError("Unsupported exchange sign $(exchangesign(getspecies(PS, iptl))) for $(getspecies(PS, iptl))")) # COV_EXCL_LINE
@@ -246,12 +304,39 @@ end
 
 
 
-function locvec2occbin(
+function locvec2occbin_naive(
     phs::ParticleHilbertSpace{PS, BR, QN},
     particle_locations::AbstractVector{<:AbstractVector{<:Integer}},
 ) where {PS, BR, QN}
     occmat, sgn = locvec2occmat(phs, particle_locations)
     return (occmat2occbin(phs, occmat), sgn)
+end
+
+
+function locvec2occbin(
+    phs::ParticleHilbertSpace{PS, BR, QN},
+    particle_locations::AbstractVector{<:AbstractVector{<:Integer}},
+) where {PS, BR, QN}
+    nptls = speciescount(PS)
+    if length(particle_locations) != nptls
+        throw(ArgumentError("length of particle locations does not match the number of particles"))
+    end
+    sgn = 1
+    occbin = zero(BR)
+    for (iptl, p) in enumerate(particle_locations)
+        if exchangesign(PS, iptl) == 1
+            # do nothing
+        elseif exchangesign(PS, iptl) == -1
+            sgn = isparityodd(p) ? -sgn : sgn
+        else
+            throw(ArgumentError("Unsupported exchange sign $(exchangesign(getspecies(PS, iptl))) for $(getspecies(PS, iptl))")) # COV_EXCL_LINE
+        end
+        for isite in p
+            count = get_occupancy(PS, iptl, isite, occbin)
+            occbin = set_occupancy(PS, iptl, isite, occbin, count+1)
+        end
+    end
+    return (occbin, sgn)
 end
 
 
