@@ -73,15 +73,6 @@ bitwidth(::Type{PS}) where {PS<:ParticleSector} = sum(bitwidth(PS, iptl) for ipt
 bitwidth(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = _BitWidths(PS)[iptl]::Int
 
 
-function bitoffset(::Type{P}, iptl::Integer)::Int where {P<:ParticleSector}
-    spec = getspecies(P)
-    offset = 0
-    for i in 1:(iptl-1)
-        offset += bitwidth(spec[i])
-    end
-    return offset
-end
-
 bitoffset(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = _BitOffsets(PS)[iptl]::Int
 
 function bitoffset(::Type{PS}, iptl::Integer, isite::Integer)::Int where {PS<:ParticleSector}
@@ -111,17 +102,17 @@ function get_bitmask(::Type{PS}, iptl::Integer, ::Type{BR}=UInt)::BR where {PS<:
     return make_bitmask(offset + bitwidth(PS, iptl), offset, BR)
 end
 
-function get_bitmask(
-    ::Type{PS},
-    iptl::Integer,
-    isite::Integer,
-    ::Type{BR}=UInt,
-)::BR where {PS<:ParticleSector, BR<:Unsigned}
-    offset = bitoffset(PS, iptl)
-    bm = make_bitmask(offset + bitwidth(PS, iptl), offset, BR)
-    sbw = bitwidth(PS)
-    return bm << (sbw*(isite-1))
-end
+# function get_bitmask(
+#     ::Type{PS},
+#     iptl::Integer,
+#     isite::Integer,
+#     ::Type{BR}=UInt,
+# )::BR where {PS<:ParticleSector, BR<:Unsigned}
+#     offset = bitoffset(PS, iptl)
+#     bm = make_bitmask(offset + bitwidth(PS, iptl), offset, BR)
+#     sbw = bitwidth(PS)
+#     return bm << (sbw*(isite-1))
+# end
 
 """
     get_bitmask(phs, [iptl, isite])
