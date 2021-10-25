@@ -64,7 +64,9 @@ function exchangesign(::Type{PS}, iptl1::Integer, iptl2::Integer) where {PS<:Par
     return iptl1 == iptl2 ? exchangesign(PS, iptl1) : 1
 end
 
-# occupation representaiton
+maxoccupancy(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = _MaxOccupancies(PS)[iptl]::Int
+
+# occupation representation
 
 bitwidth(::Type{PS}) where {PS<:ParticleSector} = sum(bitwidth(PS, iptl) for iptl in 1:numspecies(PS))::Int
 
