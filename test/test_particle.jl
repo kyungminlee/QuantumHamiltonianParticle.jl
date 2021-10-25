@@ -83,6 +83,9 @@ end
 
     @test getspeciesname(p, 1) == :b
     @test getspeciesname(p, 2) == :f
+    @test findspeciesindex(p, :b) == 1
+    @test findspeciesindex(p, :f) == 2
+    @test findspeciesindex(p, :z) <= 0
 
     @test exchangesign(p, 1) == 1
     @test exchangesign(p, 2) == -1
@@ -100,16 +103,31 @@ end
     @test bitoffset(p, 2) == 3
 
     @test bitoffset(p) == [0, 3, 4]
-    @test get_bitmask(p, 1, UInt) == UInt(0b00111)
-    @test get_bitmask(p, 2, UInt) == UInt(0b01000)
-
-    @test typeof(compress(p, [1,1], UInt8)) === UInt8
+    @test get_bitmask(p, 1, UInt) == 0b0111
+    @test get_bitmask(p, 2, UInt) == 0b1000
+    @test get_bitmask(p, UInt) == 0b1111
     @test compress(p, [1,1]) == 0b1001
     @test compress(p, [2,1]) == 0b1010
     @test compress(p, [3,1]) == 0b1011
-    @test_throws ArgumentError compress(p, [0,0,0], UInt)
-    @test_throws ArgumentError compress(p, [-1,1])
-    @test_throws ArgumentError compress(p, [8,1])
+    @test_throws ArgumentError compress(p, [0,0,0])
+    # @test_throws ArgumentError compress(p, [-1,1])
+    # @test_throws ArgumentError compress(p, [8,1])
+
+    @test get_occupancy(p, 1, 0b1011) == 3
+    @test get_occupancy(p, 2, 0b1011) == 1
+
+    @test get_occupancy(p, 1, 1, 0b1011_0001) == 1
+    @test get_occupancy(p, 2, 1, 0b1011_0001) == 0
+    @test get_occupancy(p, 1, 2, 0b1011_0001) == 3
+    @test get_occupancy(p, 2, 2, 0b1011_0001) == 1
+
+    @test set_occupancy(p, 1, 2, 0b1010_0001, 3) == 0b1011_0001
+
+    for BR in [UInt8, UInt16, UInt32, UInt64]
+        @test typeof(get_bitmask(p, 1, BR)) == BR
+        @test typeof(get_bitmask(p, BR)) == BR
+        @test typeof(compress(p, [1,1], BR)) === BR
+    end
 
     @testset "large" begin
         b1 = Boson(:b, 256)
@@ -118,6 +136,6 @@ end
     end
 
     @test extract(p, 0b1010) == [2, 1]
-    @test_throws ArgumentError extract(p, 0b1111)
+    # @test_throws ArgumentError extract(p, 0b1111)
     @test extract(p, 0b10000000) == [0, 0]
 end
