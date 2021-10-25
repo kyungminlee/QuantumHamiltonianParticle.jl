@@ -7,15 +7,15 @@ function symmetry_apply_naive(
     occbin::BR,
     phase::S=one(Int)
 ) where {BR<:Unsigned, S<:Number}
-    n_particles = speciescount(phs)
-    n_sites = numsites(phs)
-    lv = [Int[] for _ in 1:n_particles]
-    for iptl in 1:n_particles
-        sizehint!(lv[iptl], n_sites)
+    nptls = speciescount(phs)
+    nsites = numsites(phs)
+    lv = [Int[] for _ in 1:nptls]
+    for iptl in 1:nptls
+        sizehint!(lv[iptl], nsites)
     end
     occbin2locvec!(lv, phs, occbin)
     # lv = occbin2locvec(phs, occbin)
-    for iptl in 1:n_particles
+    for iptl in 1:nptls
         for j in 1:length(lv[iptl])
             lv[iptl][j] = permutation(lv[iptl][j])
         end
@@ -25,36 +25,36 @@ function symmetry_apply_naive(
     return (occbin2, sgn*phase)
 end
 
-function symmetry_apply(
+function symmetry_apply_v1(
     phs::ParticleHilbertSpace{PS, BR, QN},
     permutation::SitePermutation,
     occbin::Unsigned,
     phase::S=one(Int)
 ) where {PS, BR<:Unsigned, QN, S<:Number}
-    n_particles::Int = speciescount(phs)
-    n_sites::Int = numsites(phs)
+    nptls::Int = speciescount(phs)
+    nsites::Int = numsites(phs)
     occbin2 = zero(BR)
     pshift = 0
-    for iptl in 1:n_particles
+    for iptl in 1:nptls
         # pbw::Int = bitwidth(PS, iptl) # Keep this line for debugging purpose
         # pbm::BR = make_bitmask(pbw, BR) # Keep this line for debugging purpose
         pbw::Int = bitwidth(phs, iptl, 1)
         pbm::BR = get_bitmask(phs, iptl, 1) >> bitoffset(phs, iptl, 1)
         p_occbin2 = zero(BR)
         if exchangesign(PS, iptl) == 1
-            for isite in 1:n_sites
+            for isite in 1:nsites
                 jsite = permutation(isite)
                 occ = (occbin >> bitoffset(phs, isite)) & pbm
                 p_occbin2 |= occ << bitoffset(phs, jsite)
             end
         elseif exchangesign(PS, iptl) == -1
-            for isite in 1:n_sites
+            for isite in 1:nsites
                 jsite = permutation(isite)
                 occ = (occbin >> bitoffset(phs, isite)) & pbm
                 p_occbin2 |= occ << bitoffset(phs, jsite)
                 if occ % 2 != 0
                     count = 0
-                    for ksite in jsite+1:n_sites
+                    for ksite in jsite+1:nsites
                         count += Int((p_occbin2 >> bitoffset(phs, ksite)) & pbm)
                     end
                     if count % 2 != 0
@@ -73,6 +73,40 @@ function symmetry_apply(
 end
 
 
+function symmetry_apply(
+    phs::ParticleHilbertSpace{PS, BR, QN},
+    permutation::SitePermutation,
+    occbin::Unsigned,
+    phase::S=one(Int)
+) where {PS<:ParticleSector, BR<:Unsigned, QN, S<:Number}
+    nptls::Int = speciescount(phs)
+    nsites::Int = numsites(phs)
+    occbin2 = zero(BR)
+    for iptl in 1:nptls
+        if exchangesign(PS, iptl) == 1
+            for isite in nsites:-1:1
+                jsite = permutation(isite)
+                occbin2 |= ((occbin & get_bitmask(phs, iptl, isite)) >> bitoffset(phs, iptl, isite)) << bitoffset(phs, iptl, jsite)
+            end
+        elseif exchangesign(PS, iptl) == -1 # only fermion
+            for isite in nsites:-1:1
+                jsite = permutation(isite)
+                occ = ((occbin & get_bitmask(phs, iptl, isite)) >> bitoffset(phs, iptl, isite))
+                @assert iszero(occ) || isone(occ)
+                if !iszero(occ)
+                    p = count_ones(occbin2 & get_parity_bitmask(phs, iptl, jsite))
+                    if !iszero(p % 2)
+                        phase = -phase
+                    end
+                end
+                occbin2 |= occ << bitoffset(phs, iptl, jsite)
+            end
+        else
+            throw(ArgumentError("Unsupported exchange sign $(exchangesign(PS, iptl)) for $(getspecies(PS, iptl))")) # COV_EXCL_LINE
+        end
+    end
+    return (occbin2, phase)
+end
 
 function symmetry_apply(
     phs::ParticleHilbertSpace,
