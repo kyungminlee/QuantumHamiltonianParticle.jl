@@ -332,8 +332,8 @@ function locvec2occbin(
             throw(ArgumentError("Unsupported exchange sign $(exchangesign(getspecies(PS, iptl))) for $(getspecies(PS, iptl))")) # COV_EXCL_LINE
         end
         for isite in p
-            count = get_occupancy(PS, iptl, isite, occbin)
-            occbin = set_occupancy(PS, iptl, isite, occbin, count+1)
+            count = get_occupancy(phs, iptl, isite, occbin)
+            occbin = set_occupancy(phs, iptl, isite, occbin, count+1)
         end
     end
     return (occbin, sgn)
