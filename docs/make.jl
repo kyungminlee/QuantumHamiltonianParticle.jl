@@ -12,6 +12,7 @@ makedocs(
         "Home" => "index.md",
         "Particle" => "particle.md",
         "Ladder" => "ladder.md",
+        "Fermion Parity" => "fermionparity.md",
         "API" => "api.md",
     ]
 )
