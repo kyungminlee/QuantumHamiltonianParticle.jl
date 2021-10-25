@@ -43,6 +43,7 @@ using QuantumHamiltonian
     end
 
     @testset "state" begin
+        # 1->2, 2->3, 3->1. site (2-bits) = fermion 1 bit and boson 2 bits
         @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_000) == (0b000_000_000, 1)
 
         @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_001) == (0b000_001_000, 1)
@@ -57,4 +58,23 @@ using QuantumHamiltonian
         @test symmetry_apply(particle_hilbert_space, permutation, 0b001_011_010) == (0b011_010_001, -1)
         @test symmetry_apply(particle_hilbert_space, permutation, 0b011_010_001) == (0b010_001_011, -1)
     end
+
+    @testset "state-naive" begin
+        for symmetry_apply in [QHP.symmetry_apply_naive, QHP.symmetry_apply_v1]
+            # 1->2, 2->3, 3->1. site (2-bits) = fermion 1 bit and boson 2 bits
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_000) == (0b000_000_000, 1)
+
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_001) == (0b000_001_000, 1)
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b000_001_000) == (0b001_000_000, 1)
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b001_000_000) == (0b000_000_001, 1)
+
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b000_000_011) == (0b000_011_000, 1)
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b000_011_000) == (0b011_000_000, 1)
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b011_000_000) == (0b000_000_011, 1)
+
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b010_001_011) == (0b001_011_010, 1)
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b001_011_010) == (0b011_010_001, -1)
+            @test symmetry_apply(particle_hilbert_space, permutation, 0b011_010_001) == (0b010_001_011, -1)
+        end
+    end    
 end
