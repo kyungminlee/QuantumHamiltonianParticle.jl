@@ -75,6 +75,7 @@ using QuantumHamiltonianParticle
         @test get_bitmask(hilbert, :, :) == 0b111111111
         @test get_bitmask(hilbert, :, 2) == 0b000111000
         # @test get_bitmask(hilbert, :, [2,3]) == 0b000111111000
+
         # TODO(kyungminlee 20200917) tests for colon and vector
 
         @test get_bitmask(hilbert, 1, [2,3])    == 0b011011000
@@ -114,7 +115,7 @@ using QuantumHamiltonianParticle
         @test get_bitmask(p, [1,2], 2)    == 0b000111000
         @test get_bitmask(p, [1,], [2,3]) == 0b011011000
 
-        # @test get_bitmask(p) == 0b111111111
+        @test get_bitmask(p) == 0b000000111
 
         @test_throws BoundsError get_bitmask(p, 3, 1)
         # @test_throws BoundsError get_bitmask(p, 1, 8)
@@ -211,7 +212,6 @@ using QuantumHamiltonianParticle
     ]
     @test length(basis_list) == 6^3
     @test_throws ArgumentError QuantumHamiltonian.hs_get_basis_list(hilbert, UInt8)
-
 
     basis_list = QuantumHamiltonian.hs_get_basis_list(hilbert, [(2, 1)])
     @test basis_list == sort([
