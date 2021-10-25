@@ -84,15 +84,15 @@ function symmetry_apply(
     occbin2 = zero(BR)
     for iptl in 1:nptls
         if exchangesign(PS, iptl) == 1
-            for isite in nsites:-1:1
+            for isite in 1:nsites
                 jsite = permutation(isite)
                 occbin2 |= ((occbin & get_bitmask(phs, iptl, isite)) >> bitoffset(phs, iptl, isite)) << bitoffset(phs, iptl, jsite)
             end
         elseif exchangesign(PS, iptl) == -1 # only fermion
-            for isite in nsites:-1:1
+            for isite in nsites:-1:1 # this order because of the fermion convention
                 jsite = permutation(isite)
                 occ = ((occbin & get_bitmask(phs, iptl, isite)) >> bitoffset(phs, iptl, isite))
-                @assert iszero(occ) || isone(occ)
+                # @assert iszero(occ) || isone(occ)
                 if !iszero(occ)
                     p = count_ones(occbin2 & get_parity_bitmask(phs, iptl, jsite))
                     if !iszero(p % 2)
@@ -108,7 +108,7 @@ function symmetry_apply(
     return (occbin2, phase)
 end
 
-function symmetry_apply(
+function symmetry_apply_oldver(
     phs::ParticleHilbertSpace,
     perm::LocalGeneralizedPermutation{A},
     occbin::BR,
@@ -130,4 +130,29 @@ function symmetry_apply(
            for (x, op) in zip(sv, perm.operations)]
     ob2 = statevec2occbin(phs, sv2)
     return (ob2, amplitude)
+end
+
+
+function symmetry_apply(
+    phs::ParticleHilbertSpace,
+    perm::LocalGeneralizedPermutation{A},
+    occbin::BR,
+    phase::S=one(Int)
+) where {A, BR<:Unsigned, S<:Number}
+    nptls::Int = speciescount(phs)
+    nsites::Int = numsites(phs)
+    occbin2 = zero(BR)
+    for iptl in 1:nptls
+        for isite in 1:nsites # this order because of the fermion convention
+            occ = ((occbin & get_bitmask(phs, iptl, isite)) >> bitoffset(phs, iptl, isite))
+            if !iszero(occ)
+                p = count_ones(occbin2 & get_parity_bitmask(phs, iptl, jsite))
+                if !iszero(p % 2)
+                    phase = -phase
+                end
+            end
+            occbin2 |= occ << bitoffset(phs, iptl, jsite)
+        end
+    end
+    return (occbin2, phase)
 end
