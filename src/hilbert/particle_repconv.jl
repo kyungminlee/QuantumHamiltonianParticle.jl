@@ -171,7 +171,7 @@ function occmat2locvec(
     nsites = length(phs.sites)
     nptls = speciescount(PS)
     size(occmat) != (nptls, nsites) && throw(ArgumentError("Wrong occmat size"))
-    out = [Int[] for i in 1:nptls]
+    out = [Int[] for _ in 1:nptls]
     for iptl in 1:nptls, isite in 1:nsites
         append!(out[iptl], isite for c in 1:occmat[iptl, isite])
     end
