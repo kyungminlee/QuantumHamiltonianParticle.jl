@@ -10,6 +10,7 @@ import QuantumHamiltonian.bitoffset
 export numspecies, speciescount, getspecies, getspeciesname
 export findspeciesindex
 
+
 struct ParticleSector{
     P<:Tuple{Vararg{AbstractParticle}},
     # Cache Info
@@ -35,96 +36,90 @@ struct ParticleSector{
 end
 
 
-numspecies(::Type{<:ParticleSector{P}}) where {P} = tuplelength(P)
-speciescount(::Type{<:ParticleSector{P}}) where {P} = tuplelength(P)
-getspecies(::Type{P}) where {P<:ParticleSector} = tuple(P.parameters[1].parameters...)
-getspecies(::Type{<:ParticleSector{P}}, index::Integer) where {P} = P.parameters[index]
+@inline _Particles(::Type{<:ParticleSector{P, E, M, BW, BO}}) where {P, E, M, BW, BO} = P
+@inline _ExchangeSigns(::Type{<:ParticleSector{P, E, M, BW, BO}}) where {P, E, M, BW, BO} = E
+@inline _MaxOccupancies(::Type{<:ParticleSector{P, E, M, BW, BO}}) where {P, E, M, BW, BO} = M
+@inline _BitWidths(::Type{<:ParticleSector{P, E, M, BW, BO}}) where {P, E, M, BW, BO} = BW
+@inline _BitOffsets(::Type{<:ParticleSector{P, E, M, BW, BO}}) where {P, E, M, BW, BO} = BO
+
+
+numspecies(::Type{PS}) where {PS<:ParticleSector} = tuplelength(_Particles(PS))
+speciescount(::Type{PS}) where {PS<:ParticleSector} = tuplelength(_Particles(PS))
+getspecies(::Type{PS}) where {PS<:ParticleSector} = tuple(_Particles(PS).parameters...)
+getspecies(::Type{PS}, index::Integer) where {PS<:ParticleSector} = _Particles(PS).parameters[index]
 getspeciesname(::Type{PS}, index::Integer) where {PS<:ParticleSector} = getspecies(PS, index).parameters[1]::Symbol
 
-findspeciesindex(::P, args...) where {P<:ParticleSector} = findspeciesindex(P, args...)
+findspeciesindex(::PS, args...) where {PS<:ParticleSector} = findspeciesindex(PS, args...)
 
-# TODO: more efficient implementation
-function findspeciesindex(::Type{<:ParticleSector{P}}, name::Symbol) where {P}
-    i = findfirst(x -> getspeciesname(x) == name, P.parameters)
+function findspeciesindex(::Type{PS}, name::Symbol) where {PS<:ParticleSector}
+    # TODO: more efficient implementation
+    i = findfirst(x -> getspeciesname(x) == name, _Particles(PS).parameters)
     return isnothing(i) ? -1 : Int(i)
 end
 
-# exchangesign(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = exchangesign(getspecies(PS, iptl))
-exchangesign(::Type{<:ParticleSector{P, E}}, iptl::Integer) where {P, E} = E[iptl]
+
+exchangesign(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = _ExchangeSigns(PS)[iptl]::Int
+
 function exchangesign(::Type{PS}, iptl1::Integer, iptl2::Integer) where {PS<:ParticleSector}
     return iptl1 == iptl2 ? exchangesign(PS, iptl1) : 1
 end
 
 # occupation representaiton
 
-# bitwidth(::Type{P}) where {P<:ParticleSector} = sum(bitwidth(p) for p in getspecies(P))::Int
-# bitwidth(::Type{P}, iptl::Integer) where {P<:ParticleSector} = bitwidth(getspecies(P, iptl))::Int
 bitwidth(::Type{PS}) where {PS<:ParticleSector} = sum(bitwidth(PS, iptl) for iptl in 1:numspecies(PS))::Int
-bitwidth(::Type{<:ParticleSector{P, E, M, B}}, iptl::Integer) where {P, E, M, B} = B[iptl]::Int
 
-# function bitoffset(::Type{P}, iptl::Integer)::Int where {P<:ParticleSector}
-#     spec = getspecies(P)
-#     offset = 0
-#     for i in 1:(iptl-1)
-#         offset += bitwidth(spec[i])
-#     end
-#     return offset
-# end
-
-function bitoffset(::Type{<:ParticleSector{P, E, M, BW, BO}}, iptl::Integer)::Int where {P, E, M, BW, BO}
-    return BO[iptl]
-end
-
-function bitoffset(::Type{P}, iptl::Integer, isite::Integer)::Int where {P<:ParticleSector}
-    bw = bitwidth(P)
-    return bitoffset(P, iptl) + (bw * (isite-1))
-end
+bitwidth(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = _BitWidths(PS)[iptl]::Int
 
 
-function bitoffset(::Type{P}) where {P<:ParticleSector}
+function bitoffset(::Type{P}, iptl::Integer)::Int where {P<:ParticleSector}
     spec = getspecies(P)
-    nptls = length(spec)
     offset = 0
-    out = Vector{Int}(undef, length(spec)+1)
+    for i in 1:(iptl-1)
+        offset += bitwidth(spec[i])
+    end
+    return offset
+end
+
+bitoffset(::Type{PS}, iptl::Integer) where {PS<:ParticleSector} = _BitOffsets(PS)[iptl]::Int
+
+function bitoffset(::Type{PS}, iptl::Integer, isite::Integer)::Int where {PS<:ParticleSector}
+    return bitoffset(PS, iptl) + (bitwidth(PS) * (isite-1))
+end
+
+function bitoffset(::Type{PS}) where {PS<:ParticleSector}
+    species = getspecies(PS)
+    nptls = length(species)
+    offset = 0
+    out = Vector{Int}(undef, length(species)+1)
     for i in 1:nptls
         out[i] = offset
-        offset += bitwidth(spec[i])
+        offset += bitwidth(species[i])
     end
     out[end] = offset
     return out
 end
 
 
-function get_bitmask(
-    ::Type{P},
-    ::Type{BR}=UInt,
-)::BR where {P<:ParticleSector, BR<:Unsigned}
-  return make_bitmask(bitwidth(P), BR)
+function get_bitmask(::Type{PS}, ::Type{BR}=UInt)::BR where {PS<:ParticleSector, BR<:Unsigned}
+    return make_bitmask(bitwidth(PS), BR)
 end
 
+function get_bitmask(::Type{PS}, iptl::Integer, ::Type{BR}=UInt)::BR where {PS<:ParticleSector, BR<:Unsigned}
+    offset = bitoffset(PS, iptl)
+    return make_bitmask(offset + bitwidth(PS, iptl), offset, BR)
+end
 
 function get_bitmask(
     ::Type{P},
     iptl::Integer,
+    isite::Integer,
     ::Type{BR}=UInt,
 )::BR where {P<:ParticleSector, BR<:Unsigned}
-  offset = bitoffset(P, iptl)
-  return make_bitmask(offset+bitwidth(P, iptl), offset, BR)
+    offset = bitoffset(P, iptl)
+    bm = make_bitmask(offset+bitwidth(P, iptl), offset, BR)
+    bw = bitwidth(P)
+    return bm << (bw*(isite-1))
 end
-
-
-# function get_bitmask(
-#     ::Type{P},
-#     iptl::Integer,
-#     isite::Integer,
-#     ::Type{BR}=UInt,
-# )::BR where {P<:ParticleSector, BR<:Unsigned}
-#     offset = bitoffset(P, iptl)
-#     bm = make_bitmask(offset+bitwidth(P, iptl), offset, BR)
-#     bw = bitwidth(P)
-#     return bm << (bw*(isite-1))
-# end
-
 
 """
     get_bitmask(phs, [iptl, isite])
@@ -151,10 +146,11 @@ function get_bitmask(
     isites::AbstractVector{<:Integer},
     ::Type{BR}=UInt,
 )::BR where {PS<:ParticleSector, BR<:Unsigned}
+    nptls = speciescount(PS)
     @boundscheck for iptl in iptls
-        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+        !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
     end
-    bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
+    @inbounds bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
     bw = bitwidth(PS)
     return mapreduce(isite -> (bm << (bw * (isite-1))), |, isites; init=zero(BR))
 end
@@ -177,8 +173,9 @@ function get_bitmask(
     isite::Integer,
     ::Type{BR}=UInt,
 )::BR where {PS<:ParticleSector, BR<:Unsigned}
+    nptls = speciescount(PS)
     @boundscheck for iptl in iptls
-        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+        !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
     end
     bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
     bw = bitwidth(PS)
@@ -192,7 +189,7 @@ function get_parity_bitmask(
     isite::Integer,
     binary_type::Type{BR}=UInt,
 ) where {PS<:ParticleSector, BR<:Unsigned}
-    if isfermion(getspecies(PS, iptl))
+    if isfermion(PS, iptl)
         bm_mask = zero(BR)
         bmp = get_bitmask(PS, iptl, BR)
         bw = bitwidth(PS)
@@ -213,9 +210,10 @@ function get_occupancy(
     bvec::BR,
 ) where {PS<:ParticleSector, BR<:Unsigned}
     bm = get_bitmask(PS, iptl, BR)
-    return Int( ((bvec >> (bitwidth(PS)*(isite-1))) & bm) >> bitoffset(PS, iptl) )
+    bw = bitwidth(PS)
+    bo = bitoffset(PS, iptl)
+    return Int(((bvec >> (bw*(isite-1))) & bm) >> bo)
 end
-
 
 function get_occupancy(
     ::Type{PS},
@@ -223,10 +221,9 @@ function get_occupancy(
     bvec::BR,
 ) where {PS<:ParticleSector, BR<:Unsigned}
     bm = get_bitmask(PS, iptl, BR)
-    return Int( (bvec & bm) >> bitoffset(PS, iptl) )
+    bo = bitoffset(PS, iptl)
+    return Int((bvec & bm) >> bo)
 end
-
-
 
 
 """
@@ -241,7 +238,7 @@ function set_occupancy(
     bvec::BR,
     count::Integer,
 ) where {PS, BR}
-    @boundscheck !(0 <= count <= maxoccupancy(getspecies(PS, iptl))) && throw(ArgumentError("count out of bounds"))
+    @boundscheck !(0 <= count <= maxoccupancy(PS, iptl)) && throw(ArgumentError("count out of bounds"))
     bw = bitwidth(PS)
     bm = get_bitmask(PS, iptl, BR) << (bw*(isite-1))
     bo = bitoffset(PS, iptl, isite)
@@ -262,7 +259,6 @@ function compress(
 
     out = zero(BR)
     offset = 0
-    # for (i, (p, n)) in enumerate(zip(getspecies(PS), occupancy))
     for (p, n) in zip(getspecies(PS), occupancy)
         # n < 0 && throw(ArgumentError("occupancy should be non-negative"))
         # n > maxoccupancy(p) && throw(ArgumentError("occupancy ($n) should be no greater than the maxoccupancy of particle ($p)"))
@@ -279,34 +275,49 @@ function extract(::Type{P}, occbin::BR)::Vector{Int} where {P<:ParticleSector, B
     for (i, p) in enumerate(getspecies(P))
         mask = (one(BR) << bitwidth(p)) - 1
         n = Int(occbin & mask)
-        # @boundscheck if n > maxoccupancy(p)
-        #     throw(ArgumentError("Occupation $n of $p exceeds $(maxoccupancy(p))"))
-        # end
+        # @boundscheck if n > maxoccupancy(p) && throw(ArgumentError("Occupation $n of $p exceeds $(maxoccupancy(p))"))
         occ[i] = n
         occbin >>= bitwidth(p)
     end
     return occ
 end
 
-function extract(::Type{P}, occbin::BR, occ::AbstractVector{<:Integer})::Vector{Int} where {P<:ParticleSector, BR<:Unsigned}
-    for (i, p) in enumerate(getspecies(P))
+
+function extract(::Type{PS}, occbin::BR, occ::AbstractVector{<:Integer}) where {PS<:ParticleSector, BR<:Unsigned}
+    @warn "extract(PS, occbin, occ) deprecated. Use extract!(occ, PS, occbin) instead." maxlog=1
+    species = getspecies(PS)
+    @boundscheck length(occ) == length(species) || throw(ArgumentError("length(occ) $(length(occ)) != number of species $(length(species))"))
+    for (i, p) in enumerate(species)
         mask = (one(BR) << bitwidth(p)) - 1
         n = Int(occbin & mask)
-        occ[i] = n
+        @inbounds occ[i] = n
         occbin >>= bitwidth(p)
     end
     return occ
 end
+
+
+function extract!(occ::AbstractVector{<:Integer}, ::Type{PS}, occbin::BR) where {PS<:ParticleSector, BR<:Unsigned}
+    species = getspecies(PS)
+    @boundscheck length(occ) == length(species) || throw(ArgumentError("length(occ) $(length(occ)) != number of species $(length(species))"))
+    for (i, p) in enumerate(species)
+        mask = (one(BR) << bitwidth(p)) - 1
+        n = Int(occbin & mask)
+        @inbounds occ[i] = n
+        occbin >>= bitwidth(p)
+    end
+    return occ
+end
+
 
 for fname in [
     :exchangesign,
     :numspecies, :speciescount, :getspecies, :getspeciesname,
 ]
     @eval begin
-        ($fname)(p::P, args...) where {P<:ParticleSector} = ($fname)(P, args...)
+        ($fname)(p::PS, args...) where {PS<:ParticleSector} = ($fname)(PS, args...)
     end
 end
-
 
 for fname in [
     :bitwidth, :bitoffset, :get_bitmask, :get_parity_bitmask,
@@ -314,7 +325,15 @@ for fname in [
     :compress, :extract,
 ]
     @eval begin
-        ($fname)(p::P, args...) where {P<:ParticleSector} = ($fname)(P, args...)
+        ($fname)(p::PS, args...) where {PS<:ParticleSector} = ($fname)(PS, args...)
+    end
+end
+
+for fname in [
+    :isfermion, :isboson, :isspin
+]
+    @eval begin
+        ($fname)(::Type{PS}, i::Integer) where {PS<:ParticleSector} = ($fname)(getspecies(PS, i))
     end
 end
 
