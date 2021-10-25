@@ -41,16 +41,60 @@ struct ParticleHilbertSpace{
         QN<:Tuple{Vararg{<:AbstractQuantumNumber}}
 }<:AbstractHilbertSpace{QN}
     sites::Vector{ParticleSite{PS, BR, QN}}
-    bitwidths::Vector{Int}
-    bitoffsets::Vector{Int}
+
+    bitwidths::Matrix{Int}
+    bitoffsets::Matrix{Int}
+    bitmasks::Matrix{BR}
+    parity_bitmasks::Matrix{BR}
 
     function ParticleHilbertSpace(sites::AbstractVector{ParticleSite{PS, BR, QN}}) where {PS, BR, QN}
-        bitwidths = map(bitwidth, sites)
-        bitoffsets = Int[0, cumsum(bitwidths)...]
-        if sizeof(BR) * 8 < bitoffsets[end]
+        nsites = length(sites)
+        nptls = numspecies(PS)
+
+        bitwidths = Matrix{Int}(undef, (nptls+1, nsites))
+        bitoffsets = Matrix{Int}(undef, (nptls+1, nsites+1))
+        bitmasks = Matrix{BR}(undef, (nptls+1, nsites+1))
+
+        offset = 0
+        for isite in 1:nsites
+            for iptl in 1:nptls
+                bw = bitwidth(PS, iptl)
+                bitwidths[iptl, isite] = bw
+                bitoffsets[iptl, isite] = offset
+
+                bitmasks[iptl, isite] = make_bitmask(offset + bw, offset, BR)
+                offset += bw
+            end
+            sbw = sum(view(bitwidths, 1:nptls, isite))
+            bitwidths[end, isite] = sbw
+            bitoffsets[end, isite] = bitoffsets[1, isite]
+            bitmasks[end, isite] = make_bitmask(bitwidths[end, isite] + bitoffsets[1, isite], bitoffsets[1, isite], BR)
+        end
+        bitoffsets[:, end] .= offset
+        for iptl in 1:nptls
+            bitmasks[iptl, end] = mapreduce(identity, |, view(bitmasks, iptl, 1:nsites); init=zero(BR))
+        end
+        bitmasks[end, end] = make_bitmask(bitoffsets[end, end], BR)
+        if sizeof(BR) * 8 < bitoffsets[end, end]
             throw(ArgumentError("type $BR too small to represent the hilbert space (need $(bitoffsets[end]) bits)"))
         end
-        return new{PS, BR, QN}(sites, bitwidths, bitoffsets)
+        parity_bitmasks = zeros(BR, (nptls, nsites))
+        for iptl in 1:nptls
+            species = getspecies(PS, iptl)
+            if isboson(species) || isspin(species)
+                # do nothing
+            elseif isfermion(species)
+                for isite in 1:nsites
+                    bm_species = bitmasks[iptl, end]
+                    bm_site = bitmasks[iptl, isite]
+                    bm_mask = (bm_site - 1) & bm_species  # σᶻ in jordan wigner string
+                    parity_bitmasks[iptl, isite] = bm_mask
+                end
+            else
+                throw(ArgumentError("Particle species $(species) currently unsupported"))
+            end
+        end
+        return new{PS, BR, QN}(sites, bitwidths, bitoffsets, bitmasks, parity_bitmasks)
     end
 end
 
@@ -114,8 +158,6 @@ function get_quantum_number(hs::ParticleHilbertSpace{PS, BR, QN}, binrep::Unsign
         identity,
         tupleadd,
         let b = (get_bitmask(hs, :, isite) & binrep) >> (bw*(isite-1))
-            #i = get_state_index(site, binrep)
-            #site.states[i].quantum_number
             get_state(site, b).quantum_number
         end
             for (isite, site) in enumerate(hs.sites)
@@ -141,12 +183,23 @@ end
 
 Return number of bits needed to represent basis states of `phs`.
 """
-bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end]
+bitwidth(hs::ParticleHilbertSpace) = hs.bitoffsets[end, end]
 
-bitwidth(hs::ParticleHilbertSpace, isite::Integer) = hs.bitwidths[isite]
+function bitwidth(phs::ParticleHilbertSpace, isite::Integer)
+    nsites = numsites(phs)
+    @boundscheck !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
+    @inbounds return phs.bitwidths[end, isite]
+end
 
-bitoffset(hs::ParticleHilbertSpace, isite::Integer) = hs.bitoffsets[isite]
+function bitwidth(phs::ParticleHilbertSpace, iptl::Integer, isite::Integer)
+    nptls = numspecies(phs)
+    nsites = numsites(phs)
+    @boundscheck !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
+    @boundscheck !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
+    @inbounds return phs.bitwidths[iptl, isite]
+end
 
+bitoffset(hs::ParticleHilbertSpace, isite::Integer) = hs.bitoffsets[1, isite]
 
 """
     bitoffset(phs, iptl, isite)
@@ -154,7 +207,11 @@ bitoffset(hs::ParticleHilbertSpace, isite::Integer) = hs.bitoffsets[isite]
 Get the bit offset of the particle `iptl` at site `isite`.
 """
 function bitoffset(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
-    return phs.bitoffsets[isite] + bitoffset(PS, iptl)
+    nptls = numspecies(phs)
+    nsites = numsites(phs)
+    @boundscheck !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
+    @boundscheck !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
+    @inbounds return phs.bitoffsets[iptl, isite]
 end
 
 
@@ -173,10 +230,11 @@ function get_bitmask(
     iptl::Integer,
     isite::Integer,
 )::BR where {PS, BR, QN}
-    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
-    @boundscheck !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
-    bm = get_bitmask(PS, iptl, BR)
-    return bm << phs.bitoffsets[isite]
+    nptls = numspecies(phs)
+    nsites = numsites(phs)
+    @boundscheck !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
+    @boundscheck !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
+    @inbounds return phs.bitmasks[iptl, isite]
 end
 
 function get_bitmask(
@@ -184,14 +242,19 @@ function get_bitmask(
     iptls::AbstractVector{<:Integer},
     isites::AbstractVector{<:Integer},
 )::BR where {PS, BR, QN}
+    nptls = numspecies(phs)
+    nsites = numsites(phs)
     @boundscheck for iptl in iptls
-        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+        !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
     end
     @boundscheck for isite in isites
-        !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
+        !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
     end
-    bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
-    return mapreduce(isite -> (bm << phs.bitoffsets[isite]), |, isites; init=zero(BR))
+    bm = zero(BR)
+    for iptl in iptls, isite in isites
+        @inbounds bm |= phs.bitmasks[iptl, isite]
+    end
+    return bm
 end
 
 function get_bitmask(
@@ -199,12 +262,19 @@ function get_bitmask(
     iptl::Integer,
     isites::AbstractVector{<:Integer},
 )::BR where {PS, BR, QN}
-    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+    nptls = numspecies(phs)
+    nsites = numsites(phs)
+    @boundscheck !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
     @boundscheck for isite in isites
-        !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
+        !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
     end
-    bm = get_bitmask(PS, iptl, BR)
-    return mapreduce(isite -> (bm << phs.bitoffsets[isite]), |, isites; init=zero(BR))
+    # bm = get_bitmask(PS, iptl, BR)
+    # return mapreduce(isite -> (bm << phs.bitoffsets[isite]), |, isites; init=zero(BR))
+    bm = zero(BR)
+    for isite in isites
+        @inbounds bm |= phs.bitmasks[iptl, isite]
+    end
+    return bm
 end
 
 function get_bitmask(
@@ -212,12 +282,17 @@ function get_bitmask(
     iptls::AbstractVector{<:Integer},
     isite::Integer,
 )::BR where {PS, BR, QN}
+    nptls = numspecies(phs)
+    nsites = numsites(phs)
     @boundscheck for iptl in iptls
-        !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
+        !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
     end
-    @boundscheck !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
-    bm = mapreduce(iptl -> get_bitmask(PS, iptl, BR), |, iptls; init=zero(BR))
-    return bm << phs.bitoffsets[isite]
+    @boundscheck !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
+    bm = zero(BR)
+    for iptl in iptls
+        @inbounds bm |= phs.bitmasks[iptl, isite]
+    end
+    return bm    
 end
 
 function get_bitmask(
@@ -225,19 +300,19 @@ function get_bitmask(
     iptl::Integer,
     ::Colon,
 )::BR where {PS, BR, QN}
-    @boundscheck !(1<= iptl <= speciescount(PS)) && throw(BoundsError(PS.parameters, iptl))
-    n_sites = length(phs.sites)
-    bm = get_bitmask(PS, iptl, BR)
-    return mapreduce((isite) -> bm << phs.bitoffsets[isite], |, 1:n_sites; init=zero(BR))
+    nptls = numspecies(phs)
+    @boundscheck !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
+    @inbounds return phs.bitmasks[iptl, end]
 end
 
 function get_bitmask(
     phs::ParticleHilbertSpace{PS, BR, QN},
     ::Colon,
     isite::Integer,
-)::BR where {PS, BR, QN}
-    @boundscheck !(1<= isite <= length(phs.sites)) && throw(BoundsError(phs.sites, isite))
-    return make_bitmask(phs.bitoffsets[isite+1], phs.bitoffsets[isite], BR)
+)::BR where {PS<:ParticleSector, BR, QN}
+    nsites = numsites(phs)
+    @boundscheck !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
+    @inbounds return phs.bitmasks[end, isite]
 end
 
 function get_bitmask(
@@ -245,11 +320,11 @@ function get_bitmask(
     ::Colon,
     ::Colon,
 )::BR where {PS, BR, QN}
-    return make_bitmask(bitwidth(phs), BR)
+    return phs.bitmasks[end, end]
 end
 
 function get_bitmask(phs::ParticleHilbertSpace{PS, BR, QN})::BR where {PS, BR, QN}
-    return make_bitmask(bitwidth(phs), BR)
+    return phs.bitmasks[end, end]
 end
 
 
@@ -258,15 +333,12 @@ end
 
 Get parity bitmask (i.e. position of the Wigner-Jordan string). Nonzero only for fermions.
 """
-function get_parity_bitmask(hs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
-    if isfermion(getspecies(PS, iptl))
-        bm_species = get_bitmask(hs, iptl, :)
-        bm_site = get_bitmask(hs, iptl, isite)
-        bm_mask = ( bm_site - 1 ) & bm_species  # σᶻ in jordan wigner string
-        return bm_mask
-    else
-        return zero(BR)
-    end
+function get_parity_bitmask(phs::ParticleHilbertSpace{PS, BR, QN}, iptl::Integer, isite::Integer) where {PS, BR, QN}
+    nptls = numspecies(phs)
+    nsites = numsites(phs)
+    @boundscheck !(1 <= iptl <= nptls) && throw(BoundsError(PS.parameters, iptl))
+    @boundscheck !(1 <= isite <= nsites) && throw(BoundsError(phs.sites, isite))
+    @inbounds return phs.parity_bitmasks[iptl, isite]
 end
 
 

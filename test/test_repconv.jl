@@ -2,6 +2,7 @@ using Test
 using LatticeTools
 using QuantumHamiltonianParticle
 using QuantumHamiltonian
+const QHP = QuantumHamiltonianParticle
 
 @testset "repconv" begin
     p = ParticleSector(Boson(:m, 2), Fermion(:f))
@@ -61,6 +62,8 @@ using QuantumHamiltonian
             @test sv2 == sv
             @test om2 == om
             @test lv2 == lv
+            lv2n = QHP.occbin2locvec_naive(hilbert, ob)
+            @test lv2n == lv2
 
             sv3, sgn1 = locvec2statevec(hilbert, lv)
             om3, sgn2 = locvec2occmat(hilbert, lv)
@@ -69,6 +72,9 @@ using QuantumHamiltonian
             @test om3 == om
             @test ob3 == ob
             @test sgn1 == sgn2 == sgn3 == 1
+            ob3n, sgn3n = QHP.locvec2occbin_naive(hilbert, lv)
+            @test ob3 == ob3n
+            @test sgn3 == sgn3n
 
             if length(lv[1]) > 1
                 # flipping boson
@@ -81,6 +87,9 @@ using QuantumHamiltonian
                     @test om4 == om
                     @test ob4 == ob
                     @test sgn4 == sgn5 == sgn6 == 1
+                    ob4n, sgn6n = QHP.locvec2occbin_naive(hilbert, lv4)
+                    @test ob4n == ob4
+                    @test sgn6n == sgn6
                 end
             end
 
@@ -95,6 +104,9 @@ using QuantumHamiltonian
                     @test om4 == om
                     @test ob4 == ob
                     @test sgn4 == sgn5 == sgn6 == -1
+                    ob4n, sgn6n = QHP.locvec2occbin_naive(hilbert, lv4)
+                    @test ob4n == ob4
+                    @test sgn6n == sgn6
                 end
             end
         end
@@ -108,7 +120,6 @@ using QuantumHamiltonian
         @test_throws ArgumentError occmat2occbin(hilbert, [0 0; 0 0])
         @test_throws ArgumentError occmat2statevec(hilbert, [0 0; 0 0])
         @test_throws ArgumentError occmat2locvec(hilbert, [0 0; 0 0])
-
 
         @test statevec2locvec(hilbert, [2,1,1]) == [[1], []]
         @test statevec2locvec(hilbert, [2,2,1]) == [[1,2], []]
@@ -124,7 +135,6 @@ using QuantumHamiltonian
         @test locvec2statevec(hilbert, [[1,2], [2]]) ==  ([2,5,1], 1)
         @test locvec2statevec(hilbert, [[1,2,2], [2]]) == ([2,6,1], 1)
 
-
         @test locvec2statevec(hilbert, [[1,2,2], [1,2]]) == ([5,6,1],  1)
         @test locvec2statevec(hilbert, [[1,2,2], [2,1]]) == ([5,6,1], -1)
 
@@ -134,7 +144,11 @@ using QuantumHamiltonian
         @test locvec2occbin(hilbert, [[1,2,2], [1,2]]) == (0b000_110_101,  1)
         @test locvec2occbin(hilbert, [[1,2,2], [2,1]]) == (0b000_110_101, -1)
 
+        @test QHP.locvec2occbin_naive(hilbert, [[1,2,2], [1,2]]) == (0b000_110_101,  1)
+        @test QHP.locvec2occbin_naive(hilbert, [[1,2,2], [2,1]]) == (0b000_110_101, -1)
+
         @test occmat2locvec(hilbert, [1 2 0; 1 1 0]) == [[1,2,2], [1,2]]
         @test occbin2locvec(hilbert, 0b000_110_101) == [[1,2,2], [1,2]]
+        @test QHP.occbin2locvec_naive(hilbert, 0b000_110_101) == [[1,2,2], [1,2]]
     end
 end
